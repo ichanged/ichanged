@@ -27,6 +27,32 @@ logger::fatal(const char *format, ...)
 }
 
 void
+logger::error(const char *format, ...)
+{
+	va_list ap;
+	char buf[1024];
+
+	va_start(ap, format);
+	vsprintf(buf, format, ap);
+	va_end(ap);
+
+	logger::log(logger::LOG_ERROR, buf);
+}
+
+void
+logger::warn(const char *format, ...)
+{
+	va_list ap;
+	char buf[1024];
+
+	va_start(ap, format);
+	vsprintf(buf, format, ap);
+	va_end(ap);
+
+	logger::log(logger::LOG_WARN, buf);
+}
+
+void
 logger::log(int level, std::string info)
 {
 	if(level > logger::LOG_WARN) {

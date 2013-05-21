@@ -9,6 +9,8 @@ public:
 	virtual ~logger();
 
 	static void fatal(const char *format, ...);
+	static void error(const char *format, ...);
+	static void warn(const char *format, ...);
 private:
 	static void log(int level, std::string info);
 
