@@ -2,9 +2,13 @@
 #include <unistd.h>
 #include <ftw.h>
 #include <iostream>
+#include <stdlib.h>
+#include <string.h>
 
 #include "monitor.h"
+#include "watcher.h"
 #include "logger.h"
+#include "watch.h"
 
 monitor *g_monitor = NULL;
 
@@ -17,7 +21,7 @@ monitor::monitor(std::string dir)
 	monitor::mask = IN_CREATE;
 
 	this->dir = dir;
-	this->add_watch(dir);
+	this->add_monitor(dir);
 }
 
 monitor::~monitor()
@@ -26,28 +30,66 @@ monitor::~monitor()
 }
 
 void
-monitor::add_watch(std::string dir)
+monitor::start()
+{
+	int n;
+	char buf[monitor::event_max_size] = {0};
+
+	while(true) {
+		size_t size;
+		struct inotify_event *pe = NULL, *e = NULL;
+
+		/* 读取inotify_event结构体 */
+		n = read(monitor::inotify_fd, buf, monitor::event_max_size);
+		if(n == -1) {
+			logger::fatal("read event from inotify error: %s", ERRSTR);
+		}
+		pe = (struct inotify_event *)buf;
+		size = sizeof(struct inotify_event) + pe->len;
+		e = (struct inotify_event *)malloc(size);
+		if(e == NULL) {
+			logger::fatal("failed to allocate memory for inotify_event: %s",
+				ERRSTR);
+		}
+
+		/* 将读取的事件拷贝到分配的内存中 */
+		memcpy(e, buf, size);
+		/* 释放事件内存 */
+		free(e);
+	}
+}
+
+void
+monitor::add_monitor(std::string dir)
 {
 	int ret;
 
-	ret = ftw(dir.c_str(), (ftw_func)monitor::do_add_watch, 500);
+	ret = ftw(dir.c_str(), (ftw_func)monitor::do_add_monitor, 500);
 	if(ret == -1) {
 		logger::fatal("traverse directory %s error", dir.c_str());
 	}
 }
 
 int
-monitor::do_add_watch(const char *fpath, const struct stat *sb,
+monitor::do_add_monitor(const char *fpath, const struct stat *sb,
 		int typeflag)
 {
 	int wd;
 
-	if(typeflag != FTW_D) {
-		return 0;
-	}
-	wd = inotify_add_watch(monitor::inotify_fd, fpath, monitor::mask);
-	if(-1 == wd) {
-		logger::warn("add watch to '%s' error", fpath);
+	logger::debug(fpath);
+	switch(typeflag) {
+	case FTW_F:
+		g_watcher->add_file(fpath, sb);
+		break;
+	case FTW_D:
+		wd = inotify_add_watch(monitor::inotify_fd, fpath, monitor::mask);
+		if(-1 == wd) {
+			logger::warn("add watch to '%s' error", fpath);
+		}
+		g_watcher->add_watch(wd, fpath, sb);
+		break;
+	default:
+		break;
 	}
 	return 0;
 }
