@@ -13,8 +13,9 @@ public:
 	virtual ~monitor();
 
 	void start();
-private:
 	void add_monitor(std::string dir);
+	void remove_monitor(int wd);
+private:
 	static int do_add_monitor(const char *fpath, const struct stat *sb,
 		int typeflag);
 

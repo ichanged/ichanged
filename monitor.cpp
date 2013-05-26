@@ -7,6 +7,7 @@
 
 #include "monitor.h"
 #include "watcher.h"
+#include "handler.h"
 #include "logger.h"
 #include "watch.h"
 
@@ -18,7 +19,8 @@ monitor::monitor(std::string dir)
 	if(monitor::inotify_fd == -1) {
 		logger::fatal("create inotify file descriptor error");
 	}
-	monitor::mask = IN_CREATE;
+	monitor::mask = 0;
+	monitor::mask |= IN_CREATE;
 
 	this->dir = dir;
 	this->add_monitor(dir);
@@ -54,6 +56,8 @@ monitor::start()
 
 		/* 将读取的事件拷贝到分配的内存中 */
 		memcpy(e, buf, size);
+		/* 事件处理模块对事件进行处理 */
+		g_handler->handle_event(e);	
 		/* 释放事件内存 */
 		free(e);
 	}
@@ -66,23 +70,30 @@ monitor::add_monitor(std::string dir)
 
 	ret = ftw(dir.c_str(), (ftw_func)monitor::do_add_monitor, 500);
 	if(ret == -1) {
-		logger::fatal("traverse directory %s error", dir.c_str());
+		logger::fatal("traverse directory '%s' to add monitor error",
+			dir.c_str());
 	}
+}
+
+void
+monitor::remove_monitor(int wd)
+{
+	g_watcher->remove_watch(wd);
 }
 
 int
 monitor::do_add_monitor(const char *fpath, const struct stat *sb,
-		int typeflag)
+	int typeflag)
 {
 	int wd;
 
-	logger::debug(fpath);
 	switch(typeflag) {
 	case FTW_F:
 		g_watcher->add_file(fpath, sb);
 		break;
 	case FTW_D:
 		wd = inotify_add_watch(monitor::inotify_fd, fpath, monitor::mask);
+		logger::debug("add watch mask %d path %s", monitor::mask, fpath);
 		if(-1 == wd) {
 			logger::warn("add watch to '%s' error", fpath);
 		}
@@ -91,6 +102,7 @@ monitor::do_add_monitor(const char *fpath, const struct stat *sb,
 	default:
 		break;
 	}
+
 	return 0;
 }
 

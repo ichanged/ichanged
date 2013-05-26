@@ -15,6 +15,8 @@ public:
 	void add_watch(int wd, std::string path, const struct stat *s);
 	watch get_watch(int wd);
 
+	void remove_watch(int wd);
+
 	void add_file(std::string path, const struct stat *s);
 private:
 	std::map<int, watch> watch_map;

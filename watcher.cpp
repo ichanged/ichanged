@@ -29,6 +29,15 @@ watcher::get_watch(int wd)
 }
 
 void
+watcher::remove_watch(int wd)
+{
+	watch w;
+
+	w = this->watch_map[wd];
+	this->watch_map.erase(wd);
+}
+
+void
 watcher::add_file(std::string path, const struct stat *s)
 {
 	std::map<int, watch>::iterator pos;

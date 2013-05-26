@@ -3,7 +3,7 @@ CFLAGS = -c
 DEBUG_FLAGS = -g -Wall -DDEBUG
 
 TARGET = ichanged
-OBJ = ichanged.o logger.o monitor.o watcher.o watch.o file.o
+OBJ = ichanged.o logger.o monitor.o watcher.o watch.o file.o handler.o
 
 .PHONY: debug all clean
 
@@ -24,6 +24,8 @@ watch.o: watch.cpp watch.h
 	$(CC) $(CFLAGS) watch.cpp
 file.o: file.cpp file.h
 	$(CC) $(CFLAGS) file.cpp
+handler.o: handler.cpp handler.h
+	$(CC) $(CFLAGS) handler.cpp
 
 clean:
 	-rm $(OBJ) $(TARGET)
