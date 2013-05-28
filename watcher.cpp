@@ -16,11 +16,15 @@ watcher::~watcher()
 }
 
 void
-watcher::add_watch(int wd, const struct stat *s, bool new_create,
-	std::string path)
+watcher::init_watch(int wd, const struct stat *s, std::string path)
 {
-	watch w = watch(s, new_create, path);
-	this->watch_map[wd] = w;
+	this->watch_map[wd] = watch(s, false, path);
+}
+
+void
+watcher::add_watch(int wd, const struct stat *s, std::string path)
+{
+	this->watch_map[wd] = watch(s, true, path);
 }
 
 watch
@@ -39,7 +43,7 @@ watcher::remove_watch(int wd)
 }
 
 void
-watcher::add_file(const struct stat *s, bool new_create, std::string path)
+watcher::init_file(const struct stat *s, std::string path)
 {
 	std::map<int, watch>::iterator pos;
 	watch *w;
@@ -59,7 +63,33 @@ watcher::add_file(const struct stat *s, bool new_create, std::string path)
 	for(pos = this->watch_map.begin(); pos != this->watch_map.end(); ++pos) {
 		w = &pos->second;
 		if(w->get_path() == dir) {
-			w->add_file(s, new_create, filename);
+			w->init_file(s, filename);
+		}
+	}
+}
+
+void
+watcher::add_file(const struct stat *s, std::string path)
+{
+	std::map<int, watch>::iterator pos;
+	watch *w;
+
+	char *dir = NULL;
+	char *filename = NULL;
+
+	char *dbuf = new char[path.length() + 1];
+	char *fbuf = new char[path.length() + 1];
+
+	strcpy(dbuf, path.c_str());
+	dir = dirname(dbuf);
+
+	strcpy(fbuf, path.c_str());
+	filename = basename(fbuf);
+
+	for(pos = this->watch_map.begin(); pos != this->watch_map.end(); ++pos) {
+		w = &pos->second;
+		if(w->get_path() == dir) {
+			w->add_file(filename);
 		}
 	}
 }
@@ -67,31 +97,23 @@ watcher::add_file(const struct stat *s, bool new_create, std::string path)
 void
 watcher::file_create(int wd, std::string name)
 {
-	watch w;
-	struct stat s;
-	std::string path;
-
-	w = this->watch_map[wd];
-	path = w.get_path() + "/" + name;
-	if(-1 == stat(path.c_str(), &s)) {
-		logger::error("stat new file '%s' error: %s", path.c_str(), ERRSTR);
-	}
-	w.add_file(&s, true, name);
+	this->watch_map[wd].add_file(name);
 }
 
 void
 watcher::file_attrib(int wd, std::string name)
 {
+	this->watch_map[wd].modify_file(name);
+}
+
+void
+watcher::dir_attrib(int wd, std::string name)
+{
 	watch w;
-	struct stat s;
 	std::string path;
 
 	w = this->watch_map[wd];
-	path = w.get_path() + "/" + name;
-	if(-1 == stat(path.c_str(), &s)) {
-		logger::error("stat file '%s' error: %s", path.c_str(), ERRSTR);
-	}
-	w.modify_file(&s, name);
+	path = w.get_path();
 }
 
 void

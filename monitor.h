@@ -13,14 +13,15 @@ public:
 	virtual ~monitor();
 
 	void start();
+	void init_monitor(std::string dir);
 	void add_monitor(std::string dir);
 	void remove_monitor(int wd);
 private:
+	static int do_init_monitor(const char *fpath, const struct stat *sb,
+		int typeflag);
 	static int do_add_monitor(const char *fpath, const struct stat *sb,
 		int typeflag);
 	
-	static bool new_create;
-
 	std::string dir;
 	static int inotify_fd;
 	static int mask;

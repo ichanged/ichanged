@@ -43,6 +43,8 @@ handler::handle_event(struct inotify_event *e)
 	/* 如果已有的文件权限被改变，则记录新的权限 */
 	if(e->mask & IN_ATTRIB) {
 		if(e->mask & IN_ISDIR) {
+			g_watcher->dir_attrib(e->wd, e->name);
+		} else {
 			g_watcher->file_attrib(e->wd, e->name);
 		}
 	}

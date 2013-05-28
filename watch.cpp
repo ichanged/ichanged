@@ -1,3 +1,5 @@
+#include <sys/stat.h>
+
 #include "watch.h"
 #include "file.h"
 #include "logger.h"
@@ -22,14 +24,41 @@ watch::get_path()
 }
 
 void
-watch::add_file(const struct stat *s, bool new_create, std::string filename)
+watch::init_file(const struct stat *s, std::string filename)
 {
-	this->file_map[filename] = file(s, new_create, filename);
+	this->file_map[filename] = file(s, false, filename);
 }
 
 void
-watch::modify_file(const struct stat *s, std::string filename)
+watch::add_file(std::string filename)
 {
+	struct stat s;
+
+	this->get_file_stat(filename, &s);
+	this->file_map[filename] = file(&s, true, filename);
+}
+
+void
+watch::modify_file(std::string filename)
+{
+	struct stat s;
+
 	file f = this->file_map[filename];
-	f.modify(s);
+	this->get_file_stat(filename, &s);
+	f.modify(&s);
+}
+
+std::string
+watch::get_file_path(std::string filename)
+{
+	return this->path + "/" + filename;
+}
+
+void
+watch::get_file_stat(std::string filename, struct stat *s)
+{
+	std::string path = this->get_file_path(filename);
+	if(-1 == stat(path.c_str(), s)) {
+		logger::error("stat file '%s' error: %s", path.c_str(), ERRSTR);
+	}
 }

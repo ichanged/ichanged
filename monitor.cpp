@@ -20,11 +20,10 @@ monitor::monitor(std::string dir)
 		logger::fatal("create inotify file descriptor error");
 	}
 	monitor::mask = 0;
-	monitor::mask |= IN_CREATE;
+	monitor::mask |= IN_CREATE | IN_ATTRIB;
 
 	this->dir = dir;
-	this->add_monitor(dir);
-	this->new_create = true;
+	this->init_monitor(dir);
 }
 
 monitor::~monitor()
@@ -65,6 +64,18 @@ monitor::start()
 }
 
 void
+monitor::init_monitor(std::string dir)
+{
+	int ret;
+
+	ret = ftw(dir.c_str(), (ftw_func)monitor::do_init_monitor, 500);
+	if(ret == -1) {
+		logger::fatal("traverse directory '%s' to init monitor error",
+			dir.c_str());
+	}
+}
+
+void
 monitor::add_monitor(std::string dir)
 {
 	int ret;
@@ -83,21 +94,21 @@ monitor::remove_monitor(int wd)
 }
 
 int
-monitor::do_add_monitor(const char *fpath, const struct stat *sb,
+monitor::do_init_monitor(const char *fpath, const struct stat *sb,
 	int typeflag)
 {
 	int wd;
 
 	switch(typeflag) {
 	case FTW_F:
-		g_watcher->add_file(sb, monitor::new_create, fpath);
+		g_watcher->init_file(sb, fpath);
 		break;
 	case FTW_D:
 		wd = inotify_add_watch(monitor::inotify_fd, fpath, monitor::mask);
 		if(-1 == wd) {
 			logger::warn("add watch to '%s' error", fpath);
 		}
-		g_watcher->add_watch(wd, sb, monitor::new_create, fpath);
+		g_watcher->init_watch(wd, sb, fpath);
 		break;
 	default:
 		break;
@@ -106,6 +117,30 @@ monitor::do_add_monitor(const char *fpath, const struct stat *sb,
 	return 0;
 }
 
-bool monitor::new_create = false;
+int
+monitor::do_add_monitor(const char *fpath, const struct stat *sb,
+	int typeflag)
+{
+	int wd;
+
+	switch(typeflag) {
+	case FTW_F:
+		g_watcher->add_file(sb, fpath);
+		break;
+	case FTW_D:
+		wd = inotify_add_watch(monitor::inotify_fd, fpath, monitor::mask);
+		if(-1 == wd) {
+			logger::warn("add watch to '%s' error", fpath);
+		}
+		g_watcher->add_watch(wd, sb, fpath);
+		break;
+	default:
+		break;
+	}
+
+	return 0;
+}
+
+
 int monitor::inotify_fd = 0;
 int monitor::mask = 0;
