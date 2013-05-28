@@ -1,5 +1,3 @@
-#include <string.h>
-
 #include "watch.h"
 #include "file.h"
 #include "logger.h"
@@ -7,10 +5,10 @@
 watch::watch()
 {}
 
-watch::watch(std::string path, const struct stat *s)
+watch::watch(const struct stat *s, bool new_create, std::string path)
+:node(s, new_create)
 {
 	this->path = path;
-	memcpy(&this->s, s, sizeof(struct stat));
 }
 
 watch::~watch()
@@ -24,7 +22,14 @@ watch::get_path()
 }
 
 void
-watch::add_file(std::string filename, const struct stat *s)
+watch::add_file(const struct stat *s, bool new_create, std::string filename)
 {
-	this->file_map[filename] = file(filename, s);
+	this->file_map[filename] = file(s, new_create, filename);
+}
+
+void
+watch::modify_file(const struct stat *s, std::string filename)
+{
+	file f = this->file_map[filename];
+	f.modify(s);
 }

@@ -1,17 +1,17 @@
 #ifndef _FILE_H_
 #define _FILE_H_
 
-#include <sys/stat.h>
 #include <string>
 
-class file {
+#include "node.h"
+
+class file : public node{
 public:
 	file();
-	file(std::string filename, const struct stat *s);
+	file(const struct stat *s, bool new_create, std::string filename);
 	~file();
 private:
 	std::string filename;
-	struct stat s;
 };
 
 #endif

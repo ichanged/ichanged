@@ -1,4 +1,4 @@
-#include <string.h>
+#include <string>
 
 #include "file.h"
 
@@ -6,10 +6,10 @@ file::file()
 {
 }
 
-file::file(std::string filename, const struct stat *s)
+file::file(const struct stat *s, bool new_create, std::string filename)
+:node(s, new_create)
 {
 	this->filename = filename;
-	memcpy(&this->s, s, sizeof(struct stat));
 }
 
 file::~file()

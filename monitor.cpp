@@ -24,6 +24,7 @@ monitor::monitor(std::string dir)
 
 	this->dir = dir;
 	this->add_monitor(dir);
+	this->new_create = true;
 }
 
 monitor::~monitor()
@@ -89,15 +90,14 @@ monitor::do_add_monitor(const char *fpath, const struct stat *sb,
 
 	switch(typeflag) {
 	case FTW_F:
-		g_watcher->add_file(fpath, sb);
+		g_watcher->add_file(sb, monitor::new_create, fpath);
 		break;
 	case FTW_D:
 		wd = inotify_add_watch(monitor::inotify_fd, fpath, monitor::mask);
-		logger::debug("add watch mask %d path %s", monitor::mask, fpath);
 		if(-1 == wd) {
 			logger::warn("add watch to '%s' error", fpath);
 		}
-		g_watcher->add_watch(wd, fpath, sb);
+		g_watcher->add_watch(wd, sb, monitor::new_create, fpath);
 		break;
 	default:
 		break;
@@ -106,5 +106,6 @@ monitor::do_add_monitor(const char *fpath, const struct stat *sb,
 	return 0;
 }
 
+bool monitor::new_create = false;
 int monitor::inotify_fd = 0;
 int monitor::mask = 0;

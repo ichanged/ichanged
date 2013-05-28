@@ -1,23 +1,23 @@
 #ifndef _WATCH_H_
 #define _WATCH_H_
 
-#include <sys/stat.h>
 #include <string>
 #include <map>
 
+#include "node.h"
 #include "file.h"
 
-class watch {
+class watch : public node{
 public:
 	watch();
-	watch(std::string path, const struct stat *s);
+	watch(const struct stat *s, bool new_create, std::string path);
 	~watch();
 
 	std::string get_path();
-	void add_file(std::string filename, const struct stat *s);
+	void add_file(const struct stat *s, bool new_create, std::string filename);
+	void modify_file(const struct stat *s, std::string filename);
 private:
 	std::string path;
-	struct stat s;
 
 	std::map<std::string, file> file_map;
 };

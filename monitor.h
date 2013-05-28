@@ -18,6 +18,8 @@ public:
 private:
 	static int do_add_monitor(const char *fpath, const struct stat *sb,
 		int typeflag);
+	
+	static bool new_create;
 
 	std::string dir;
 	static int inotify_fd;
