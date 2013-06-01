@@ -19,8 +19,7 @@ monitor::monitor(std::string dir)
 	if(monitor::inotify_fd == -1) {
 		logger::fatal("create inotify file descriptor error");
 	}
-	monitor::mask = 0;
-	monitor::mask |= IN_CREATE | IN_ATTRIB;
+	monitor::mask = IN_CREATE | IN_ATTRIB | IN_MODIFY;
 
 	this->dir = dir;
 	this->init_monitor(dir);

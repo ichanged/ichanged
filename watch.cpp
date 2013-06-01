@@ -8,9 +8,11 @@ watch::watch()
 {}
 
 watch::watch(const struct stat *s, bool new_create, std::string path)
-:node(s, new_create)
+:
+node(s, new_create),
+_path(path),
+_file_change(false)
 {
-	this->path = path;
 }
 
 watch::~watch()
@@ -20,44 +22,79 @@ watch::~watch()
 std::string
 watch::get_path()
 {
-	return this->path;
+	return this->_path;
 }
 
 void
-watch::init_file(const struct stat *s, std::string filename)
+watch::attrib()
 {
-	this->file_map[filename] = file(s, false, filename);
+	this->_get_stat(this->_path, &this->_ns);
+}
+
+bool
+watch::is_file_change()
+{
+	return this->_file_change;
 }
 
 void
-watch::add_file(std::string filename)
+watch::file_init(const struct stat *s, std::string filename)
+{
+	this->_file_map[filename] = file(s, false, filename);
+}
+
+void
+watch::file_create(std::string filename)
 {
 	struct stat s;
 
-	this->get_file_stat(filename, &s);
-	this->file_map[filename] = file(&s, true, filename);
+	this->_get_file_stat(filename, &s);
+	this->_file_map[filename] = file(&s, true, filename);
+
+	this->_file_change = true;
+	this->_file_set.insert(filename);
 }
 
 void
-watch::modify_file(std::string filename)
+watch::file_modify(std::string filename)
 {
 	struct stat s;
 
-	file f = this->file_map[filename];
-	this->get_file_stat(filename, &s);
-	f.modify(&s);
+	this->_get_file_stat(filename, &s);
+	this->_file_map[filename].modify(&s);
+
+	this->_file_change = true;
+	this->_file_set.insert(filename);
+}
+
+void
+watch::file_attrib(std::string filename)
+{
+	struct stat s;
+
+	this->_get_file_stat(filename, &s);
+	this->_file_map[filename].attrib(&s);
+
+	this->_file_change = true;
+	this->_file_set.insert(filename);
 }
 
 std::string
-watch::get_file_path(std::string filename)
+watch::_get_file_path(std::string filename)
 {
-	return this->path + "/" + filename;
+	return this->_path + "/" + filename;
 }
 
 void
-watch::get_file_stat(std::string filename, struct stat *s)
+watch::_get_file_stat(std::string filename, struct stat *s)
 {
-	std::string path = this->get_file_path(filename);
+	std::string path = this->_get_file_path(filename);
+	this->_get_stat(path, s);
+}
+
+void
+watch::_get_stat(std::string path, struct stat *s)
+{
 	if(-1 == stat(path.c_str(), s)) {
 		logger::error("stat file '%s' error: %s", path.c_str(), ERRSTR);
 	}

@@ -3,6 +3,7 @@
 
 #include <string>
 #include <map>
+#include <set>
 #include <sys/stat.h>
 
 #include "node.h"
@@ -16,17 +17,22 @@ public:
 
 	std::string get_path();
 
-	void init_file(const struct stat *s, std::string filename);
+	void attrib();
 
-	void add_file(std::string filename);
-	void modify_file(std::string filename);
+	bool is_file_change();
+	void file_init(const struct stat *s, std::string filename);
+	void file_create(std::string filename);
+	void file_modify(std::string filename);
+	void file_attrib(std::string filename);
 private:
-	std::string get_file_path(std::string filename);
-	void get_file_stat(std::string filename, struct stat *s);
+	std::string _get_file_path(std::string filename);
+	void _get_file_stat(std::string filename, struct stat *s);
+	void _get_stat(std::string path, struct stat *s);
 
-	std::string path;
-
-	std::map<std::string, file> file_map;
+	std::string _path;
+	bool _file_change;
+	std::map<std::string, file> _file_map;
+	std::set<std::string> _file_set;
 };
 
 #endif

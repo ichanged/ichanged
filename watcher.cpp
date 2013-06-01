@@ -18,19 +18,19 @@ watcher::~watcher()
 void
 watcher::init_watch(int wd, const struct stat *s, std::string path)
 {
-	this->watch_map[wd] = watch(s, false, path);
+	this->_watch_map[wd] = watch(s, false, path);
 }
 
 void
 watcher::add_watch(int wd, const struct stat *s, std::string path)
 {
-	this->watch_map[wd] = watch(s, true, path);
+	this->_watch_map[wd] = watch(s, true, path);
 }
 
 watch
 watcher::get_watch(int wd)
 {
-	return this->watch_map[wd];
+	return this->_watch_map[wd];
 }
 
 void
@@ -38,8 +38,8 @@ watcher::remove_watch(int wd)
 {
 	watch w;
 
-	w = this->watch_map[wd];
-	this->watch_map.erase(wd);
+	w = this->_watch_map[wd];
+	this->_watch_map.erase(wd);
 }
 
 void
@@ -60,10 +60,11 @@ watcher::init_file(const struct stat *s, std::string path)
 	strcpy(fbuf, path.c_str());
 	filename = basename(fbuf);
 
-	for(pos = this->watch_map.begin(); pos != this->watch_map.end(); ++pos) {
+	for(pos = this->_watch_map.begin(); pos != this->_watch_map.end(); ++pos) {
 		w = &pos->second;
 		if(w->get_path() == dir) {
-			w->init_file(s, filename);
+			w->file_init(s, filename);
+			break;
 		}
 	}
 }
@@ -86,10 +87,11 @@ watcher::add_file(const struct stat *s, std::string path)
 	strcpy(fbuf, path.c_str());
 	filename = basename(fbuf);
 
-	for(pos = this->watch_map.begin(); pos != this->watch_map.end(); ++pos) {
+	for(pos = this->_watch_map.begin(); pos != this->_watch_map.end(); ++pos) {
 		w = &pos->second;
 		if(w->get_path() == dir) {
-			w->add_file(filename);
+			w->file_create(filename);
+			break;
 		}
 	}
 }
@@ -97,35 +99,37 @@ watcher::add_file(const struct stat *s, std::string path)
 void
 watcher::file_create(int wd, std::string name)
 {
-	this->watch_map[wd].add_file(name);
+	this->_watch_map[wd].file_create(name);
+	this->_watch_set.insert(wd);
 }
 
 void
 watcher::file_attrib(int wd, std::string name)
 {
-	this->watch_map[wd].modify_file(name);
+	this->_watch_map[wd].file_attrib(name);
+	this->_watch_set.insert(wd);
 }
 
 void
 watcher::dir_attrib(int wd, std::string name)
 {
-	watch w;
-	std::string path;
-
-	w = this->watch_map[wd];
-	path = w.get_path();
+	this->_watch_map[wd].attrib();
+	this->_watch_set.insert(wd);
 }
 
 void
 watcher::print_diff_result()
 {
-	std::map<int, watch>::iterator pos;
+	std::set<int>::iterator pos;
 	watch *w;
 
-	for(pos = this->watch_map.begin(); pos != this->watch_map.end(); ++pos) {
-		w = &pos->second;
+	for(pos = this->_watch_set.begin(); pos != this->_watch_set.end(); ++pos) {
+		w = &this->_watch_map[*pos];
 		if(w->is_new_create()) {
 			logger::debug("watch '%s' is new create", w->get_path().c_str());
+		}
+		if(w->is_file_change()) {
+			logger::debug("watch '%s' file changed", w->get_path().c_str());
 		}
 	}
 }

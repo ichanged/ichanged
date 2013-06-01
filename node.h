@@ -6,17 +6,18 @@
 class node {
 public:
 	node();
-	node(const struct stat *s, bool new_create);
+	node(const struct stat *base, bool new_create);
 	~node();
 
-	void modify(const struct stat *ns);
-
 	bool is_new_create();
-	bool is_modified();
+	bool is_modify();
+	bool is_attrib();
 protected:
-	bool new_create;
-	bool modified;
-	struct stat s, ns;
+	bool _new_create;
+	bool _modify;
+	bool _attrib;
+
+	struct stat _base, _ns;
 };
 
 #endif

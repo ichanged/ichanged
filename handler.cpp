@@ -48,4 +48,5 @@ handler::handle_event(struct inotify_event *e)
 			g_watcher->file_attrib(e->wd, e->name);
 		}
 	}
+	g_watcher->print_diff_result();
 }

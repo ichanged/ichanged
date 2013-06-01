@@ -4,6 +4,7 @@
 #include <sys/stat.h>
 #include <string>
 #include <map>
+#include <set>
 
 #include "watch.h"
 
@@ -17,16 +18,17 @@ public:
 	watch get_watch(int wd);
 	void remove_watch(int wd);
 
+	void dir_attrib(int wd, std::string name);
+
 	void init_file(const struct stat *s, std::string path);
 	void add_file(const struct stat *s, std::string path);
-
 	void file_create(int wd, std::string name);
 	void file_attrib(int wd, std::string name);
-	void dir_attrib(int wd, std::string name);
 
 	void print_diff_result();
 private:
-	std::map<int, watch> watch_map;
+	std::map<int, watch> _watch_map;
+	std::set<int> _watch_set;
 };
 
 extern watcher *g_watcher;
