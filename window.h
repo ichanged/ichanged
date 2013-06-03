@@ -11,8 +11,10 @@ public:
 	static void destory();
 
 	static void *start(void *arg);
-	static void refresh();
 private:
+	static void draw_summary();
+	static void draw_event();
+
 	static WINDOW *scr;
 	static pthread_t thread_id;
 };

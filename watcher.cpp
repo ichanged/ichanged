@@ -1,4 +1,5 @@
 #include <sys/stat.h>
+#include <pthread.h>
 #include <libgen.h>
 #include <string.h>
 
@@ -7,6 +8,7 @@
 
 std::map<int, watch> watcher::_watch_map;
 std::set<int> watcher::_watch_set;
+pthread_mutex_t watcher::mutex = PTHREAD_MUTEX_INITIALIZER;
 
 void
 watcher::init_watch(int wd, const struct stat *s, std::string path)
@@ -110,6 +112,28 @@ watcher::dir_attrib(int wd, std::string name)
 {
 	watcher::_watch_map[wd].attrib();
 	watcher::_watch_set.insert(wd);
+}
+
+void
+watcher::lock()
+{
+	int status;
+
+	status = pthread_mutex_lock(&watcher::mutex);
+	if(status != 0) {
+		logger::fatal("lock watcher error: %s", ERRSTR);
+	}
+}
+
+void
+watcher::unlock()
+{
+	int status;
+
+	status = pthread_mutex_unlock(&watcher::mutex);
+	if(status != 0) {
+		logger::fatal("unlock watcher error: %s", ERRSTR);
+	}
 }
 
 void

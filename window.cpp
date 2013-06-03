@@ -1,8 +1,11 @@
 #include <ncurses.h>
 #include <pthread.h>
+#include <unistd.h>
+#include <time.h>
 
 #include "logger.h"
 #include "window.h"
+#include "option.h"
 
 WINDOW *window::scr = NULL;
 pthread_t window::thread_id = 0;
@@ -12,7 +15,7 @@ window::init()
 {
 	int status;
 
-	scr = initscr();
+	window::scr = initscr();
 
 	status = pthread_create(&window::thread_id, NULL, window::start, NULL);
 	if(status != 0) {
@@ -41,16 +44,38 @@ window::destory()
 void *
 window::start(void *arg)
 {
-	while(1) {
-		window::refresh();
+	while(true) {
+		// 清除屏幕所有内容
+		wclear(window::scr);
+
+		// 打印摘要信息
+		window::draw_summary();
+
+		// 将信息往终端上输出
+		wrefresh(window::scr);
+
+		// 根据配置的刷新时间，睡眠一段时间
+		sleep(option::interval);
 	}
 	return NULL;
 }
 
 void
-window::refresh()
+window::draw_summary()
 {
-	wprintw(scr, "ichanged - \n");
-	wrefresh(scr);
-	getch();
+	struct tm result;
+	time_t t;
+
+	// 取当前时间
+	t = time(NULL);
+	localtime_r(&t, &result);
+
+	wprintw(window::scr, "ichanged - %02d:%02d:%02d up\n",
+		result.tm_hour, result.tm_min, result.tm_sec);
+	wprintw(window::scr, "Directory: %s\n", option::directory.c_str());
+}
+
+void
+window::draw_event()
+{
 }

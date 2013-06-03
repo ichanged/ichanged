@@ -2,6 +2,7 @@
 #define _WATCHER_H_
 
 #include <sys/stat.h>
+#include <pthread.h>
 #include <string>
 #include <map>
 #include <set>
@@ -22,10 +23,14 @@ public:
 	static void file_create(int wd, std::string name);
 	static void file_attrib(int wd, std::string name);
 
+	static void lock();
+	static void unlock();
 	static void print_diff_result();
 private:
 	static std::map<int, watch> _watch_map;
 	static std::set<int> _watch_set;
+
+	static pthread_mutex_t mutex;
 };
 
 #endif
