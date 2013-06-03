@@ -10,27 +10,22 @@
 
 class watcher {
 public:
-	watcher();
-	virtual ~watcher();
+	static void init_watch(int wd, const struct stat *s, std::string path);
+	static void add_watch(int wd, const struct stat *s, std::string path);
+	static watch get_watch(int wd);
+	static void remove_watch(int wd);
 
-	void init_watch(int wd, const struct stat *s, std::string path);
-	void add_watch(int wd, const struct stat *s, std::string path);
-	watch get_watch(int wd);
-	void remove_watch(int wd);
+	static void dir_attrib(int wd, std::string name);
 
-	void dir_attrib(int wd, std::string name);
+	static void init_file(const struct stat *s, std::string path);
+	static void add_file(const struct stat *s, std::string path);
+	static void file_create(int wd, std::string name);
+	static void file_attrib(int wd, std::string name);
 
-	void init_file(const struct stat *s, std::string path);
-	void add_file(const struct stat *s, std::string path);
-	void file_create(int wd, std::string name);
-	void file_attrib(int wd, std::string name);
-
-	void print_diff_result();
+	static void print_diff_result();
 private:
-	std::map<int, watch> _watch_map;
-	std::set<int> _watch_set;
+	static std::map<int, watch> _watch_map;
+	static std::set<int> _watch_set;
 };
-
-extern watcher *g_watcher;
 
 #endif

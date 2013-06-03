@@ -10,28 +10,53 @@
 #include "handler.h"
 #include "logger.h"
 #include "watch.h"
+#include "option.h"
 
-monitor *g_monitor = NULL;
+std::string monitor::dir;
+int monitor::inotify_fd = 0;
+int monitor::mask = 0;
+pthread_t monitor::thread_id = 0;
 
-monitor::monitor(std::string dir)
+void
+monitor::init()
 {
+	int status;
+
 	monitor::inotify_fd = inotify_init();
 	if(monitor::inotify_fd == -1) {
 		logger::fatal("create inotify file descriptor error");
 	}
 	monitor::mask = IN_CREATE | IN_ATTRIB | IN_MODIFY;
 
-	this->dir = dir;
-	this->init_monitor(dir);
+	monitor::dir = option::directory;
+	monitor::init_monitor(option::directory);
+
+	status = pthread_create(&monitor::thread_id, NULL, monitor::start, NULL);
+	if(status != 0) {
+		logger::fatal("create monitor thread error: %s", ERRSTR);
+	}
 }
 
-monitor::~monitor()
+void
+monitor::wait()
+{
+	int status;
+	void *ret;
+
+	status = pthread_join(monitor::thread_id, &ret);
+	if(status != 0) {
+		logger::fatal("join monitor thread error: %s", ERRSTR);
+	}
+}
+
+void
+monitor::destory()
 {
 	close(monitor::inotify_fd);
 }
 
-void
-monitor::start()
+void *
+monitor::start(void *arg)
 {
 	int n;
 	char buf[monitor::event_max_size] = {0};
@@ -56,10 +81,11 @@ monitor::start()
 		/* 将读取的事件拷贝到分配的内存中 */
 		memcpy(e, buf, size);
 		/* 事件处理模块对事件进行处理 */
-		g_handler->handle_event(e);	
+		handler::handle_event(e);	
 		/* 释放事件内存 */
 		free(e);
 	}
+	return NULL;
 }
 
 void
@@ -89,7 +115,7 @@ monitor::add_monitor(std::string dir)
 void
 monitor::remove_monitor(int wd)
 {
-	g_watcher->remove_watch(wd);
+	watcher::remove_watch(wd);
 }
 
 int
@@ -100,14 +126,14 @@ monitor::do_init_monitor(const char *fpath, const struct stat *sb,
 
 	switch(typeflag) {
 	case FTW_F:
-		g_watcher->init_file(sb, fpath);
+		watcher::init_file(sb, fpath);
 		break;
 	case FTW_D:
 		wd = inotify_add_watch(monitor::inotify_fd, fpath, monitor::mask);
 		if(-1 == wd) {
 			logger::warn("add watch to '%s' error", fpath);
 		}
-		g_watcher->init_watch(wd, sb, fpath);
+		watcher::init_watch(wd, sb, fpath);
 		break;
 	default:
 		break;
@@ -124,14 +150,14 @@ monitor::do_add_monitor(const char *fpath, const struct stat *sb,
 
 	switch(typeflag) {
 	case FTW_F:
-		g_watcher->add_file(sb, fpath);
+		watcher::add_file(sb, fpath);
 		break;
 	case FTW_D:
 		wd = inotify_add_watch(monitor::inotify_fd, fpath, monitor::mask);
 		if(-1 == wd) {
 			logger::warn("add watch to '%s' error", fpath);
 		}
-		g_watcher->add_watch(wd, sb, fpath);
+		watcher::add_watch(wd, sb, fpath);
 		break;
 	default:
 		break;
@@ -139,7 +165,3 @@ monitor::do_add_monitor(const char *fpath, const struct stat *sb,
 
 	return 0;
 }
-
-
-int monitor::inotify_fd = 0;
-int monitor::mask = 0;

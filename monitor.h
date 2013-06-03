@@ -4,27 +4,30 @@
 #include <string>
 #include <sys/inotify.h>
 #include <limits.h>
+#include <pthread.h>
 
 typedef int (*ftw_func)(const char *fpath, const struct stat *sb, int typeflag);
 
 class monitor {
 public:
-	monitor(std::string dir);
-	virtual ~monitor();
+	static void init();
+	static void wait();
+	static void destory();
 
-	void start();
-	void init_monitor(std::string dir);
-	void add_monitor(std::string dir);
-	void remove_monitor(int wd);
+	static void *start(void *arg);
+	static void init_monitor(std::string dir);
+	static void add_monitor(std::string dir);
+	static void remove_monitor(int wd);
 private:
 	static int do_init_monitor(const char *fpath, const struct stat *sb,
 		int typeflag);
 	static int do_add_monitor(const char *fpath, const struct stat *sb,
 		int typeflag);
 	
-	std::string dir;
+	static std::string dir;
 	static int inotify_fd;
 	static int mask;
+	static pthread_t thread_id;
 
 	static const int event_max_size =
 		sizeof(struct inotify_event) + NAME_MAX + 1;

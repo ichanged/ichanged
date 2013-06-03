@@ -3,20 +3,10 @@
 #include "watcher.h"
 #include "logger.h"
 
-handler *g_handler = NULL;
-
-handler::handler()
-{
-}
-
-handler::~handler()
-{
-}
-
 void
 handler::handle_event(struct inotify_event *e)
 {
-	watch w = g_watcher->get_watch(e->wd);
+	watch w = watcher::get_watch(e->wd);
 	std::string path;
 
 	path = w.get_path();
@@ -38,15 +28,15 @@ handler::handle_event(struct inotify_event *e)
 
 	/* 如果有新的普通文件被创建，则向监控下添加文件 */
 	if(e->mask & IN_CREATE && !(e->mask & IN_ISDIR)) {
-		g_watcher->file_create(e->wd, e->name);
+		watcher::file_create(e->wd, e->name);
 	}
 	/* 如果已有的文件权限被改变，则记录新的权限 */
 	if(e->mask & IN_ATTRIB) {
 		if(e->mask & IN_ISDIR) {
-			g_watcher->dir_attrib(e->wd, e->name);
+			watcher::dir_attrib(e->wd, e->name);
 		} else {
-			g_watcher->file_attrib(e->wd, e->name);
+			watcher::file_attrib(e->wd, e->name);
 		}
 	}
-	g_watcher->print_diff_result();
+	watcher::print_diff_result();
 }

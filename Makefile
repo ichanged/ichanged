@@ -4,7 +4,7 @@ DEBUG_FLAGS = -g -Wall -DDEBUG
 
 TARGET = ichanged
 OBJ = ichanged.o logger.o monitor.o watcher.o node.o watch.o file.o handler.o \
-	option.o
+	window.o option.o
 
 .PHONY: debug all clean
 
@@ -12,7 +12,7 @@ debug: CFLAGS += $(DEBUG_FLAGS)
 debug: clean all
 
 all: $(OBJ)
-	$(CC) -o $(TARGET) $(OBJ)
+	$(CC) -o $(TARGET) $(OBJ) -lncurses -lpthread
 ichanged.o: ichanged.cpp
 	$(CC) $(CFLAGS) ichanged.cpp
 logger.o: logger.cpp logger.h
@@ -29,6 +29,8 @@ file.o: file.cpp file.h
 	$(CC) $(CFLAGS) file.cpp
 handler.o: handler.cpp handler.h
 	$(CC) $(CFLAGS) handler.cpp
+window.o: window.cpp window.h
+	$(CC) $(CFLAGS) window.cpp
 option.o: option.cpp option.h
 	$(CC) $(CFLAGS) option.cpp
 

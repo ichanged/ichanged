@@ -6,13 +6,7 @@
 
 class handler {
 public:
-	handler();
-	virtual ~handler();
-
-	void handle_event(struct inotify_event *e);
-private:
+	static void handle_event(struct inotify_event *e);
 };
-
-extern handler *g_handler;
 
 #endif
