@@ -13,8 +13,10 @@ public:
 
 	void modify(const struct stat *ns);
 	void attrib(const struct stat *ns);
+
+	std::string get_filename();
 private:
-	std::string filename;
+	std::string _filename;
 };
 
 #endif

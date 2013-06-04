@@ -19,11 +19,13 @@ public:
 
 	void attrib();
 
-	bool is_file_change();
+	bool file_change();
 	void file_init(const struct stat *s, std::string filename);
 	void file_create(std::string filename);
 	void file_modify(std::string filename);
 	void file_attrib(std::string filename);
+
+	void generate_snapshot(std::vector<event> *event_vec);
 private:
 	std::string _get_file_path(std::string filename);
 	void _get_file_stat(std::string filename, struct stat *s);

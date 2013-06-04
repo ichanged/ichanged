@@ -54,4 +54,8 @@ handler::handle_file_event(struct inotify_event *e, std::string path)
 	if(e->mask & IN_ATTRIB) {
 		watcher::file_attrib(e->wd, e->name);
 	}
+	/* 如果已有的文件被修改，则记录文件新的属性 */
+	if(e->mask & IN_MODIFY) {
+		watcher::file_modify(e->wd, e->name);
+	}
 }

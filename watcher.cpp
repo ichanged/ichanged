@@ -8,6 +8,9 @@
 
 std::map<int, watch> watcher::_watch_map;
 std::set<int> watcher::_watch_set;
+
+std::vector<event> watcher::_event_vec;
+
 pthread_mutex_t watcher::mutex = PTHREAD_MUTEX_INITIALIZER;
 
 void
@@ -35,6 +38,13 @@ watcher::remove_watch(int wd)
 
 	w = watcher::_watch_map[wd];
 	watcher::_watch_map.erase(wd);
+}
+
+void
+watcher::dir_attrib(int wd, std::string name)
+{
+	watcher::_watch_map[wd].attrib();
+	watcher::_watch_set.insert(wd);
 }
 
 void
@@ -108,9 +118,9 @@ watcher::file_attrib(int wd, std::string name)
 }
 
 void
-watcher::dir_attrib(int wd, std::string name)
+watcher::file_modify(int wd, std::string name)
 {
-	watcher::_watch_map[wd].attrib();
+	watcher::_watch_map[wd].file_modify(name);
 	watcher::_watch_set.insert(wd);
 }
 
@@ -134,4 +144,20 @@ watcher::unlock()
 	if(status != 0) {
 		logger::fatal("unlock watcher error: %s", ERRSTR);
 	}
+}
+
+std::vector<event> *
+watcher::generate_snapshot()
+{
+	std::set<int>::iterator pos;
+
+	watcher::_event_vec.clear();
+	for(pos = watcher::_watch_set.begin(); pos != watcher::_watch_set.end();
+		++pos) {
+		watch &w = watcher::_watch_map[*pos];
+		if(w.file_change()) {
+			w.generate_snapshot(&watcher::_event_vec);
+		}
+	}
+	return &watcher::_event_vec;
 }

@@ -32,7 +32,7 @@ watch::attrib()
 }
 
 bool
-watch::is_file_change()
+watch::file_change()
 {
 	return this->_file_change;
 }
@@ -77,6 +77,32 @@ watch::file_attrib(std::string filename)
 
 	this->_file_change = true;
 	this->_file_set.insert(filename);
+}
+
+void
+watch::generate_snapshot(std::vector<event> *event_vec)
+{
+	std::set<std::string>::iterator pos;
+
+	for(pos = this->_file_set.begin(); pos != this->_file_set.end(); ++pos) {
+		file &f = this->_file_map[*pos];
+		if(f.is_new_create()) {
+			event e;
+			e.set_type(event::TYPE_CREATE);
+			e.set_path(this->_get_file_path(f.get_filename()));
+			e.set_base_size(f.get_base_size());
+			e.set_current_size(f.get_current_size());
+			event_vec->push_back(e);
+		}
+		if(f.is_modify()) {
+			event e;
+			e.set_type(event::TYPE_MODIFY);
+			e.set_path(this->_get_file_path(f.get_filename()));
+			e.set_base_size(f.get_base_size());
+			e.set_current_size(f.get_current_size());
+			event_vec->push_back(e);
+		}
+	}
 }
 
 std::string

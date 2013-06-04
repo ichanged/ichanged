@@ -2,10 +2,13 @@
 #include <pthread.h>
 #include <unistd.h>
 #include <time.h>
+#include <vector>
 
 #include "logger.h"
 #include "window.h"
 #include "option.h"
+#include "watcher.h"
+#include "event.h"
 
 WINDOW *window::scr = NULL;
 pthread_t window::thread_id = 0;
@@ -50,10 +53,11 @@ window::start(void *arg)
 
 		// 打印摘要信息
 		window::draw_summary();
+		// 打印事件信息
+		window::draw_event();
 
 		// 将信息往终端上输出
 		wrefresh(window::scr);
-
 		// 根据配置的刷新时间，睡眠一段时间
 		sleep(option::interval);
 	}
@@ -73,9 +77,20 @@ window::draw_summary()
 	wprintw(window::scr, "ichanged - %02d:%02d:%02d up\n",
 		result.tm_hour, result.tm_min, result.tm_sec);
 	wprintw(window::scr, "Directory: %s\n", option::directory.c_str());
+	wprintw(window::scr, "%-30s", "FILE");
 }
 
 void
 window::draw_event()
 {
+	std::vector<event> *event_vec;
+	std::vector<event>::iterator pos;
+
+	watcher::lock();
+	event_vec = watcher::generate_snapshot();
+	watcher::unlock();
+	for(pos = event_vec->begin(); pos != event_vec->end(); ++pos) {
+		wprintw(window::scr, "%s\n", pos->get_path().c_str(),
+			pos->get_base_size(), pos->get_current_size());
+	}
 }

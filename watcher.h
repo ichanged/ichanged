@@ -6,7 +6,9 @@
 #include <string>
 #include <map>
 #include <set>
+#include <vector>
 
+#include "event.h"
 #include "watch.h"
 
 class watcher {
@@ -22,12 +24,17 @@ public:
 	static void add_file(const struct stat *s, std::string path);
 	static void file_create(int wd, std::string name);
 	static void file_attrib(int wd, std::string name);
+	static void file_modify(int wd, std::string name);
+
+	static std::vector<event> *generate_snapshot();
 
 	static void lock();
 	static void unlock();
 private:
 	static std::map<int, watch> _watch_map;
 	static std::set<int> _watch_set;
+
+	static std::vector<event> _event_vec;
 
 	static pthread_mutex_t mutex;
 };
