@@ -25,7 +25,6 @@ public:
 
 	static void lock();
 	static void unlock();
-	static void print_diff_result();
 private:
 	static std::map<int, watch> _watch_map;
 	static std::set<int> _watch_set;

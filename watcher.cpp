@@ -135,21 +135,3 @@ watcher::unlock()
 		logger::fatal("unlock watcher error: %s", ERRSTR);
 	}
 }
-
-void
-watcher::print_diff_result()
-{
-	std::set<int>::iterator pos;
-	watch *w;
-
-	for(pos = watcher::_watch_set.begin(); pos != watcher::_watch_set.end();
-		++pos) {
-		w = &watcher::_watch_map[*pos];
-		if(w->is_new_create()) {
-			logger::debug("watch '%s' is new create", w->get_path().c_str());
-		}
-		if(w->is_file_change()) {
-			logger::debug("watch '%s' file changed", w->get_path().c_str());
-		}
-	}
-}
