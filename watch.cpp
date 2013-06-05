@@ -96,6 +96,11 @@ watch::generate_snapshot(std::vector<event> *event_vec)
 		if(e.get_type() == event::TYPE_NONE) {
 			continue;
 		}
+		/* 如果文件被修改且大小不变，不显示 */
+		if(e.get_type() == event::TYPE_MODIFY
+		&& f.get_base_size() == f.get_current_size()) {
+			continue;
+		}
 		e.set_path(this->_get_file_path(f.get_filename()));
 		e.set_base_size(f.get_base_size());
 		e.set_current_size(f.get_current_size());
