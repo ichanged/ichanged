@@ -2,6 +2,19 @@
 
 #include "event.h"
 
+event::event()
+:
+_path(""),
+_type(0),
+_base_size(0),
+_current_size(0)
+{
+}
+
+event::~event()
+{
+}
+
 void
 event::set_path(const std::string path)
 {
@@ -20,10 +33,29 @@ event::set_type(const int type)
 	this->_type = type;
 }
 
+void
+event::add_type(const int type)
+{
+	this->_type |= type;
+}
+
 int
 event::get_type()
 {
 	return this->_type;
+}
+
+std::string
+event::get_type_string()
+{
+	std::string type = std::string("");
+	if(this->_type & event::TYPE_MODIFY) {
+		type += "M";
+	}
+	if(this->_type & event::TYPE_CREATE) {
+		type += "+";
+	}
+	return type;
 }
 
 void
