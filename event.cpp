@@ -53,6 +53,9 @@ std::string
 event::get_type_string()
 {
 	std::string type = std::string("");
+	if(this->_type & event::TYPE_ATTRIB) {
+		type += "A";
+	}
 	if(this->_type & event::TYPE_MODIFY) {
 		type += "M";
 	}

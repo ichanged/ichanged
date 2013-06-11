@@ -104,6 +104,9 @@ watch::generate_snapshot(std::vector<event> *event_vec)
 		if(f.is_modify()) {
 			e.add_type(event::TYPE_MODIFY);
 		}
+		if(f.is_attrib()) {
+			e.add_type(event::TYPE_ATTRIB);
+		}
 		if(e.get_type() == event::TYPE_NONE) {
 			continue;
 		}
