@@ -26,6 +26,7 @@ public:
 	static const int TYPE_NONE = 0x00000000;
 	static const int TYPE_CREATE = 0x00000001;
 	static const int TYPE_MODIFY = 0x00000002;
+	static const int TYPE_DIRECTORY = 0x10000000;
 private:
 	std::string _path;
 	int _type;

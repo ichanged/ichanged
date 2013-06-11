@@ -84,6 +84,17 @@ watch::generate_snapshot(std::vector<event> *event_vec)
 {
 	std::set<std::string>::iterator pos;
 
+	/* 针对监控目录本身生成快照 */
+	if(this->is_new_create()) {
+		event e;
+		e.set_type(event::TYPE_CREATE | event::TYPE_DIRECTORY);
+		e.set_path(this->_path);
+		e.set_base_size(this->get_base_size());
+		e.set_current_size(this->get_current_size());
+		event_vec->push_back(e);
+	}
+
+	/* 针对监控目录下被修改过的文件生成快照 */
 	for(pos = this->_file_set.begin(); pos != this->_file_set.end(); ++pos) {
 		file &f = this->_file_map[*pos];
 		event e;

@@ -24,7 +24,11 @@ event::set_path(const std::string path)
 std::string
 event::get_path()
 {
-	return this->_path;
+	if(this->_type & event::TYPE_DIRECTORY) {
+		return this->_path + "/";
+	} else {
+		return this->_path;
+	}
 }
 
 void

@@ -23,6 +23,7 @@ void
 watcher::add_watch(int wd, const struct stat *s, std::string path)
 {
 	watcher::_watch_map[wd] = watch(s, true, path);
+	watcher::_watch_set.insert(wd);
 }
 
 watch
@@ -155,7 +156,7 @@ watcher::generate_snapshot()
 	for(pos = watcher::_watch_set.begin(); pos != watcher::_watch_set.end();
 		++pos) {
 		watch &w = watcher::_watch_map[*pos];
-		if(w.file_change()) {
+		if(w.is_new_create() || w.file_change()) {
 			w.generate_snapshot(&watcher::_event_vec);
 		}
 	}
