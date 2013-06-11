@@ -6,6 +6,7 @@
 
 class option {
 public:
+	static void parse_args(int argc, char *argv[]);
 	static std::string directory;
 	static uint32_t interval;
 };

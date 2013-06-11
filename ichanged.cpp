@@ -4,8 +4,11 @@
 #include "window.h"
 
 int
-main()
+main(int argc, char *argv[])
 {
+	/* 解析命令行参数 */
+	option::parse_args(argc, argv);
+
 	monitor::init();
 	window::init();
 
