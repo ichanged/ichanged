@@ -7,6 +7,8 @@
 class options {
 public:
 	static void parse_args(int argc, char *argv[]);
+	static void print_usage();
+
 	static std::string directory;
 	static uint32_t interval;
 };
