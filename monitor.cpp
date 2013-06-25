@@ -10,7 +10,7 @@
 #include "handler.h"
 #include "logger.h"
 #include "watch.h"
-#include "option.h"
+#include "options.h"
 
 std::string monitor::dir;
 int monitor::inotify_fd = 0;
@@ -28,8 +28,8 @@ monitor::init()
 	}
 	monitor::mask = IN_CREATE | IN_ATTRIB | IN_MODIFY;
 
-	monitor::dir = option::directory;
-	monitor::init_monitor(option::directory);
+	monitor::dir = options::directory;
+	monitor::init_monitor(options::directory);
 
 	status = pthread_create(&monitor::thread_id, NULL, monitor::start, NULL);
 	if(status != 0) {

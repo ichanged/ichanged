@@ -6,7 +6,7 @@
 
 #include "logger.h"
 #include "window.h"
-#include "option.h"
+#include "options.h"
 #include "watcher.h"
 #include "event.h"
 
@@ -61,7 +61,7 @@ window::start(void *arg)
 		// 将信息往终端上输出
 		wrefresh(window::scr);
 		// 根据配置的刷新时间，睡眠一段时间
-		sleep(option::interval);
+		sleep(options::interval);
 	}
 	return NULL;
 }
@@ -78,7 +78,7 @@ window::draw_summary()
 
 	wprintw(window::scr, "ichanged - %02d:%02d:%02d up\n",
 		result.tm_hour, result.tm_min, result.tm_sec);
-	wprintw(window::scr, "Directory: %s\n", option::directory.c_str());
+	wprintw(window::scr, "Directory: %s\n", options::directory.c_str());
 	wattron(window::scr, A_REVERSE);
 	wprintw(window::scr, " %-4s %-40s %-5s %-5s\n", "TYPE", "FILE", "BASE", "CUR");
 	wattroff(window::scr, A_REVERSE);

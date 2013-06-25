@@ -1,10 +1,10 @@
-#ifndef _OPTION_H_
-#define _OPTION_H_
+#ifndef _OPTIONS_H_
+#define _OPTIONS_H_
 
 #include <string>
 #include <inttypes.h>
 
-class option {
+class options {
 public:
 	static void parse_args(int argc, char *argv[]);
 	static std::string directory;
