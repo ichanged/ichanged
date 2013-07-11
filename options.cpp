@@ -1,13 +1,16 @@
 #include <getopt.h>
 #include <stdlib.h>
 #include <stdio.h>
+#include <vector>
 
 #include "options.h"
 
 /* 监控目录 */
-std::string options::directory = "/var/";
+std::string options::directory = "/var";
 /* 界面刷新时间间隔 */
 uint32_t options::interval = 2;
+/* 排除监控的文件、目录 */
+std::vector<std::string> options::exclude;
 /* 是否监控隐藏文件、目录 */
 bool options::watch_hidden = false;
 
@@ -31,6 +34,7 @@ options::parse_args(int argc, char *argv[])
 			options::directory = std::string(optarg);
 			break;
 		case 'e':
+			options::exclude.push_back(std::string(optarg));
 			break;	
 		case 'w':
 			options::watch_hidden = true;
@@ -54,7 +58,7 @@ options::print_usage()
 	"Options:\n"
 	"    -i, --interval        Monitor interval, default is %ds.\n"
 	"    -d, --directory       Monitor directory, default is '%s'.\n"
-	"    -e, --exclude=LIST    Skip files and directories in LIST.\n"
+	"    -e, --exclude=PATH    Skip file or directory specified by PATH.\n"
 	"    -w, --watch-hidden    Watch hidden files and directories.\n",
 	options::interval, options::directory.c_str());
 }

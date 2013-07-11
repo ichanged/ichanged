@@ -130,6 +130,8 @@ monitor::do_init_monitor(const char *fpath, const struct stat *sb,
 		return 0;
 	}
 
+	// TODO 如果当前目录是配置了不监控的特定目录，则直接返回
+
 	switch(typeflag) {
 	case FTW_F:
 		watcher::init_file(sb, fpath);
