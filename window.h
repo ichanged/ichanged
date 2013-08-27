@@ -11,12 +11,15 @@ public:
 	static void destory();
 
 	static void *start(void *arg);
+
 private:
 	static void draw_summary();
 	static void draw_event();
 
 	static WINDOW *scr;
 	static pthread_t thread_id;
+
+	static const int COL_MAX = 1024; 
 };
 
 #endif

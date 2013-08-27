@@ -49,7 +49,18 @@ window::destory()
 void *
 window::start(void *arg)
 {
-	while(true) {
+	char *str;
+	char key;
+
+	str = (char *)malloc(window::COL_MAX);
+	if (str == NULL) {
+		logger::fatal("malloc string of window summary failed : %s",
+				ERRSTR);	
+	}
+	window::draw_summary();
+
+	while(key = wgetch(window::scr) != 27) {
+		if (key == KEY_RESIZE)
 		// 清除屏幕所有内容
 		wclear(window::scr);
 
@@ -79,9 +90,26 @@ window::draw_summary()
 	wprintw(window::scr, "ichanged - %02d:%02d:%02d up\n",
 		result.tm_hour, result.tm_min, result.tm_sec);
 	wprintw(window::scr, "Directory: %s\n", options::directory.c_str());
+//	wattron(window::scr, A_REVERSE);
+//	wprintw(window::scr, " %-4s %-40s %-5s %-5s\n", 
+//			"TYPE", "FILE", "BASE", "CUR");
+//	wattroff(window::scr, A_REVERSE);
+}
+
+void
+window::draw_status_bar(char **string)
+{
+	char *tmp = *string;	
+
+	memset(tmp, 0, sizeof(tmp));
+	sprintf(tmp, "%-4s %-40s %-5s %-5s", "TYPE", "FILE", "BASE", "CUR");
+	memset(&tmp[strlen(tmp) - 1], ' ', COLS - (strlen(tmp) -1));
+	string[COLS] = '\0';
+		
 	wattron(window::scr, A_REVERSE);
-	wprintw(window::scr, " %-4s %-40s %-5s %-5s\n", "TYPE", "FILE", "BASE", "CUR");
+	wprintw(window::scr, "%s", tmp);
 	wattroff(window::scr, A_REVERSE);
+
 }
 
 void
