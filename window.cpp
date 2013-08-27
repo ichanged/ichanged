@@ -18,7 +18,7 @@ window::init()
 {
 	int status;
 
-	window::scr = initscr();
+	initscr();
 
 	cbreak();
 
@@ -57,23 +57,23 @@ window::start(void *arg)
 		logger::fatal("malloc string of window summary failed : %s",
 				ERRSTR);	
 	}
-	window::draw_summary();
-
-	while(key = wgetch(window::scr) != 27) {
-		if (key == KEY_RESIZE)
-		// 清除屏幕所有内容
-		wclear(window::scr);
-
-		// 打印摘要信息
-		window::draw_summary();
-		// 打印事件信息
-		window::draw_event();
-
-		// 将信息往终端上输出
-		wrefresh(window::scr);
-		// 根据配置的刷新时间，睡眠一段时间
-		sleep(options::interval);
-	}
+//	window::draw_summary();
+//
+//	while(key = wgetch(window::scr) != 27) {
+//		if (key == KEY_RESIZE)
+//		// 清除屏幕所有内容
+//		wclear(window::scr);
+//
+//		// 打印摘要信息
+//		window::draw_summary();
+//		// 打印事件信息
+//		window::draw_event();
+//
+//		// 将信息往终端上输出
+//		wrefresh(window::scr);
+//		// 根据配置的刷新时间，睡眠一段时间
+//		sleep(options::interval);
+//	}
 	return NULL;
 }
 

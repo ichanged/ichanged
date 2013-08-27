@@ -16,7 +16,8 @@ private:
 	static void draw_summary();
 	static void draw_event();
 
-	static WINDOW *scr;
+	static WINDOW *sum_win;
+	static WINDOW *event_win;
 	static pthread_t thread_id;
 
 	static const int COL_MAX = 1024; 
