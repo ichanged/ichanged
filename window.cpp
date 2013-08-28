@@ -10,17 +10,13 @@
 #include "watcher.h"
 #include "event.h"
 
-WINDOW *window::scr = NULL;
 pthread_t window::thread_id = 0;
+std::string window::status_bar;
 
 void
 window::init()
 {
 	int status;
-
-	initscr();
-
-	cbreak();
 
 	status = pthread_create(&window::thread_id, NULL, window::start, NULL);
 	if(status != 0) {
@@ -43,24 +39,43 @@ window::wait()
 void
 window::destory()
 {
-	endwin();
 }
 
 void *
 window::start(void *arg)
 {
-	char *str;
-	char key;
+	struct sigaction sa;
 
-	str = (char *)malloc(window::COL_MAX);
-	if (str == NULL) {
-		logger::fatal("malloc string of window summary failed : %s",
-				ERRSTR);	
+	initscr();
+
+	window::draw_summary();
+	window::draw_status_bar();
+
+	memset(&sa, 0, sizeof(struct sigaction));
+	sa.sa_handler = win_resize;
+
+	sigaction(SIGWINCH, &sa, NULL);
+
+	while(getch() != 27) {
+			
 	}
-//	window::draw_summary();
-//
-//	while(key = wgetch(window::scr) != 27) {
-//		if (key == KEY_RESIZE)
+	endwin();
+	return NULL;
+}
+
+void
+window::win_resize(int sig)
+{
+	endwin();
+	refresh();
+	clear();
+
+	window::draw_summary();
+	window::draw_status_bar();
+
+	refresh();
+}
+
 //		// 清除屏幕所有内容
 //		wclear(window::scr);
 //
@@ -73,9 +88,6 @@ window::start(void *arg)
 //		wrefresh(window::scr);
 //		// 根据配置的刷新时间，睡眠一段时间
 //		sleep(options::interval);
-//	}
-	return NULL;
-}
 
 void
 window::draw_summary()
@@ -87,9 +99,11 @@ window::draw_summary()
 	t = time(NULL);
 	localtime_r(&t, &result);
 
-	wprintw(window::scr, "ichanged - %02d:%02d:%02d up\n",
+	printw("ichanged - %02d:%02d:%02d up\n",
 		result.tm_hour, result.tm_min, result.tm_sec);
-	wprintw(window::scr, "Directory: %s\n", options::directory.c_str());
+	printw("Directory: %s\n", options::directory.c_str());
+
+	refresh();
 //	wattron(window::scr, A_REVERSE);
 //	wprintw(window::scr, " %-4s %-40s %-5s %-5s\n", 
 //			"TYPE", "FILE", "BASE", "CUR");
@@ -97,33 +111,37 @@ window::draw_summary()
 }
 
 void
-window::draw_status_bar(char **string)
+window::draw_status_bar()
 {
-	char *tmp = *string;	
+	char tmp[60];
 
-	memset(tmp, 0, sizeof(tmp));
 	sprintf(tmp, "%-4s %-40s %-5s %-5s", "TYPE", "FILE", "BASE", "CUR");
-	memset(&tmp[strlen(tmp) - 1], ' ', COLS - (strlen(tmp) -1));
-	string[COLS] = '\0';
-		
-	wattron(window::scr, A_REVERSE);
-	wprintw(window::scr, "%s", tmp);
-	wattroff(window::scr, A_REVERSE);
+	window::status_bar = tmp;
+	window::status_bar.resize(COLS, ' ');	
+//	memset(str, 0, sizeof(str));
+//	sprintf(str, "%-4s %-40s %-5s %-5s", "TYPE", "FILE", "BASE", "CUR");
+//	memset(&str[strlen(str) - 1], ' ', COLS - (strlen(tmp) -1));
+//	string[COLS] = '\0';
+//		
+	attron(A_REVERSE);
+	printw("%s", window::status_bar.c_str());
+	attroff(A_REVERSE);
 
+	refresh();
 }
 
 void
 window::draw_event()
 {
-	std::vector<event> *event_vec;
-	std::vector<event>::iterator pos;
-
-	watcher::lock();
-	event_vec = watcher::generate_snapshot();
-	watcher::unlock();
-	for(pos = event_vec->begin(); pos != event_vec->end(); ++pos) {
-		wprintw(window::scr, " %-4s %-40s %-5d %-5d\n",
-			pos->get_type_string().c_str(), pos->get_path().c_str(),
-			pos->get_base_size(), pos->get_current_size());
-	}
+//	std::vector<event> *event_vec;
+//	std::vector<event>::iterator pos;
+//
+//	watcher::lock();
+//	event_vec = watcher::generate_snapshot();
+//	watcher::unlock();
+//	for(pos = event_vec->begin(); pos != event_vec->end(); ++pos) {
+//		wprintw(window::scr, " %-4s %-40s %-5d %-5d\n",
+//			pos->get_type_string().c_str(), pos->get_path().c_str(),
+//			pos->get_base_size(), pos->get_current_size());
+//	}
 }
