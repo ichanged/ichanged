@@ -27,7 +27,7 @@ monitor::init()
 	if(monitor::inotify_fd == -1) {
 		logger::fatal("create inotify file descriptor error");
 	}
-	monitor::mask = IN_CREATE | IN_ATTRIB | IN_MODIFY;
+	monitor::mask = IN_CREATE | IN_ATTRIB | IN_MODIFY | IN_DELETE;
 
 	monitor::dir = options::directory;
 	monitor::init_monitor(options::directory);
