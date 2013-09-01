@@ -17,7 +17,7 @@ const std::string directory = "/tmp/xxtest/";
 
 int inotify_fd;
 int mask;
-std::map<std::string, int> watch;
+std::map<int, std::string> watch;
 
 typedef int (*ftw_func) (const char *fpath, const struct stat *sb, 
 		int typeflag);
@@ -29,25 +29,57 @@ add_monitor(const char *fpath, const struct stat *sb, int typeflag)
 
 	if (typeflag == FTW_D) {
 		wd = inotify_add_watch(inotify_fd, fpath, mask);
-		watch.insert(std::pair<std::string, int>(fpath, wd));
+		watch.insert(std::pair<int, std::string>(wd, fpath));
 	}
 
 	return 0;
 }
 
+void 
+handle_dir(struct inotify_event *event, std::string dir_name)
+{
+	int wd;
+	std::string path, tmp;
+
+	tmp.assign(event->name);
+	path = dir_name + '/' + tmp;
+
+	wd = inotify_add_watch(inotify_fd, path.c_str(), mask);
+	watch.insert(std::pair<int, std::string>(wd, path));
+
+	if (event->mask & IN_CREATE) {
+		std::cout << "New directory is " << path << std::endl;
+	} 
+}
+
+void
+handle_file(struct inotify_event *event, std::string dir_name)
+{
+	if (event->mask & IN_CREATE) {
+		std::cout << dir_name << "/" << event->name << "is created" 
+			<< std::endl; 			
+	} else if (event->mask & IN_ATTRIB) {
+		std::cout <<
+	}	
+}
+
 void
 handle(struct inotify_event *event)
 {
-	std::string path 
+	std::string path; 
 
-	std::map<std::string, int>::iterator iter;	
+	std::map<int, std::string>::iterator iter;	
 	iter = watch.find(event->wd);
-	if iter == watch.end() {
+	if (iter == watch.end()) {
 		printf("find watch error!\n");
 		exit(EXIT_FAILURE);
 	}
 
-	printf("%");
+	if (event->mask & IN_ISDIR) {
+		handle_dir(event, iter->second);	
+	} else {
+		handle_file(event, iter->second);
+	}
 }
 
 int
@@ -79,7 +111,7 @@ main(int argc, char *argv[])
 		memcpy(event, buf, size);
 
 		handle(event);
-			
+      		
 	}
 
 	return 0;	
