@@ -14,13 +14,13 @@ std::vector<event> watcher::_event_vec;
 pthread_mutex_t watcher::mutex = PTHREAD_MUTEX_INITIALIZER;
 
 void
-watcher::init_watch(int wd, const struct stat *s, std::string path)
+watcher::init_watch(int wd, const struct stat *sb, std::string path)
 {
 	watcher::_watch_map[wd] = watch(s, false, path);
 }
 
 void
-watcher::add_watch(int wd, const struct stat *s, std::string path)
+watcher::add_watch(int wd, const struct stat *sb, std::string path)
 {
 	watcher::_watch_map[wd] = watch(s, true, path);
 	watcher::_watch_set.insert(wd);
@@ -39,6 +39,9 @@ watcher::remove_watch(int wd)
 
 	w = watcher::_watch_map[wd];
 	watcher::_watch_map.erase(wd);
+
+	//wufei
+	watcher::_watch_set.insert(wd);
 }
 
 void
@@ -49,7 +52,7 @@ watcher::dir_attrib(int wd, std::string name)
 }
 
 void
-watcher::init_file(const struct stat *s, std::string path)
+watcher::init_file(const struct stat *sb, std::string path)
 {
 	std::map<int, watch>::iterator pos;
 	watch *w;
@@ -77,7 +80,7 @@ watcher::init_file(const struct stat *s, std::string path)
 }
 
 void
-watcher::add_file(const struct stat *s, std::string path)
+watcher::add_file(const struct stat *sb, std::string path)
 {
 	std::map<int, watch>::iterator pos;
 	watch *w;

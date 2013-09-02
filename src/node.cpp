@@ -15,7 +15,7 @@ _change(false)
 {
 	this->_new_create = new_create;
 	memcpy(&this->_base, base, sizeof(struct stat));
-	if(this->_new_create) {
+	if (this->_new_create) {
 		memcpy(&this->_ns, base, sizeof(struct stat));
 	}
 }

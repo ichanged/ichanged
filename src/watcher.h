@@ -13,15 +13,15 @@
 
 class watcher {
 public:
-	static void init_watch(int wd, const struct stat *s, std::string path);
-	static void add_watch(int wd, const struct stat *s, std::string path);
+	static void init_watch(int wd, const struct stat *sb, std::string path);
+	static void add_watch(int wd, const struct stat *sb, std::string path);
 	static watch get_watch(int wd);
 	static void remove_watch(int wd);
 
 	static void dir_attrib(int wd, std::string name);
 
-	static void init_file(const struct stat *s, std::string path);
-	static void add_file(const struct stat *s, std::string path);
+	static void init_file(const struct stat *sb, std::string path);
+	static void add_file(const struct stat *sb, std::string path);
 	static void file_create(int wd, std::string name);
 	static void file_attrib(int wd, std::string name);
 	static void file_modify(int wd, std::string name);

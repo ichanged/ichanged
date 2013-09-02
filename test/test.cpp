@@ -55,12 +55,15 @@ handle_dir(struct inotify_event *event, std::string dir_name)
 void
 handle_file(struct inotify_event *event, std::string dir_name)
 {
-	if (event->mask & IN_CREATE) {
-		std::cout << dir_name << "/" << event->name << "is created" 
-			<< std::endl; 			
-	} else if (event->mask & IN_ATTRIB) {
-		std::cout <<
-	}	
+//	std::cout << dir_name << "/" << event->name << " ";
+//
+//	if (event->mask & IN_CREATE) {
+//		std::cout << "is created" << std::endl;
+//	} else if (event->mask & IN_ATTRIB) {
+//		std::cout << "attrib was changed" << std::endl;
+//	} else if (event->mask & IN_MODIFY) {
+//		std::cout << "file was write" << std::endl;
+//	}	
 }
 
 void

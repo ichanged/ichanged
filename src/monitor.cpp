@@ -69,14 +69,15 @@ monitor::start(void *arg)
 		/* 读取inotify_event结构体 */
 		n = read(monitor::inotify_fd, buf, monitor::event_max_size);
 		if(n == -1) {
-			logger::fatal("read event from inotify error: %s", ERRSTR);
+			logger::fatal("read event from inotify error: %s", 
+					ERRSTR);
 		}
 		pe = (struct inotify_event *)buf;
 		size = sizeof(struct inotify_event) + pe->len;
 		e = (struct inotify_event *)malloc(size);
 		if(e == NULL) {
-			logger::fatal("failed to allocate memory for inotify_event: %s",
-				ERRSTR);
+			logger::fatal("failed to allocate memory for" 
+					" inotify_event: %s", ERRSTR);
 		}
 
 		/* 将读取的事件拷贝到分配的内存中 */
@@ -127,27 +128,27 @@ monitor::do_init_monitor(const char *fpath, const struct stat *sb,
 	std::vector<std::string>::iterator iter;
 	std::string sfpath = std::string(fpath);
 
-	// 如果配置了不监控隐藏文件与目录，则直接返回
-	if(!options::watch_hidden && monitor::is_path_hidden(fpath)) {
-		return 0;
-	}
+//	// 如果配置了不监控隐藏文件与目录，则直接返回
+//	if (!options::watch_hidden && monitor::is_path_hidden(fpath)) {
+//		return 0;
+//	}
 
-	// 如果当前目录是配置了不监控的特定目录，则直接返回
-	for (iter = options::exclude.begin(); iter != options::exclude.end();
-		++iter) {
-		if (sfpath.compare(0, iter->length(), *iter) == 0) {
-			std::cout << "match:" << *iter << "," << sfpath << std::endl;
-			return 0;
-		}
-	}
+//	// 如果当前目录是配置了不监控的特定目录，则直接返回
+//	for (iter = options::exclude.begin(); iter != options::exclude.end();
+//		++iter) {
+//		if (sfpath.compare(0, iter->length(), *iter) == 0) {
+//			std::cout << "match:" << *iter << "," << sfpath << std::endl;
+//			return 0;
+//		}
+//	}
 
-	switch(typeflag) {
+	switch (typeflag) {
 	case FTW_F:
 		watcher::init_file(sb, fpath);
 		break;
 	case FTW_D:
 		wd = inotify_add_watch(monitor::inotify_fd, fpath, monitor::mask);
-		if(-1 == wd) {
+		if (wd == -1) {
 			logger::warn("add watch to '%s' error", fpath);
 		}
 		watcher::init_watch(wd, sb, fpath);
@@ -155,7 +156,6 @@ monitor::do_init_monitor(const char *fpath, const struct stat *sb,
 	default:
 		break;
 	}
-	//logger::debug("init '%s'", fpath);
 
 	return 0;
 }
@@ -167,9 +167,9 @@ monitor::do_add_monitor(const char *fpath, const struct stat *sb,
 	int wd;
 
 	// 如果配置了不监控隐藏文件与目录，则直接返回
-	if(!options::watch_hidden && monitor::is_path_hidden(fpath)) {
-		return 0;
-	}
+//	if(!options::watch_hidden && monitor::is_path_hidden(fpath)) {
+//		return 0;
+//	}
 
 	switch(typeflag) {
 	case FTW_F:
