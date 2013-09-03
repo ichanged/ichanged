@@ -19,7 +19,7 @@ handler::handle_event(struct inotify_event *e)
 
 	watcher::lock();
 	if (e->mask & IN_ISDIR) {
-		handler::handle_dir_event(e, path);
+		//handler::handle_dir_event(e, path);
 	} else {
 		handler::handle_file_event(e, path);
 	}

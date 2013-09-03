@@ -38,32 +38,32 @@ add_monitor(const char *fpath, const struct stat *sb, int typeflag)
 void 
 handle_dir(struct inotify_event *event, std::string dir_name)
 {
-	int wd;
-	std::string path, tmp;
-
-	tmp.assign(event->name);
-	path = dir_name + '/' + tmp;
-
-	wd = inotify_add_watch(inotify_fd, path.c_str(), mask);
-	watch.insert(std::pair<int, std::string>(wd, path));
-
-	if (event->mask & IN_CREATE) {
-		std::cout << "New directory is " << path << std::endl;
-	} 
+//	int wd;
+//	std::string path, tmp;
+//
+//	tmp.assign(event->name);
+//	path = dir_name + '/' + tmp;
+//
+//	wd = inotify_add_watch(inotify_fd, path.c_str(), mask);
+//	watch.insert(std::pair<int, std::string>(wd, path));
+//
+//	if (event->mask & IN_CREATE) {
+//		std::cout << "New directory is " << path << std::endl;
+//	} else  
 }
 
 void
 handle_file(struct inotify_event *event, std::string dir_name)
 {
-//	std::cout << dir_name << "/" << event->name << " ";
-//
-//	if (event->mask & IN_CREATE) {
-//		std::cout << "is created" << std::endl;
-//	} else if (event->mask & IN_ATTRIB) {
-//		std::cout << "attrib was changed" << std::endl;
-//	} else if (event->mask & IN_MODIFY) {
-//		std::cout << "file was write" << std::endl;
-//	}	
+	std::cout << dir_name << "/" << event->name << " ";
+
+	if (event->mask & IN_CREATE) {
+		std::cout << "is created" << std::endl;
+	} else if (event->mask & IN_ATTRIB) {
+		std::cout << "attrib was changed" << std::endl;
+	} else if (event->mask & IN_MODIFY) {
+		std::cout << "file was write" << std::endl;
+	}	
 }
 
 void

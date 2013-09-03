@@ -10,10 +10,12 @@ main(int argc, char *argv[])
 	options::parse_args(argc, argv);
 
 	monitor::init();
-//	window::init();
+	window::init();
+
+	window::draw_event();
 
 	monitor::wait();
-//	window::wait();
+	window::wait();
 
 	monitor::destory();
 //	window::destory();

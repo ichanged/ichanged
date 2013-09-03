@@ -27,7 +27,8 @@ monitor::init()
 	if(monitor::inotify_fd == -1) {
 		logger::fatal("create inotify file descriptor error");
 	}
-	monitor::mask = IN_CREATE | IN_ATTRIB | IN_MODIFY | IN_DELETE;
+	monitor::mask = IN_CREATE | IN_ATTRIB | IN_MODIFY | IN_MOVE | 
+		IN_DELETE;
 
 	monitor::dir = options::directory;
 	monitor::init_monitor(options::directory);
@@ -85,6 +86,7 @@ monitor::start(void *arg)
 		/* 事件处理模块对事件进行处理 */
 		handler::handle_event(e);	
 		/* 释放事件内存 */
+
 		free(e);
 	}
 	return NULL;

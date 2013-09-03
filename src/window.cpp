@@ -133,15 +133,18 @@ window::draw_status_bar()
 void
 window::draw_event()
 {
-//	std::vector<event> *event_vec;
-//	std::vector<event>::iterator pos;
-//
-//	watcher::lock();
-//	event_vec = watcher::generate_snapshot();
-//	watcher::unlock();
-//	for(pos = event_vec->begin(); pos != event_vec->end(); ++pos) {
+	std::vector<event> *event_vec;
+	std::vector<event>::iterator pos;
+
+	watcher::lock();
+	event_vec = watcher::generate_snapshot();
+	watcher::unlock();
+	for(pos = event_vec->begin(); pos != event_vec->end(); ++pos) {
 //		wprintw(window::scr, " %-4s %-40s %-5d %-5d\n",
 //			pos->get_type_string().c_str(), pos->get_path().c_str(),
 //			pos->get_base_size(), pos->get_current_size());
-//	}
+		printf(" %-4s %-40s %-5d %-5d\n",
+			pos->get_type_string().c_str(), pos->get_path().c_str(),
+			pos->get_base_size(), pos->get_current_size());
+	}
 }
