@@ -16,7 +16,7 @@ class monitor {
 public:
 	static void init();
 	static void wait();
-	static void destory();
+	static void destroy();
 
 	static void *start(void *arg);
 	static void init_monitor(std::string dir);

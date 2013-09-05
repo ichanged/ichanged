@@ -16,13 +16,13 @@ pthread_mutex_t watcher::mutex = PTHREAD_MUTEX_INITIALIZER;
 void
 watcher::init_watch(int wd, const struct stat *sb, std::string path)
 {
-	watcher::_watch_map[wd] = watch(s, false, path);
+	watcher::_watch_map[wd] = watch(sb, false, path);
 }
 
 void
 watcher::add_watch(int wd, const struct stat *sb, std::string path)
 {
-	watcher::_watch_map[wd] = watch(s, true, path);
+	watcher::_watch_map[wd] = watch(sb, true, path);
 	watcher::_watch_set.insert(wd);
 }
 
@@ -73,7 +73,7 @@ watcher::init_file(const struct stat *sb, std::string path)
 		++pos) {
 		w = &pos->second;
 		if(w->get_path() == dir) {
-			w->file_init(s, filename);
+			w->file_init(sb, filename);
 			break;
 		}
 	}

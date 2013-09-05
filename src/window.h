@@ -10,14 +10,15 @@ class window {
 public:
 	static void init();
 	static void wait();
-	static void destory();
+	static void destroy();
 
+	//faye
+	static void draw_event();
 	static void *start(void *arg);
 
 private:
 	static void draw_summary();
 	static void draw_status_bar();
-	static void draw_event();
 	static void win_resize(int sig);
 
 	static pthread_t thread_id;

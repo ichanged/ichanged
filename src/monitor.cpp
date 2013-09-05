@@ -52,7 +52,7 @@ monitor::wait()
 }
 
 void
-monitor::destory()
+monitor::destroy()
 {
 	close(monitor::inotify_fd);
 }

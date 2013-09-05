@@ -37,8 +37,9 @@ window::wait()
 }
 
 void
-window::destory()
+window::destroy()
 {
+	endwin();
 }
 
 void *

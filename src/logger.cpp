@@ -5,12 +5,27 @@
 
 #include "logger.h"
 
+std::ofstream logger::fout;
+const char *logger::LOG_FILE = "ichanged.log";
+
 logger::logger()
 {
 }
 
 logger::~logger()
 {
+}
+
+void
+logger::init()
+{
+	logger::fout.open(LOG_FILE);	
+}
+
+void
+logger::destroy()
+{
+	logger::fout.close();	
 }
 
 void
@@ -83,14 +98,14 @@ logger::debug(const char *format, ...)
 void
 logger::log(int level, std::string info)
 {
-	FILE *fp;
+//	FILE *fp;
 	const char *slevel = NULL;
 
-	if(level > logger::LOG_WARN) {
-		fp = stderr;
-	} else {
-		fp = stdout;
-	}
+//	if(level > logger::LOG_WARN) {
+//		fp = stderr;
+//	} else {
+//		fp = stdout;
+//	}
 
 	switch(level) {
 	case logger::LOG_FATAL:
@@ -113,7 +128,9 @@ logger::log(int level, std::string info)
 		break;
 	}
 
-	fprintf(fp, "[%s] %s\n", slevel, info.c_str());
+//	fprintf(fp, "[%s] %s\n", slevel, info.c_str());
+	logger::fout << "[" << __FILE__ << __LINE__ << "] " << "[" << slevel 
+		<< "] " << info.c_str() << std::endl;
 	if(level > logger::LOG_WARN) {
 		exit(EXIT_FAILURE);
 	}
