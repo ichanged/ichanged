@@ -53,8 +53,6 @@ main(int argc, char *argv[])
 	monitor::init();
 	window::init();
 
-	window::draw_event();
-
 	monitor::wait();
 	window::wait();
 

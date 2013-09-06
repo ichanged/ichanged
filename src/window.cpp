@@ -45,22 +45,27 @@ window::destroy()
 void *
 window::start(void *arg)
 {
-	struct sigaction sa;
-
-	initscr();
-
-	window::draw_summary();
-	window::draw_status_bar();
-
-	memset(&sa, 0, sizeof(struct sigaction));
-	sa.sa_handler = win_resize;
-
-	sigaction(SIGWINCH, &sa, NULL);
-
-	while(getch() != 27) {
-			
+//	struct sigaction sa;
+//
+//	initscr();
+//
+//	window::draw_summary();
+//	window::draw_status_bar();
+//
+//	memset(&sa, 0, sizeof(struct sigaction));
+//	sa.sa_handler = win_resize;
+//
+//	sigaction(SIGWINCH, &sa, NULL);
+//
+//	while(getch() != 27) {
+//			
+//	}
+//	endwin();
+//
+	while (true) {
+		window::draw_event();
+		sleep(2);
 	}
-	endwin();
 	return NULL;
 }
 
@@ -144,7 +149,7 @@ window::draw_event()
 //		wprintw(window::scr, " %-4s %-40s %-5d %-5d\n",
 //			pos->get_type_string().c_str(), pos->get_path().c_str(),
 //			pos->get_base_size(), pos->get_current_size());
-		printf(" %-4s %-40s %-5d %-5d\n",
+		printf(" %-4s %-40s %-5ld %-5ld\n",
 			pos->get_type_string().c_str(), pos->get_path().c_str(),
 			pos->get_base_size(), pos->get_current_size());
 	}
