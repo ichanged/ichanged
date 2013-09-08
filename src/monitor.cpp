@@ -11,6 +11,7 @@
 #include "logger.h"
 #include "watch.h"
 #include "options.h"
+#include "ichanged.h"
 
 std::string monitor::dir;
 int monitor::inotify_fd = 0;
@@ -37,6 +38,10 @@ monitor::init()
 	if(status != 0) {
 		logger::fatal("create monitor thread error: %s", ERRSTR);
 	}
+	//tid[0] = monitor::thread_id; 
+
+	logger::info("[%s %d] monitor module init completely", __FILE__,
+			__LINE__);
 }
 
 void
@@ -55,6 +60,8 @@ void
 monitor::destroy()
 {
 	close(monitor::inotify_fd);
+	logger::info("[%s %d] monitor module init completely", __FILE__,
+			__LINE__);
 }
 
 void *
@@ -70,8 +77,8 @@ monitor::start(void *arg)
 		/* 读取inotify_event结构体 */
 		n = read(monitor::inotify_fd, buf, monitor::event_max_size);
 		if(n == -1) {
-			logger::fatal("read event from inotify error: %s", 
-					ERRSTR);
+			logger::fatal("[%s %d]read event from inotify error: %s", 
+					__FILE__, __LINE__, ERRSTR);
 		}
 		pe = (struct inotify_event *)buf;
 		size = sizeof(struct inotify_event) + pe->len;

@@ -9,6 +9,7 @@
 #include "options.h"
 #include "watcher.h"
 #include "event.h"
+#include "ichanged.h"
 
 pthread_t window::thread_id = 0;
 std::string window::status_bar;
@@ -22,6 +23,9 @@ window::init()
 	if(status != 0) {
 		logger::fatal("create window thread error: %s", ERRSTR);
 	}
+	//tid[1] = window::thread_id;
+	logger::info("[%s %d] window module init completely", __FILE__, 
+			__LINE__);
 }
 
 void
@@ -40,6 +44,8 @@ void
 window::destroy()
 {
 	endwin();
+	logger::info("[%s %d] window module end completely", __FILE__, 
+			__LINE__);
 }
 
 void *

@@ -1,17 +1,22 @@
-#include <cstdlib>
-#include <cstring>
-
 #include "monitor.h"
 #include "watcher.h"
 #include "options.h"
 #include "window.h"
 #include "logger.h"
+#include "ichanged.h"
 
+pthread_t tid[THREAD_NUM]; 
 static void handler(int sig);
 static void destroy();
 
 void
-handler(int sig)
+sigquit_handler(int sig)
+{
+	pthread_exit(NULL);
+}
+
+void
+sigint_handler(int sig)
 {
 	logger::info("[%s %d] ichanged stop waiting", __FILE__, __LINE__);	
 	exit(EXIT_SUCCESS);
@@ -31,16 +36,24 @@ int
 main(int argc, char *argv[])
 {
 	int status;
-	struct sigaction sa;
+	struct sigaction sa_int, sa_quit;
 
-	memset(&sa, 0, sizeof(sa));
-	sa.sa_handler = handler;
-	status = sigaction(SIGINT, &sa, NULL);
+	memset(&sa_int, 0, sizeof(sa_int));
+	memset(&sa_quit, 0, sizeof(sa_quit));
+
+	sa_int.sa_handler = sigint_handler;
+	sa_quit.sa_handler = sigquit_handler;
+
+	status = sigaction(SIGINT, &sa_int, NULL);
 	if (status == -1 ) {
 		logger::warn("[%s %d]signal handler register error", __FILE__,
 				__LINE__);
 	}
-
+	status = sigaction(SIGQUIT, &sa_quit, NULL);
+	if (status == -1 ) {
+		logger::warn("[%s %d]signal handler register error", __FILE__,
+				__LINE__);
+	}
 	status = atexit(destroy);
 	if (status != 0) {
 		logger::warn("[%s %d]exit handler register", __FILE__, __LINE__);
@@ -49,7 +62,7 @@ main(int argc, char *argv[])
 	/* 解析命令行参数 */
 	options::parse_args(argc, argv);
 
-	//logger::init();
+	logger::init();
 	monitor::init();
 	window::init();
 

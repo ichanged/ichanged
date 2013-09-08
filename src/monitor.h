@@ -22,6 +22,7 @@ public:
 	static void init_monitor(std::string dir);
 	static void add_monitor(std::string dir);
 	static void remove_monitor(int wd);
+	static pthread_t thread_id;
 private:
 	static int do_init_monitor(const char *fpath, const struct stat *sb,
 		int typeflag);
@@ -38,7 +39,6 @@ private:
 	static std::string dir;
 	static int inotify_fd;
 	static int mask;
-	static pthread_t thread_id;
 
 	static const int event_max_size =
 		sizeof(struct inotify_event) + NAME_MAX + 1;

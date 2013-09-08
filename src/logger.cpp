@@ -20,12 +20,14 @@ void
 logger::init()
 {
 	logger::fout.open(LOG_FILE);	
+	logger::info("[%s %d] log module init completely", __FILE__, __LINE__);
 }
 
 void
 logger::destroy()
 {
 	logger::fout.close();	
+	logger::info("[%s %d] log module end completely", __FILE__, __LINE__);
 }
 
 void
@@ -129,8 +131,7 @@ logger::log(int level, std::string info)
 	}
 
 //	fprintf(fp, "[%s] %s\n", slevel, info.c_str());
-	logger::fout << "[" << __FILE__ << __LINE__ << "] " << "[" << slevel 
-		<< "] " << info.c_str() << std::endl;
+	logger::fout << "[" << slevel << "] " << info.c_str() << std::endl;
 	if(level > logger::LOG_WARN) {
 		exit(EXIT_FAILURE);
 	}
