@@ -6,7 +6,8 @@
 #include "ichanged.h"
 
 pthread_t tid[THREAD_NUM]; 
-static void handler(int sig);
+static void sigquit_handler(int sig);
+static void sigint_handler(int sig);
 static void destroy();
 
 void
@@ -18,6 +19,13 @@ sigquit_handler(int sig)
 void
 sigint_handler(int sig)
 {
+	int i;
+
+	for(i = 0; i < THREAD_NUM; i++) {
+		logger::info("[%s %d] thread: %lu will be killed", __FILE__,
+				__LINE__, tid[i]);
+		pthread_kill(tid[i], SIGQUIT);
+	}
 	logger::info("[%s %d] ichanged stop waiting", __FILE__, __LINE__);	
 	exit(EXIT_SUCCESS);
 }
@@ -25,11 +33,10 @@ sigint_handler(int sig)
 void
 destroy()
 {
-	logger::info("[%s %d] ichanged exit normally", __FILE__, __LINE__);
-	
-	logger::destroy();
 	monitor::destroy();	
 	window::destroy();
+	logger::info("[%s %d] ichanged exit normally", __FILE__, __LINE__);
+	logger::destroy();
 }
 
 int

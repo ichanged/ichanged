@@ -38,10 +38,10 @@ monitor::init()
 	if(status != 0) {
 		logger::fatal("create monitor thread error: %s", ERRSTR);
 	}
-	//tid[0] = monitor::thread_id; 
+	tid[0] = monitor::thread_id; 
 
-	logger::info("[%s %d] monitor module init completely", __FILE__,
-			__LINE__);
+	logger::info("[%s %d] thread: %lu monitor module init completely", 
+			__FILE__, __LINE__, monitor::thread_id);
 }
 
 void
@@ -60,7 +60,7 @@ void
 monitor::destroy()
 {
 	close(monitor::inotify_fd);
-	logger::info("[%s %d] monitor module init completely", __FILE__,
+	logger::info("[%s %d] monitor module end completely", __FILE__,
 			__LINE__);
 }
 

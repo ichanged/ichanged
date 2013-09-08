@@ -23,9 +23,9 @@ window::init()
 	if(status != 0) {
 		logger::fatal("create window thread error: %s", ERRSTR);
 	}
-	//tid[1] = window::thread_id;
-	logger::info("[%s %d] window module init completely", __FILE__, 
-			__LINE__);
+	tid[1] = window::thread_id;
+	logger::info("[%s %d] thread: %lu window module init completely", 
+			__FILE__, __LINE__, window::thread_id);
 }
 
 void
