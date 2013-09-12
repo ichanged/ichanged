@@ -58,4 +58,5 @@ handler::handle_file_event(struct inotify_event *e, std::string path)
 	if (e->mask & IN_MODIFY) {
 		watcher::file_modify(e->wd, e->name);
 	}
+	if (e->mask & IN_DELETE || e->mask-> IN_MOVE)
 }

@@ -69,8 +69,8 @@ window::start(void *arg)
 //	endwin();
 //
 	while (true) {
-		window::draw_event();
-		sleep(2);
+	//	window::draw_event();
+	//	sleep(5);
 	}
 	return NULL;
 }
