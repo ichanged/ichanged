@@ -80,6 +80,15 @@ watch::file_attrib(std::string filename)
 }
 
 void
+watch::file_delete(std::string filename)
+{
+	this->_file_map[filename].delete(NULL);	
+
+	this->_file_change = true;
+	this->_file_set.insert(filename);
+}
+
+void
 watch::generate_snapshot(std::vector<event> *event_vec)
 {
 	std::set<std::string>::iterator pos;

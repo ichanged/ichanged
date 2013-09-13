@@ -15,6 +15,7 @@ public:
 	bool is_new_create();
 	bool is_modify();
 	bool is_attrib();
+	bool is_delete();
 
 	bool is_change();
 
@@ -25,6 +26,7 @@ protected:
 	bool _modify;
 	bool _attrib;
 	bool _change;
+	bool _delete;
 
 	struct stat _base, _ns;
 };

@@ -2,6 +2,7 @@
 #define _HANDLER_H_
 
 #include <sys/inotify.h>
+#include <unistd.h>
 #include <string>
 
 class handler {
