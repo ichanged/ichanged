@@ -33,6 +33,14 @@ file::attrib(const struct stat *ns)
 	this->_change = true;
 }
 
+void 
+file::idelete(const struct stat *ns)
+{
+	this->_ns.st_size = -2 ;
+	this->_delete = true;
+	this->_change = true;
+}
+
 std::string
 file::get_filename()
 {

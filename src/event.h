@@ -27,6 +27,7 @@ public:
 	static const int TYPE_CREATE = 0x00000001;
 	static const int TYPE_MODIFY = 0x00000002;
 	static const int TYPE_ATTRIB = 0x00000004;
+	static const int TYPE_DELETE = 0x00000008;
 	static const int TYPE_DIRECTORY = 0x10000000;
 private:
 	std::string _path;

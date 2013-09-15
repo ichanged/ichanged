@@ -82,7 +82,7 @@ watch::file_attrib(std::string filename)
 void
 watch::file_delete(std::string filename)
 {
-	this->_file_map[filename].delete(NULL);	
+	this->_file_map[filename].idelete(NULL);	
 
 	this->_file_change = true;
 	this->_file_set.insert(filename);
@@ -116,14 +116,17 @@ watch::generate_snapshot(std::vector<event> *event_vec)
 		if(f.is_attrib()) {
 			e.add_type(event::TYPE_ATTRIB);
 		}
+		if(f.is_delete()) {
+			e.add_type(event::TYPE_DELETE);
+		}
 		if(e.get_type() == event::TYPE_NONE) {
 			continue;
 		}
-		/* 如果文件被修改且大小不变，不显示 */
-		if(e.get_type() == event::TYPE_MODIFY
-		&& f.get_base_size() == f.get_current_size()) {
-			continue;
-		}
+//		/* 如果文件被修改且大小不变，不显示 */
+//		if(e.get_type() == event::TYPE_MODIFY
+//		&& f.get_base_size() == f.get_current_size()) {
+//			continue;
+//		}
 		e.set_path(this->_get_file_path(f.get_filename()));
 		e.set_base_size(f.get_base_size());
 		e.set_current_size(f.get_current_size());

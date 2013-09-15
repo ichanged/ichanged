@@ -25,8 +25,8 @@ protected:
 	bool _new_create;
 	bool _modify;
 	bool _attrib;
-	bool _change;
 	bool _delete;
+	bool _change;
 
 	struct stat _base, _ns;
 };

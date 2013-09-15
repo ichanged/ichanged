@@ -138,10 +138,13 @@ watcher::file_modify(int wd, std::string name)
 }
 
 void
-watcher::file_delete(int wd, std:string name)
+watcher::file_delete(int wd, std::string name)
 {
-	watcher::_watch_map[wd].file_delete(name);
-	watcher::_watch_set.insert(wd);
+	if (name.rfind(".swp") == std::string::npos && 
+			name.rfind(".swx") == std::string::npos) {
+		watcher::_watch_map[wd].file_delete(name);
+		watcher::_watch_set.insert(wd);
+	}
 }
 
 void

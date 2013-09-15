@@ -24,7 +24,7 @@ event::set_path(const std::string path)
 std::string
 event::get_path()
 {
-	if(this->_type & event::TYPE_DIRECTORY) {
+	if (this->_type & event::TYPE_DIRECTORY) {
 		return this->_path + "/";
 	} else {
 		return this->_path;
@@ -53,14 +53,17 @@ std::string
 event::get_type_string()
 {
 	std::string type = std::string("");
-	if(this->_type & event::TYPE_ATTRIB) {
+	if (this->_type & event::TYPE_ATTRIB) {
 		type += "A";
 	}
-	if(this->_type & event::TYPE_MODIFY) {
+	if (this->_type & event::TYPE_MODIFY) {
 		type += "M";
 	}
-	if(this->_type & event::TYPE_CREATE) {
+	if (this->_type & event::TYPE_CREATE) {
 		type += "+";
+	}
+	if (this->_type & event::TYPE_DELETE) {
+		type += "D";
 	}
 	return type;
 }

@@ -11,6 +11,7 @@ node::node(const struct stat *base, bool new_create)
 :
 _modify(false),
 _attrib(false),
+_delete(false),
 _change(false)
 {
 	this->_new_create = new_create;
@@ -46,6 +47,12 @@ bool
 node::is_change()
 {
 	return this->_change;
+}
+
+bool
+node::is_delete()
+{
+	return this->_delete;
 }
 
 off_t
