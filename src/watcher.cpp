@@ -110,46 +110,40 @@ watcher::add_file(const struct stat *sb, std::string path)
 void
 watcher::file_create(int wd, std::string name)
 {
-	if (name.rfind(".swp") == std::string::npos && 
-			name.rfind(".swx") == std::string::npos) {
-		if (watcher::_watch_map[wd].file_create(name)) {
-			watcher::_watch_set.insert(wd);
-		}
+	if (watcher::_watch_map[wd].file_create(name)) {
+		watcher::_watch_set.insert(wd);
 	}
 }
 
 void
 watcher::file_attrib(int wd, std::string name)
 {
-	if (name.rfind(".swp") == std::string::npos && 
-			name.rfind(".swx") == std::string::npos) {
-		if (watcher::_watch_map[wd].file_attrib(name)) {
-			watcher::_watch_set.insert(wd);
-		}
+	if (watcher::_watch_map[wd].file_attrib(name)) {
+		watcher::_watch_set.insert(wd);
 	}
 }
 
 void
 watcher::file_modify(int wd, std::string name)
 {
-	if (name.rfind(".swp") == std::string::npos && 
-			name.rfind(".swx") == std::string::npos) {
-		if (watcher::_watch_map[wd].file_modify(name)) {
-			watcher::_watch_set.insert(wd);
-		}
+	if (watcher::_watch_map[wd].file_modify(name)) {
+		watcher::_watch_set.insert(wd);
 	}
 }
 
 void
 watcher::file_delete(int wd, std::string name)
 {
-	if (name.rfind(".swp") == std::string::npos && 
-			name.rfind(".swx") == std::string::npos) {
-		if (watcher::_watch_map[wd].file_delete(name)) {
-			watcher::_watch_set.insert(wd);
-		}
+	if (watcher::_watch_map[wd].file_delete(name)) {
+		watcher::_watch_set.insert(wd);
 	}
 }
+
+//void
+//watcher::file_write(int wd, std::string name)
+//{
+//	
+//}
 
 void
 watcher::lock()
