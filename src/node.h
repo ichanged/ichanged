@@ -21,8 +21,9 @@ public:
 
 	off_t get_base_size();
 	off_t get_current_size();
+
+	bool new_create;
 protected:
-	bool _new_create;
 	bool _modify;
 	bool _attrib;
 	bool _delete;

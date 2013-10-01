@@ -79,13 +79,17 @@ watch::file_attrib(std::string filename)
 	this->_file_set.insert(filename);
 }
 
-void
+bool
 watch::file_delete(std::string filename)
 {
+	if (this->_file_map[filename].new_create) {
+		this->_file_set.erase(filename);
+		return false;	
+	}
 	this->_file_map[filename].idelete(NULL);	
-
 	this->_file_change = true;
 	this->_file_set.insert(filename);
+	return true;
 }
 
 void

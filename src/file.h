@@ -16,6 +16,7 @@ public:
 	void idelete(const struct stat *ns);
 
 	std::string get_filename();
+
 private:
 	std::string _filename;
 };

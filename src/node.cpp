@@ -7,17 +7,20 @@ node::node()
 {
 }
 
-node::node(const struct stat *base, bool new_create)
+node::node(const struct stat *stat_tmp, bool new_create)
 :
 _modify(false),
 _attrib(false),
 _delete(false),
 _change(false)
 {
-	this->_new_create = new_create;
-	memcpy(&this->_base, base, sizeof(struct stat));
-	if (this->_new_create) {
-		memcpy(&this->_ns, base, sizeof(struct stat));
+	this->new_create = new_create;
+	if (new_create) {
+		this->_base.st_size = -2;		
+		memcpy(&this->_ns, stat_tmp, sizeof(struct stat));
+	} else {
+		memcpy(&this->_base, stat_tmp, sizeof(struct stat));
+		memcpy(&this->_ns, stat_tmp, sizeof(struct stat));
 	}
 }
 
@@ -28,7 +31,7 @@ node::~node()
 bool
 node::is_new_create()
 {
-	return this->_new_create;
+	return this->new_create;
 }
 
 bool

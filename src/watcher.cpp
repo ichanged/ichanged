@@ -140,10 +140,19 @@ watcher::file_modify(int wd, std::string name)
 void
 watcher::file_delete(int wd, std::string name)
 {
+//	std::map<std::string, file>::iterator pos;
+//	watch *tmp = &_watch_map[wd]; 
+//
+//	for(pos = tmp->begin(); pos != tmp->end(); pos++) {
+//		if (pos->first == name && pos->second.new_create == false) {
+//					
+//		} 	
+//	}
 	if (name.rfind(".swp") == std::string::npos && 
 			name.rfind(".swx") == std::string::npos) {
-		watcher::_watch_map[wd].file_delete(name);
-		watcher::_watch_set.insert(wd);
+		if (watcher::_watch_map[wd].file_delete(name)) {
+			watcher::_watch_set.insert(wd);
+		}
 	}
 }
 
@@ -153,7 +162,7 @@ watcher::lock()
 	int status;
 
 	status = pthread_mutex_lock(&watcher::mutex);
-	if(status != 0) {
+	if (status != 0) {
 		logger::fatal("lock watcher error: %s", ERRSTR);
 	}
 }
@@ -164,7 +173,7 @@ watcher::unlock()
 	int status;
 
 	status = pthread_mutex_unlock(&watcher::mutex);
-	if(status != 0) {
+	if (status != 0) {
 		logger::fatal("unlock watcher error: %s", ERRSTR);
 	}
 }
@@ -175,9 +184,10 @@ watcher::generate_snapshot()
 	std::set<int>::iterator pos;
 
 	watcher::_event_vec.clear();
-	for(pos = watcher::_watch_set.begin(); pos != watcher::_watch_set.end();
+	for (pos = watcher::_watch_set.begin(); pos != watcher::_watch_set.end();
 		++pos) {
 		watch &w = watcher::_watch_map[*pos];
+		//why
 		if(w.is_new_create() || w.file_change()) {
 			w.generate_snapshot(&watcher::_event_vec);
 		}

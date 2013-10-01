@@ -24,7 +24,7 @@ public:
 	void file_create(std::string filename);
 	void file_modify(std::string filename);
 	void file_attrib(std::string filename);
-	void file_delete(std::string filename);
+	bool file_delete(std::string filename);
 
 	void generate_snapshot(std::vector<event> *event_vec);
 private:
