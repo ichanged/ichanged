@@ -43,40 +43,46 @@ watch::file_init(const struct stat *s, std::string filename)
 	this->_file_map[filename] = file(s, false, filename);
 }
 
-void
+bool
 watch::file_create(std::string filename)
 {
 	struct stat s;
 
-	this->_get_file_stat(filename, &s);
-	this->_file_map[filename] = file(&s, true, filename);
-
-	this->_file_change = true;
-	this->_file_set.insert(filename);
+	if (this->_get_file_stat(filename, &s)) {
+		this->_file_map[filename] = file(&s, true, filename);
+		this->_file_change = true;
+		this->_file_set.insert(filename);
+		return true;
+	}
+	return false;
 }
 
-void
+bool
 watch::file_modify(std::string filename)
 {
 	struct stat s;
 
-	this->_get_file_stat(filename, &s);
-	this->_file_map[filename].modify(&s);
-
-	this->_file_change = true;
-	this->_file_set.insert(filename);
+	if (this->_get_file_stat(filename, &s)) {
+		this->_file_map[filename].modify(&s);
+		this->_file_change = true;
+		this->_file_set.insert(filename);
+		return true;
+	}
+	return false;
 }
 
-void
+bool
 watch::file_attrib(std::string filename)
 {
 	struct stat s;
 
-	this->_get_file_stat(filename, &s);
-	this->_file_map[filename].attrib(&s);
-
-	this->_file_change = true;
-	this->_file_set.insert(filename);
+	if (this->_get_file_stat(filename, &s)) {
+		this->_file_map[filename].attrib(&s);
+		this->_file_change = true;
+		this->_file_set.insert(filename);
+		return true;
+	}
+	return false;
 }
 
 bool
@@ -144,17 +150,18 @@ watch::_get_file_path(std::string filename)
 	return this->_path + "/" + filename;
 }
 
-void
+bool
 watch::_get_file_stat(std::string filename, struct stat *s)
 {
 	std::string path = this->_get_file_path(filename);
-	this->_get_stat(path, s);
+	return this->_get_stat(path, s);
 }
 
-void
+bool
 watch::_get_stat(std::string path, struct stat *s)
 {
 	if(-1 == stat(path.c_str(), s)) {
-		logger::error("stat file '%s' error: %s", path.c_str(), ERRSTR);
+		return false;
 	}
+	return true;
 }

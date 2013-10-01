@@ -30,6 +30,7 @@ monitor::init()
 	}
 	monitor::mask = IN_CREATE | IN_ATTRIB | IN_MODIFY | IN_MOVE | 
 		IN_DELETE;
+	//monitor::mask = IN_ALL_EVENTS;
 
 	monitor::dir = options::directory;
 	monitor::init_monitor(options::directory);

@@ -21,16 +21,16 @@ public:
 
 	bool file_change();
 	void file_init(const struct stat *s, std::string filename);
-	void file_create(std::string filename);
-	void file_modify(std::string filename);
-	void file_attrib(std::string filename);
+	bool file_create(std::string filename);
+	bool file_modify(std::string filename);
+	bool file_attrib(std::string filename);
 	bool file_delete(std::string filename);
 
 	void generate_snapshot(std::vector<event> *event_vec);
 private:
 	std::string _get_file_path(std::string filename);
-	void _get_file_stat(std::string filename, struct stat *s);
-	void _get_stat(std::string path, struct stat *s);
+	bool _get_file_stat(std::string filename, struct stat *s);
+	bool _get_stat(std::string path, struct stat *s);
 
 	std::string _path;
 	bool _file_change;
