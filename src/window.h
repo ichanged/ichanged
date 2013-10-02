@@ -5,6 +5,7 @@
 #include <pthread.h>
 #include <string>
 #include <signal.h>
+#include <sstream>
 
 class window {
 public:
@@ -19,6 +20,7 @@ private:
 	static void draw_status_bar();
 	static void draw_event();
 	static void win_resize(int sig);
+	static void _itoa(off_t size, std::string &size_str);
 
 	static pthread_t thread_id;
 	static std::string status_bar; 
@@ -27,6 +29,3 @@ private:
 };
 
 #endif
-
-//hahahhahahhaha
-

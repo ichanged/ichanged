@@ -6,7 +6,7 @@
 #include "options.h"
 
 /* 监控目录 */
-std::string options::directory = "/home/faye/ichanged";
+std::string options::directory = "/tmp";
 /* 界面刷新时间间隔 */
 uint32_t options::interval = 2;
 /* 排除监控的文件、目录 */
@@ -25,7 +25,7 @@ options::parse_args(int argc, char *argv[])
 		{"watch-hidden", no_argument, NULL, 'w'}
 	};
 
-	while((opt = getopt_long(argc, argv, "i:d:e:w", opts, NULL)) != -1) {
+	while((opt = getopt_long(argc, argv, "i:d:e:wf", opts, NULL)) != -1) {
 		switch(opt) {
 		case 'i':
 			options::interval = atoi(optarg);

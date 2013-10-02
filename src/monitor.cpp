@@ -160,7 +160,7 @@ monitor::do_init_monitor(const char *fpath, const struct stat *sb,
 		wd = inotify_add_watch(monitor::inotify_fd, fpath, 
 				monitor::mask);
 		if (wd == -1) {
-			logger::warn("add watch to '%s' error", fpath);
+			logger::warn("add watch to '%s' error: %s", fpath, ERRSTR);
 		}
 		watcher::init_watch(wd, sb, fpath);
 		break;
