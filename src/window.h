@@ -6,6 +6,7 @@
 #include <string>
 #include <signal.h>
 #include <sstream>
+#include <math.h>
 
 class window {
 public:

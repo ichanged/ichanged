@@ -169,6 +169,10 @@ window::draw_event()
 //		wprintw(window::scr, " %-4s %-40s %-5d %-5d\n",
 //			pos->get_type_string().c_str(), pos->get_path().c_str(),
 //			pos->get_base_size(), pos->get_current_size());
+		if (abs(pos->get_base_size() - pos->get_current_size())
+				< options::threshold) {
+			continue;
+		} 
 		window::_itoa(pos->get_base_size(), base_size);
 		window::_itoa(pos->get_current_size(), current_size);
 		printf(" %-4s %-40s %-5s %-5s\n",

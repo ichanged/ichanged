@@ -17,6 +17,9 @@ public:
 	static std::vector<std::string> exclude;
 	/* 是否监控隐藏文件、目录 */
 	static bool watch_hidden;
+	/* 显示文件变化的阙值 */
+	static long threshold;  
+
 };
 
 #endif
