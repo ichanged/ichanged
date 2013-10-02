@@ -41,6 +41,18 @@ file::idelete(const struct stat *ns)
 	this->_change = true;
 }
 
+bool
+file::write(const struct stat *ns)
+{
+	if (this->_ns.st_size < ns->st_size) {
+		memcpy(&this->_ns, ns, sizeof(struct stat));
+		this->_modify = true;
+		this->_change = true;
+		return true;
+	}
+	return false;
+}
+
 std::string
 file::get_filename()
 {

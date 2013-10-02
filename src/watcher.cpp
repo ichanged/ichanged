@@ -139,11 +139,13 @@ watcher::file_delete(int wd, std::string name)
 	}
 }
 
-//void
-//watcher::file_write(int wd, std::string name)
-//{
-//	
-//}
+void
+watcher::file_write(int wd, std::string name)
+{
+	if (watcher::_watch_map[wd].file_write(name)) {
+		watcher::_watch_set.insert(wd);	
+	}	
+}
 
 void
 watcher::lock()

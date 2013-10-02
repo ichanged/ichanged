@@ -26,6 +26,7 @@ public:
 	static void file_attrib(int wd, std::string name);
 	static void file_modify(int wd, std::string name);
 	static void file_delete(int wd, std::string name);
+	static void file_write(int wd, std::string name);
 
 	static std::vector<event> *generate_snapshot();
 

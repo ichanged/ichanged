@@ -25,6 +25,7 @@ public:
 	bool file_modify(std::string filename);
 	bool file_attrib(std::string filename);
 	bool file_delete(std::string filename);
+	bool file_write(std::string filename);
 
 	void generate_snapshot(std::vector<event> *event_vec);
 private:

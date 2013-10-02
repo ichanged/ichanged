@@ -14,6 +14,7 @@ public:
 	void modify(const struct stat *ns);
 	void attrib(const struct stat *ns);
 	void idelete(const struct stat *ns);
+	bool write(const struct stat *s);
 
 	std::string get_filename();
 

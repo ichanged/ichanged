@@ -98,6 +98,22 @@ watch::file_delete(std::string filename)
 	return true;
 }
 
+bool
+watch::file_write(std::string filename)
+{
+	struct stat s;
+	file f;
+
+	if (this->_get_file_stat(filename, &s)) {
+		if (this->_file_map[filename].write(&s)) {
+			this->_file_change = true;
+			this->_file_set.insert(filename);
+			return true;
+		}
+	}	
+	return false;
+}
+
 void
 watch::generate_snapshot(std::vector<event> *event_vec)
 {
