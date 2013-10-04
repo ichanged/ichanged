@@ -15,6 +15,8 @@ std::vector<std::string> options::exclude;
 bool options::watch_hidden = false;
 /* 显示文件变化的阙值 */
 long options::threshold = 0;
+/* ichanged记录变化的文件 */
+std::string options::filename = "change.log";
 
 void
 options::parse_args(int argc, char *argv[])

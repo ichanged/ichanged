@@ -10,6 +10,7 @@
 #include "watcher.h"
 #include "event.h"
 #include "ichanged.h"
+#include "record.h"
 
 pthread_t window::thread_id = 0;
 std::string window::status_bar;
@@ -69,8 +70,8 @@ window::start(void *arg)
 //	endwin();
 //
 	while (true) {
-		window::draw_event();
-		sleep(5);
+		window::draw_event();	
+		sleep(options::interval);
 	}
 	return NULL;
 }
@@ -161,10 +162,13 @@ window::draw_event()
 	std::vector<event> *event_vec;
 	std::vector<event>::iterator pos;
 	std::string base_size, current_size;
+	char output[1000] = {0};
 
 	watcher::lock();
 	event_vec = watcher::generate_snapshot();
 	watcher::unlock();
+
+	record::get_time();
 	for(pos = event_vec->begin(); pos != event_vec->end(); ++pos) {
 //		wprintw(window::scr, " %-4s %-40s %-5d %-5d\n",
 //			pos->get_type_string().c_str(), pos->get_path().c_str(),
@@ -175,8 +179,12 @@ window::draw_event()
 		} 
 		window::_itoa(pos->get_base_size(), base_size);
 		window::_itoa(pos->get_current_size(), current_size);
-		printf(" %-4s %-40s %-5s %-5s\n",
-			pos->get_type_string().c_str(), pos->get_path().c_str(),
-			base_size.c_str(), current_size.c_str());
+
+		sprintf(output, " %-4s %-40s %-5s %-5s\n", 
+				pos->get_type_string().c_str(), 
+				pos->get_path().c_str(), base_size.c_str(),
+				current_size.c_str());		
+		record::event_to_file(output);
+		printf("%s", output);
 	}
 }

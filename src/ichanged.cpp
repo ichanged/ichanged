@@ -2,6 +2,7 @@
 #include "watcher.h"
 #include "options.h"
 #include "window.h"
+#include "record.h"
 #include "logger.h"
 #include "ichanged.h"
 
@@ -35,6 +36,7 @@ destroy()
 {
 	monitor::destroy();	
 	window::destroy();
+	record::close();
 	logger::info("[%s %d] ichanged exit normally", __FILE__, __LINE__);
 	logger::destroy();
 }
@@ -72,6 +74,7 @@ main(int argc, char *argv[])
 	logger::init();
 	monitor::init();
 	window::init();
+	record::init();
 
 	monitor::wait();
 	window::wait();

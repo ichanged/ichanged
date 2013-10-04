@@ -2,6 +2,7 @@
 #define _OPTIONS_H_
 
 #include <string>
+#include <vector>
 #include <inttypes.h>
 
 class options {
@@ -19,6 +20,8 @@ public:
 	static bool watch_hidden;
 	/* 显示文件变化的阙值 */
 	static long threshold;  
+	/* ichanged记录变化的文件 */
+	static std::string filename; 
 
 };
 
