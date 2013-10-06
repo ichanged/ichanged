@@ -127,7 +127,10 @@ monitor::add_monitor(std::string dir)
 void
 monitor::remove_monitor(int wd)
 {
-	watcher::remove_watch(wd);
+	if (inotify_rm_watch(monitor::inotify_fd, wd) <= 0) {
+		logger::warn("[%s %d]rm inotify watch failure", __FILE__, 
+				__LINE__);
+	}
 }
 
 int

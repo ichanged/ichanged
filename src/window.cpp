@@ -174,8 +174,11 @@ window::draw_event()
 //			pos->get_type_string().c_str(), pos->get_path().c_str(),
 //			pos->get_base_size(), pos->get_current_size());
 		if (abs(pos->get_base_size() - pos->get_current_size())
-				< options::threshold) {
-			continue;
+				< options::threshold) { 
+			if (pos->get_base_size() != -2 && 
+				pos->get_current_size() != -2) {
+				continue;
+			}
 		} 
 		window::_itoa(pos->get_base_size(), base_size);
 		window::_itoa(pos->get_current_size(), current_size);

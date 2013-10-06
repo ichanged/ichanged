@@ -25,16 +25,47 @@ watch::get_path()
 	return this->_path;
 }
 
-void
+bool
 watch::attrib()
 {
-	this->_get_stat(this->_path, &this->_ns);
+	if (this->_get_stat(this->_path, &this->_ns)) {
+		this->_attrib = true;
+		this->_change = true;
+		return true;
+	}
+	return false;
 }
 
 bool
-watch::file_change()
+watch::modify()
 {
-	return this->_file_change;
+	if (this->_get_stat(this->_path, &this->_ns)) {
+		this->_modify = true;
+		this->_change = true;
+		return true;
+	}
+	return false;
+}
+
+bool
+watch::idelete()
+{
+	if (this->new_create) {
+		return false;
+	}
+	this->_ns.st_size = -2;
+	this->_delete = true;	
+	this->_change = true;
+	return true;
+}
+
+bool
+watch::is_change()
+{
+	if (this->_file_change || this->_change) {
+		return true;
+	}
+	return false;
 }
 
 void
@@ -46,7 +77,7 @@ watch::file_init(const struct stat *s, std::string filename)
 bool
 watch::file_create(std::string filename)
 {
-	struct stat s;
+	struct stat s; 
 
 	if (this->_get_file_stat(filename, &s)) {
 		this->_file_map[filename] = file(&s, true, filename);
@@ -120,17 +151,38 @@ watch::generate_snapshot(std::vector<event> *event_vec)
 	std::set<std::string>::iterator pos;
 
 	/* 针对监控目录本身生成快照 */
-	if(this->is_new_create()) {
-		event e;
-		e.set_type(event::TYPE_CREATE | event::TYPE_DIRECTORY);
+//	if(this->is_new_create()) {
+//		event e;
+//		e.set_type(event::TYPE_CREATE | event::TYPE_DIRECTORY);
+//		e.set_path(this->_path);
+//		e.set_base_size(this->get_base_size());
+//		e.set_current_size(this->get_current_size());
+//		event_vec->push_back(e);
+//	}
+
+	if (this->is_new_create() || this->_change) {
+		event e;		
+		e.add_type(event::TYPE_DIRECTORY);
+		if (this->is_new_create()) {
+			e.add_type(event::TYPE_CREATE);	
+		}
+		if (this->_modify) {
+			e.add_type(event::TYPE_MODIFY);	
+		}
+		if (this->_attrib) {
+			e.add_type(event::TYPE_ATTRIB);
+		}
+		if (this->_delete) {
+			e.add_type(event::TYPE_DELETE);
+		}
 		e.set_path(this->_path);
-		e.set_base_size(this->get_base_size());
-		e.set_current_size(this->get_current_size());
+		e.set_base_size(this->_base.st_size);
+		e.set_current_size(this->_ns.st_size);
 		event_vec->push_back(e);
 	}
 
 	/* 针对监控目录下被修改过的文件生成快照 */
-	for(pos = this->_file_set.begin(); pos != this->_file_set.end(); ++pos) {
+	for (pos = this->_file_set.begin(); pos != this->_file_set.end(); ++pos) {
 		file &f = this->_file_map[*pos];
 		event e;
 		if(f.is_new_create()) {

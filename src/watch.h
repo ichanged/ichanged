@@ -17,9 +17,11 @@ public:
 
 	std::string get_path();
 
-	void attrib();
+	bool attrib();
+	bool idelete();
+	bool modify();
 
-	bool file_change();
+	bool is_change();
 	void file_init(const struct stat *s, std::string filename);
 	bool file_create(std::string filename);
 	bool file_modify(std::string filename);

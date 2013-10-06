@@ -18,7 +18,9 @@ public:
 	static watch get_watch(int wd);
 	static void remove_watch(int wd);
 
-	static void dir_attrib(int wd, std::string name);
+	static void dir_attrib(int wd, char *path);
+	static void dir_delete(int wd, char *path);
+	static void dir_modify(int wd, char *path);
 
 	static void init_file(const struct stat *sb, std::string path);
 	static void add_file(const struct stat *sb, std::string path);
@@ -34,6 +36,7 @@ public:
 	static void unlock();
 private:
 	static std::map<int, watch> _watch_map;
+	static std::map<std::string, int> _wd_map;
 	static std::set<int> _watch_set;
 
 	static std::vector<event> _event_vec;

@@ -7,6 +7,7 @@
 #include "logger.h"
 
 std::map<int, watch> watcher::_watch_map;
+std::map<std::string, int> watcher::_wd_map;
 std::set<int> watcher::_watch_set;
 
 std::vector<event> watcher::_event_vec;
@@ -17,6 +18,7 @@ void
 watcher::init_watch(int wd, const struct stat *sb, std::string path)
 {
 	watcher::_watch_map[wd] = watch(sb, false, path);
+	watcher::_wd_map[path] = wd;
 }
 
 void
@@ -32,23 +34,57 @@ watcher::get_watch(int wd)
 	return watcher::_watch_map[wd];
 }
 
+//void
+//watcher::remove_watch(int wd)
+//{
+//	watch w;
+//
+//	w = watcher::_watch_map[wd];
+//	if(w.new_create) {
+//		watcher::_watch_map.erase(wd);	
+//		return;
+//	}
+//
+////	watch w;
+////
+////	w = watcher::_watch_map[wd];
+////	watcher::_watch_map.erase(wd);
+//}
+
 void
-watcher::remove_watch(int wd)
+watcher::dir_delete(int wd, char *path)
 {
-	watch w;
+	std::string path_tmp;
 
-	w = watcher::_watch_map[wd];
-	watcher::_watch_map.erase(wd);
-
-	//wufei
-	watcher::_watch_set.insert(wd);
+	path_tmp = watcher::_watch_map[wd].get_path() + "/" + std::string(path); 
+	wd = watcher::_wd_map[path_tmp];
+	if (watcher::_watch_map[wd].idelete()) {
+		watcher::_watch_set.insert(wd);	
+	}
 }
 
 void
-watcher::dir_attrib(int wd, std::string name)
+watcher::dir_modify(int wd, char *path)
 {
-	watcher::_watch_map[wd].attrib();
-	watcher::_watch_set.insert(wd);
+	std::string path_tmp;
+
+	path_tmp = watcher::_watch_map[wd].get_path() + "/" + std::string(path); 
+	wd = watcher::_wd_map[path_tmp];
+	if (watcher::_watch_map[wd].modify()) {
+		watcher::_watch_set.insert(wd);
+	}
+}
+
+void
+watcher::dir_attrib(int wd, char *path)
+{
+	std::string path_tmp;
+
+	path_tmp = watcher::_watch_map[wd].get_path() + "/" + std::string(path); 
+	wd = watcher::_wd_map[path_tmp];
+	if (watcher::_watch_map[wd].attrib()) {
+		watcher::_watch_set.insert(wd);
+	}
 }
 
 void
@@ -178,8 +214,7 @@ watcher::generate_snapshot()
 	for (pos = watcher::_watch_set.begin(); pos != watcher::_watch_set.end();
 		++pos) {
 		watch &w = watcher::_watch_map[*pos];
-		//why
-		if(w.is_new_create() || w.file_change()) {
+		if(w.is_new_create() || w.is_change()) {
 			w.generate_snapshot(&watcher::_event_vec);
 		}
 	}
