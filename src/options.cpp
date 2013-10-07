@@ -67,7 +67,7 @@ options::print_usage()
 	"    -i, --interval        Monitor interval, default is %ds.\n"
 	"    -d, --directory       Monitor directory, default is '%s'.\n"
 	"    -e, --exclude=PATH    Skip file or directory specified by PATH.\n"
-	"    -t  --threshold	   set threshold to show change when size of files beyonds it.\n"
+	"    -t  --threshold	  Set threshold to show change when size of files beyonds it.\n"
 	"    -w, --watch-hidden    Watch hidden files and directories.\n",
 	options::interval, options::directory.c_str());
 }
