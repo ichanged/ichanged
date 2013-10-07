@@ -35,9 +35,13 @@ window::wait()
 	int status;
 	void *ret;
 
-	status = pthread_join(window::thread_id, &ret);
-	if(status != 0) {
-		logger::fatal("join window thread error: %s", ERRSTR);
+	try {
+		status = pthread_join(window::thread_id, &ret);
+		if(status != 0) {
+			logger::fatal("join window thread error: %s", ERRSTR);
+		}
+	} catch(...) {
+		endwin();
 	}
 }
 
@@ -52,27 +56,28 @@ window::destroy()
 void *
 window::start(void *arg)
 {
-//	struct sigaction sa;
-//
-//	initscr();
-//
-//	window::draw_summary();
-//	window::draw_status_bar();
-//
-//	memset(&sa, 0, sizeof(struct sigaction));
-//	sa.sa_handler = win_resize;
-//
-//	sigaction(SIGWINCH, &sa, NULL);
-//
-//	while(getch() != 27) {
-//			
-//	}
-//	endwin();
-//
-	while (true) {
-		window::draw_event();	
-		sleep(options::interval);
+	struct sigaction sa;
+
+	initscr();
+
+	window::draw_summary();
+	window::draw_status_bar();
+
+	memset(&sa, 0, sizeof(struct sigaction));
+	sa.sa_handler = win_resize;
+
+	sigaction(SIGWINCH, &sa, NULL);
+
+	while(getch() != 27) {
+				
 	}
+
+	endwin();
+
+//	while (true) {
+//		window::draw_event();	
+//		sleep(options::interval);
+//	}
 	return NULL;
 }
 
@@ -188,6 +193,6 @@ window::draw_event()
 				pos->get_path().c_str(), base_size.c_str(),
 				current_size.c_str());		
 		record::event_to_file(output);
-		printf("%s", output);
+//		printf("%s", output);
 	}
 }

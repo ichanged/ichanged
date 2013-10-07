@@ -12,6 +12,7 @@
 #include "watch.h"
 #include "options.h"
 #include "ichanged.h"
+#include "window.h"
 
 std::string monitor::dir;
 int monitor::inotify_fd = 0;
@@ -51,9 +52,13 @@ monitor::wait()
 	int status;
 	void *ret;
 
-	status = pthread_join(monitor::thread_id, &ret);
-	if(status != 0) {
-		logger::fatal("join monitor thread error: %s", ERRSTR);
+	try {
+		status = pthread_join(monitor::thread_id, &ret);
+		if(status != 0) {
+			logger::fatal("join monitor thread error: %s", ERRSTR);
+		}
+	} catch (...){
+		endwin();	
 	}
 }
 

@@ -39,7 +39,7 @@ options::parse_args(int argc, char *argv[])
 			options::directory = std::string(optarg);
 			break;
 		case 'e':
-			options::exclude.push_back(std::string(optarg));
+			options::exclude.push_back(optarg);
 			break;	
 		case 't':
 			options::threshold = atoi(optarg); 
