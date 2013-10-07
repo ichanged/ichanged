@@ -29,6 +29,9 @@ handler::handle_event(struct inotify_event *e)
 void
 handler::handle_dir_event(struct inotify_event *e, std::string path)
 {
+	if (monitor::is_path_hidden(path.c_str())) {
+		return;	
+	}
 	/* 如果有新的目录被创建或者被移入监控目录，则对新目录加监控 */
 	if (e->mask & IN_CREATE || e->mask & IN_MOVED_TO) {
 		//printf("%s dir was created\n", e->name);
@@ -38,7 +41,6 @@ handler::handle_dir_event(struct inotify_event *e, std::string path)
 	if (e->mask & IN_IGNORED || e->mask & IN_DELETE) {
 		//printf("%s dir was ignored\n", e->name);
 		watcher::dir_delete(e->wd, e->name);
-		monitor::remove_monitor(e->wd);
 	}
 	/* 如果已有的目录权限被改变，则记录新的权限 */
 	if (e->mask & IN_ATTRIB) {
@@ -91,6 +93,9 @@ handler::handle_dir_event(struct inotify_event *e, std::string path)
 void
 handler::handle_file_event(struct inotify_event *e, std::string path)
 {
+	if (monitor::is_path_hidden(path.c_str())) {
+		return;
+	}	
 	if (e->mask & IN_CREATE) {
 		//printf("%s was created\n", e->name);
 		watcher::file_create(e->wd, e->name);		

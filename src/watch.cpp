@@ -11,7 +11,8 @@ watch::watch(const struct stat *s, bool new_create, std::string path)
 :
 node(s, new_create),
 _path(path),
-_file_change(false)
+_file_change(false),
+_history_exist(false)
 {
 }
 
@@ -51,10 +52,12 @@ bool
 watch::idelete()
 {
 	if (this->new_create) {
+		this->_change = false;
+		this->_history_exist = true;
 		return false;
 	}
-	this->_ns.st_size = -2;
 	this->_delete = true;	
+	this->_ns.st_size = -2;
 	this->_change = true;
 	return true;
 }
@@ -160,7 +163,7 @@ watch::generate_snapshot(std::vector<event> *event_vec)
 //		event_vec->push_back(e);
 //	}
 
-	if (this->is_new_create() || this->_change) {
+	if (!this->_history_exist && (this->is_new_create() || this->_change)) {
 		event e;		
 		e.add_type(event::TYPE_DIRECTORY);
 		if (this->is_new_create()) {

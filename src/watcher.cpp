@@ -5,6 +5,7 @@
 
 #include "watcher.h"
 #include "logger.h"
+#include "monitor.h"
 
 std::map<int, watch> watcher::_watch_map;
 std::map<std::string, int> watcher::_wd_map;
@@ -25,6 +26,7 @@ void
 watcher::add_watch(int wd, const struct stat *sb, std::string path)
 {
 	watcher::_watch_map[wd] = watch(sb, true, path);
+	watcher::_wd_map[path] = wd;
 	watcher::_watch_set.insert(wd);
 }
 
@@ -33,23 +35,6 @@ watcher::get_watch(int wd)
 {
 	return watcher::_watch_map[wd];
 }
-
-//void
-//watcher::remove_watch(int wd)
-//{
-//	watch w;
-//
-//	w = watcher::_watch_map[wd];
-//	if(w.new_create) {
-//		watcher::_watch_map.erase(wd);	
-//		return;
-//	}
-//
-////	watch w;
-////
-////	w = watcher::_watch_map[wd];
-////	watcher::_watch_map.erase(wd);
-//}
 
 void
 watcher::dir_delete(int wd, char *path)
@@ -60,7 +45,9 @@ watcher::dir_delete(int wd, char *path)
 	wd = watcher::_wd_map[path_tmp];
 	if (watcher::_watch_map[wd].idelete()) {
 		watcher::_watch_set.insert(wd);	
-	}
+	}	
+
+	monitor::remove_monitor(wd);
 }
 
 void

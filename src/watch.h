@@ -37,6 +37,7 @@ private:
 
 	std::string _path;
 	bool _file_change;
+	bool _history_exist;
 	std::map<std::string, file> _file_map;
 	std::set<std::string> _file_set;
 };

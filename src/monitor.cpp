@@ -141,10 +141,10 @@ monitor::do_init_monitor(const char *fpath, const struct stat *sb,
 	std::vector<std::string>::iterator iter;
 	std::string sfpath = std::string(fpath);
 
-//	// 如果配置了不监控隐藏文件与目录，则直接返回
-//	if (!options::watch_hidden && monitor::is_path_hidden(fpath)) {
-//		return 0;
-//	}
+	// 如果配置了不监控隐藏文件与目录，则直接返回
+	if (!options::watch_hidden && monitor::is_path_hidden(fpath)) {
+		return 0;
+	}
 
 //	// 如果当前目录是配置了不监控的特定目录，则直接返回
 //	for (iter = options::exclude.begin(); iter != options::exclude.end();
@@ -181,9 +181,9 @@ monitor::do_add_monitor(const char *fpath, const struct stat *sb,
 	int wd;
 
 	// 如果配置了不监控隐藏文件与目录，则直接返回
-//	if(!options::watch_hidden && monitor::is_path_hidden(fpath)) {
-//		return 0;
-//	}
+	if(!options::watch_hidden && monitor::is_path_hidden(fpath)) {
+		return 0;
+	}
 
 	switch(typeflag) {
 	case FTW_F:
