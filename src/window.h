@@ -27,6 +27,9 @@ private:
 	static std::string status_bar; 
 
 	static const int COL_MAX = 1024; 
+
+	static WINDOW *status, *event_list;
+
 };
 
 #endif

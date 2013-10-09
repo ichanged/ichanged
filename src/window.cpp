@@ -14,6 +14,8 @@
 
 pthread_t window::thread_id = 0;
 std::string window::status_bar;
+WINDOW *window::status;
+WINDOW *window::event_list;
 
 void
 window::init()
@@ -60,24 +62,31 @@ window::start(void *arg)
 
 	initscr();
 
+	window::status = newwin(3, 0, 0, 0);
+	window::event_list = newwin(LINES - 3, 0, 3, 0);
+
 	window::draw_summary();
 	window::draw_status_bar();
 
+	wprintw(window::event_list, "hello");
+	wrefresh(window::event_list);
 	memset(&sa, 0, sizeof(struct sigaction));
 	sa.sa_handler = win_resize;
 
 	sigaction(SIGWINCH, &sa, NULL);
 
-	while(getch() != 27) {
-				
+	while (!flag) {
+		wclear(window::event_list);
+		wrefresh(window::event_list);
+		window::draw_event();
+		wrefresh(window::event_list);
+		sleep(options::interval);
 	}
+//	while(wgetch(window::status) != 27) {
+//	}
 
 	endwin();
 
-//	while (true) {
-//		window::draw_event();	
-//		sleep(options::interval);
-//	}
 	return NULL;
 }
 
@@ -85,13 +94,11 @@ void
 window::win_resize(int sig)
 {
 	endwin();
-	refresh();
-	clear();
-
+	wclear(window::status);
+	wrefresh(window::status);
 	window::draw_summary();
 	window::draw_status_bar();
-
-	refresh();
+	wrefresh(window::status);
 }
 
 //		// 清除屏幕所有内容
@@ -117,11 +124,11 @@ window::draw_summary()
 	t = time(NULL);
 	localtime_r(&t, &result);
 
-	printw("ichanged - %02d:%02d:%02d up\n",
+	wprintw(window::status, "ichanged - %02d:%02d:%02d up\n",
 		result.tm_hour, result.tm_min, result.tm_sec);
-	printw("Directory: %s\n", options::directory.c_str());
+	wprintw(window::status, "Directory: %s\n", options::directory.c_str());
 
-	refresh();
+	wrefresh(window::status);
 //	wattron(window::scr, A_REVERSE);
 //	wprintw(window::scr, " %-4s %-40s %-5s %-5s\n", 
 //			"TYPE", "FILE", "BASE", "CUR");
@@ -141,11 +148,11 @@ window::draw_status_bar()
 //	memset(&str[strlen(str) - 1], ' ', COLS - (strlen(tmp) -1));
 //	string[COLS] = '\0';
 //		
-	attron(A_REVERSE);
-	printw("%s", window::status_bar.c_str());
-	attroff(A_REVERSE);
+	wattron(window::status,A_REVERSE);
+	wprintw(window::status, "%s", window::status_bar.c_str());
+	wattroff(window::status, A_REVERSE);
 
-	refresh();
+	wrefresh(window::status);
 }
 
 void
@@ -193,6 +200,8 @@ window::draw_event()
 				pos->get_path().c_str(), base_size.c_str(),
 				current_size.c_str());		
 		record::event_to_file(output);
+		wprintw(window::event_list, output);
+		wrefresh(window::event_list);
 //		printf("%s", output);
 	}
 }

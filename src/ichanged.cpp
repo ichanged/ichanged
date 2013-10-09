@@ -7,10 +7,10 @@
 #include "ichanged.h"
 
 pthread_t tid[THREAD_NUM]; 
+int flag = 0;
 static void sigquit_handler(int sig);
 static void sigint_handler(int sig);
 static void destroy();
-static int flag = 0;
 
 void
 sigquit_handler(int sig)
@@ -21,8 +21,7 @@ sigquit_handler(int sig)
 void
 sigint_handler(int sig)
 {
-	int i;
-
+	flag = 1;
 	pthread_kill(tid[0], SIGQUIT);
 	pthread_kill(tid[1], SIGQUIT);
 //	for(i = 0; i < THREAD_NUM; i++) {
