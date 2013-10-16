@@ -17,16 +17,22 @@ Error::Error(std::string _file, int _line, const char *format, ...) throw()
 	this->error_msg.assign(tmp);
 }
 
-std::string 
-Error::what()
+Error::
+~Error() throw()
 {
-	return this->error_msg;	
+	
 }
 
-std::string
+const char * 
+Error::what()
+{
+	return this->error_msg.c_str();	
+}
+
+const char *
 Error::get_file()
 {
-	return this->file; 
+	return this->file.c_str(); 
 }
 
 int

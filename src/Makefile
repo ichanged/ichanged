@@ -4,7 +4,7 @@ DEBUG_FLAGS = -g -Wall -DDEBUG
 
 TARGET = ichanged
 OBJ = ichanged.o logger.o monitor.o watcher.o node.o watch.o file.o handler.o \
-	window.o options.o event.o record.o
+	window.o options.o event.o record.o error.o
 
 .PHONY: debug all clean
 
@@ -37,6 +37,8 @@ event.o: event.cpp event.h
 	$(CC) $(CFLAGS) event.cpp
 record.o: record.cpp record.h
 	$(CC) $(CFLAGS) record.cpp
+error.o: error.cpp error.h
+	$(CC) $(CFLAGS) error.cpp
 
 clean:
 	-rm $(OBJ) $(TARGET)

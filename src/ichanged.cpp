@@ -4,6 +4,7 @@
 #include "window.h"
 #include "record.h"
 #include "logger.h"
+#include "error.h"
 #include "ichanged.h"
 
 pthread_t tid[THREAD_NUM]; 
@@ -55,19 +56,24 @@ main(int argc, char *argv[])
 	sa_int.sa_handler = sigint_handler;
 	sa_quit.sa_handler = sigquit_handler;
 
-	status = sigaction(SIGINT, &sa_int, NULL);
-	if (status == -1 ) {
-		logger::warn("[%s %d]signal handler register error", __FILE__,
-				__LINE__);
-	}
-	status = sigaction(SIGQUIT, &sa_quit, NULL);
-	if (status == -1 ) {
-		logger::warn("[%s %d]signal handler register error", __FILE__,
-				__LINE__);
-	}
-	status = atexit(destroy);
-	if (status != 0) {
-		logger::warn("[%s %d]exit handler register", __FILE__, __LINE__);
+	try {
+		status = sigaction(SIGINT, &sa_int, NULL);
+		if (status == -1 ) {
+			throw Error(__FILE__, __LINE__, 
+					"signal handler register error");
+		}
+		status = sigaction(SIGQUIT, &sa_quit, NULL);
+		if (status == -1 ) {
+			throw Error(__FILE__, __LINE__,
+					"signal handler register error");
+		}
+		status = atexit(destroy);
+		if (status != 0) {
+			throw Error(__FILE__, __LINE__,
+					"exit function register error");
+		}
+	} catch(Error &x) {
+		logger::warn("[%s %d] %s", x.get_file(), x.get_line(), x.what());
 	}
 
 	/* 解析命令行参数 */

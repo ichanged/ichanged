@@ -7,8 +7,9 @@
 class Error {
 public:
 	Error(std::string file, int line, const char *format, ...) throw();
-	std::string what();
-	std::string get_file();
+	~Error() throw();
+	const char *what();
+	const char *get_file();
 	int get_line();
 
 	std::string error_msg;
