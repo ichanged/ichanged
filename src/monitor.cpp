@@ -6,6 +6,7 @@
 #include <string.h>
 
 #include "monitor.h"
+#include "error.h"
 #include "watcher.h"
 #include "handler.h"
 #include "logger.h"
@@ -27,7 +28,8 @@ monitor::init()
 	std::cout << "starting monitor, please wait..." << std::endl;
 	monitor::inotify_fd = inotify_init();
 	if(monitor::inotify_fd == -1) {
-		logger::fatal("create inotify file descriptor error");
+		throw Error(__FILE__, __LINE__, 
+				"create inotify file descriptor error");
 	}
 	monitor::mask = IN_CREATE | IN_ATTRIB | IN_MODIFY | IN_MOVE | 
 		IN_DELETE;
@@ -38,7 +40,8 @@ monitor::init()
 
 	status = pthread_create(&monitor::thread_id, NULL, monitor::start, NULL);
 	if(status != 0) {
-		logger::fatal("create monitor thread error: %s", ERRSTR);
+		throw Error(__FILE__, __LINE__, 
+				"create monitor thread error: %s", ERRSTR);
 	}
 	tid[0] = monitor::thread_id; 
 
@@ -83,7 +86,7 @@ monitor::start(void *arg)
 		/* 读取inotify_event结构体 */
 		n = read(monitor::inotify_fd, buf, monitor::event_max_size);
 		if(n == -1) {
-			logger::fatal("[%s %d]read event from inotify error: %s", 
+			logger::fatal("read event from inotify error: %s", 
 					__FILE__, __LINE__, ERRSTR);
 		}
 		pe = (struct inotify_event *)buf;

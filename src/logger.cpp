@@ -19,8 +19,9 @@ logger::~logger()
 void
 logger::init()
 {
-	logger::fout.open(LOG_FILE);	
-	logger::info("[%s %d] log module init completely", __FILE__, __LINE__);
+	logger::fout.open(LOG_FILE);
+	logger::info("[%s %d] log module init completely", 
+				__FILE__, __LINE__);
 }
 
 void

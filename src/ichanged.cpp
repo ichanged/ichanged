@@ -72,17 +72,19 @@ main(int argc, char *argv[])
 			throw Error(__FILE__, __LINE__,
 					"exit function register error");
 		}
+
+		/* 解析命令行参数 */
+		options::parse_args(argc, argv);
+		
+		logger::init();
+		monitor::init();
+		window::init();
+		record::init();
+
 	} catch(Error &x) {
-		logger::warn("[%s %d] %s", x.get_file(), x.get_line(), x.what());
+		logger::fatal("[%s %d] %s", x.get_file(), x.get_line(), 
+				x.what());
 	}
-
-	/* 解析命令行参数 */
-	options::parse_args(argc, argv);
-
-	logger::init();
-	monitor::init();
-	window::init();
-	record::init();
 
 	monitor::wait();
 	window::wait();

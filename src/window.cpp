@@ -5,6 +5,7 @@
 #include <vector>
 
 #include "logger.h"
+#include "error.h"
 #include "window.h"
 #include "options.h"
 #include "watcher.h"
@@ -24,7 +25,8 @@ window::init()
 
 	status = pthread_create(&window::thread_id, NULL, window::start, NULL);
 	if(status != 0) {
-		logger::fatal("create window thread error: %s", ERRSTR);
+		throw Error(__FILE__, __LINE__, 
+				"create window thread error: %s", ERRSTR);
 	}
 	tid[1] = window::thread_id;
 	logger::info("[%s %d] thread: %lu window module init completely", 
