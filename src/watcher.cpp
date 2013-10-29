@@ -26,6 +26,7 @@ void
 watcher::add_watch(int wd, const struct stat *sb, std::string path)
 {
 	watcher::_watch_map[wd] = watch(sb, true, path);
+	watcher::_watch_map[wd].set_time();
 	watcher::_wd_map[path] = wd;
 	watcher::_watch_set.insert(wd);
 }

@@ -32,6 +32,7 @@ watch::attrib()
 	if (this->_get_stat(this->_path, &this->_ns)) {
 		this->_attrib = true;
 		this->_change = true;
+		this->set_time();
 		return true;
 	}
 	return false;
@@ -43,6 +44,7 @@ watch::modify()
 	if (this->_get_stat(this->_path, &this->_ns)) {
 		this->_modify = true;
 		this->_change = true;
+		this->set_time();
 		return true;
 	}
 	return false;
@@ -59,6 +61,7 @@ watch::idelete()
 	this->_delete = true;	
 	this->_ns.st_size = -2;
 	this->_change = true;
+	this->set_time();
 	return true;
 }
 
@@ -84,6 +87,7 @@ watch::file_create(std::string filename)
 
 	if (this->_get_file_stat(filename, &s)) {
 		this->_file_map[filename] = file(&s, true, filename);
+		this->_file_map[filename].set_time();
 		this->_file_change = true;
 		this->_file_set.insert(filename);
 		return true;
@@ -171,7 +175,8 @@ watch::generate_snapshot(std::vector<event> *event_vec)
 		e.set_path(this->_path);
 		e.set_base_size(this->_base.st_size);
 		e.set_current_size(this->_ns.st_size);
-		e.set_chg_time(this->_chg_time);
+		printf("%s\n", this->get_time());
+		e.set_chg_time(this->get_time());
 		event_vec->push_back(e);
 	}
 
