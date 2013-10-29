@@ -102,7 +102,6 @@ monitor::start(void *arg)
 		/* 事件处理模块对事件进行处理 */
 		handler::handle_event(e);	
 		/* 释放事件内存 */
-
 		free(e);
 	}
 	return NULL;

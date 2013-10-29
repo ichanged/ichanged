@@ -153,16 +153,6 @@ watch::generate_snapshot(std::vector<event> *event_vec)
 {
 	std::set<std::string>::iterator pos;
 
-	/* 针对监控目录本身生成快照 */
-//	if(this->is_new_create()) {
-//		event e;
-//		e.set_type(event::TYPE_CREATE | event::TYPE_DIRECTORY);
-//		e.set_path(this->_path);
-//		e.set_base_size(this->get_base_size());
-//		e.set_current_size(this->get_current_size());
-//		event_vec->push_back(e);
-//	}
-
 	if (!this->_history_exist && (this->is_new_create() || this->_change)) {
 		event e;		
 		e.add_type(event::TYPE_DIRECTORY);
@@ -181,6 +171,7 @@ watch::generate_snapshot(std::vector<event> *event_vec)
 		e.set_path(this->_path);
 		e.set_base_size(this->_base.st_size);
 		e.set_current_size(this->_ns.st_size);
+		e.set_chg_time(this->_chg_time);
 		event_vec->push_back(e);
 	}
 
@@ -211,6 +202,7 @@ watch::generate_snapshot(std::vector<event> *event_vec)
 		e.set_path(this->_get_file_path(f.get_filename()));
 		e.set_base_size(f.get_base_size());
 		e.set_current_size(f.get_current_size());
+		e.set_chg_time(f.get_time());
 		event_vec->push_back(e);
 	}
 }

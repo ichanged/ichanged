@@ -32,6 +32,18 @@ event::get_path()
 }
 
 void
+event::set_chg_time(const char *time)
+{
+	strncpy(this->_chg_time, time, strlen(time));
+}	
+
+char *
+event::get_chg_time()
+{
+	return this->_chg_time;
+}
+
+void
 event::set_type(const int type)
 {
 	this->_type = type;

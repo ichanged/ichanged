@@ -3,6 +3,7 @@
 
 #include <sys/stat.h>
 #include <string>
+#include <string.h>
 
 class event {
 public:
@@ -12,6 +13,8 @@ public:
 	void set_path(const std::string path);
 	std::string get_path();
 
+	void set_chg_time(const char *time);
+	char *get_chg_time();
 	void set_type(const int type);
 	void add_type(const int type);
 	int get_type();
@@ -30,6 +33,7 @@ public:
 	static const int TYPE_DELETE = 0x00000008;
 	static const int TYPE_DIRECTORY = 0x10000000;
 private:
+	char _chg_time[25];
 	std::string _path;
 	int _type;
 	off_t _base_size;

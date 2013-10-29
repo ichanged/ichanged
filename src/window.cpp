@@ -70,8 +70,8 @@ window::start(void *arg)
 	window::draw_summary();
 	window::draw_status_bar();
 
-	wprintw(window::event_list, "hello");
-	wrefresh(window::event_list);
+//	wprintw(window::event_list, "hello");
+//	wrefresh(window::event_list);
 	memset(&sa, 0, sizeof(struct sigaction));
 	sa.sa_handler = win_resize;
 
@@ -140,9 +140,10 @@ window::draw_summary()
 void
 window::draw_status_bar()
 {
-	char tmp[60];
+	char tmp[1000];
 
-	sprintf(tmp, "%-4s %-40s %-5s %-5s", "TYPE", "FILE", "BASE", "CUR");
+	sprintf(tmp, "%-5s %-5s %-5s %-20s %-50s", "TYPE", "BASE", "CUR", 
+			"TIME", "FILE");
 	window::status_bar = tmp;
 	window::status_bar.resize(COLS, ' ');	
 //	memset(str, 0, sizeof(str));
@@ -197,10 +198,10 @@ window::draw_event()
 		window::_itoa(pos->get_base_size(), base_size);
 		window::_itoa(pos->get_current_size(), current_size);
 
-		sprintf(output, " %-4s %-40s %-5s %-5s\n", 
+		sprintf(output, " %-5s %-5s %-5s %20s %-20s\n", 
 				pos->get_type_string().c_str(), 
-				pos->get_path().c_str(), base_size.c_str(),
-				current_size.c_str());		
+				base_size.c_str(), current_size.c_str(),
+				pos->get_chg_time(), pos->get_path().c_str());		
 		record::event_to_file(output);
 		wprintw(window::event_list, output);
 		wrefresh(window::event_list);
