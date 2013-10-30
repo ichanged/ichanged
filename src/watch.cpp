@@ -175,7 +175,6 @@ watch::generate_snapshot(std::vector<event> *event_vec)
 		e.set_path(this->_path);
 		e.set_base_size(this->_base.st_size);
 		e.set_current_size(this->_ns.st_size);
-		printf("%s\n", this->get_time());
 		e.set_chg_time(this->get_time());
 		event_vec->push_back(e);
 	}

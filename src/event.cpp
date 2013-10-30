@@ -34,6 +34,7 @@ event::get_path()
 void
 event::set_chg_time(const char *time)
 {
+	memset(this->_chg_time, 0, sizeof(this->_chg_time));
 	strncpy(this->_chg_time, time, strlen(time));
 }	
 

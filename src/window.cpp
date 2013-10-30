@@ -60,39 +60,35 @@ window::destroy()
 void *
 window::start(void *arg)
 {
-//	struct sigaction sa;
-//
-//	initscr();
-//
-//	window::status = newwin(3, 0, 0, 0);
-//	window::event_list = newwin(LINES - 3, 0, 3, 0);
-//
-//	window::draw_summary();
-//	window::draw_status_bar();
-//
-////	wprintw(window::event_list, "hello");
-////	wrefresh(window::event_list);
-//	memset(&sa, 0, sizeof(struct sigaction));
-//	sa.sa_handler = win_resize;
-//
-//	sigaction(SIGWINCH, &sa, NULL);
-//
-//	while (!flag) {
-//		wclear(window::event_list);
-//		wrefresh(window::event_list);
-//		window::draw_event();
-//		wrefresh(window::event_list);
-//		sleep(options::interval);
-//	}
-////	while(wgetch(window::status) != 27) {
-////	}
-//
-//	endwin();
-	
-	while(!flag) {
-		window::draw_event();	
-	}
+	struct sigaction sa;
 
+	initscr();
+
+	window::status = newwin(3, 0, 0, 0);
+	window::event_list = newwin(LINES - 3, 0, 3, 0);
+
+	window::draw_summary();
+	window::draw_status_bar();
+
+//	wprintw(window::event_list, "hello");
+//	wrefresh(window::event_list);
+	memset(&sa, 0, sizeof(struct sigaction));
+	sa.sa_handler = win_resize;
+
+	sigaction(SIGWINCH, &sa, NULL);
+
+	while (!flag) {
+		wclear(window::event_list);
+		wrefresh(window::event_list);
+		window::draw_event();
+		wrefresh(window::event_list);
+		sleep(options::interval);
+	}
+//	while(wgetch(window::status) != 27) {
+//	}
+
+	endwin();
+	
 	return NULL;
 }
 
@@ -178,37 +174,33 @@ window::_itoa(off_t size, std::string &size_str)
 void
 window::draw_event()
 {
-//	std::vector<event> *event_vec;
-//	std::vector<event>::iterator pos;
-//	std::string base_size, current_size;
-//	char output[1000] = {0};
-//
-//	watcher::lock();
-//	event_vec = watcher::generate_snapshot();
-//	watcher::unlock();
-//
-//	record::get_time();
-//	for(pos = event_vec->begin(); pos != event_vec->end(); ++pos) {
-////		wprintw(window::scr, " %-4s %-40s %-5d %-5d\n",
-////			pos->get_type_string().c_str(), pos->get_path().c_str(),
-////			pos->get_base_size(), pos->get_current_size());
-//		if (abs(pos->get_base_size() - pos->get_current_size())
-//				< options::threshold) { 
-//			if (pos->get_base_size() != -2 && 
-//				pos->get_current_size() != -2) {
-//				continue;
-//			}
-//		} 
-//		window::_itoa(pos->get_base_size(), base_size);
-//		window::_itoa(pos->get_current_size(), current_size);
-//
-//		sprintf(output, " %-5s %-8s %-8s %-22s %-20s\n", 
-//				pos->get_type_string().c_str(), 
-//				base_size.c_str(), current_size.c_str(),
-//				pos->get_chg_time(), pos->get_path().c_str());		
-//		record::event_to_file(output);
-//		wprintw(window::event_list, output);
-//		wrefresh(window::event_list);
-////		printf("%s", output);
-//	}
+	std::vector<event> *event_vec;
+	std::vector<event>::iterator pos;
+	std::string base_size, current_size;
+	char output[1000] = {0};
+
+	watcher::lock();
+      	event_vec = watcher::generate_snapshot();
+	watcher::unlock();
+
+	record::get_time();
+	for(pos = event_vec->begin(); pos != event_vec->end(); ++pos) {
+		if (abs(pos->get_base_size() - pos->get_current_size())
+				< options::threshold) { 
+			if (pos->get_base_size() != -2 && 
+				pos->get_current_size() != -2) {
+				continue;
+			}
+		} 
+		window::_itoa(pos->get_base_size(), base_size);
+		window::_itoa(pos->get_current_size(), current_size);
+
+		sprintf(output, " %-5s %-8s %-8s %-22s %-20s\n", 
+				pos->get_type_string().c_str(), 
+				base_size.c_str(), current_size.c_str(),
+				pos->get_chg_time(), pos->get_path().c_str());		
+		record::event_to_file(output);
+		wprintw(window::event_list, output);
+		wrefresh(window::event_list);
+	}
 }
