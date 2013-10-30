@@ -76,13 +76,36 @@ watcher::dir_attrib(int wd, char *path)
 }
 
 void
+watcher::init_link_file(const struc stat *sb, std::string path)
+{
+	char *dir = NULL;
+	char *filename = NULL;
+	char buf[1024] = {0};			
+
+	char *dbuf = new char[path.length() + 1];
+	char *fbuf = new char[path.length() + 1];
+
+	if (readlink(path, buf, sizeof(buf)) == -1) {
+		logger::fatal("[%s %d]readlink error: %s", __FILE__, __LINE__,
+				ERRSTR);
+	}
+
+	strcpy(dbuf, path.c_str());
+	dir = dirname(dbuf);
+}
+
+void
 watcher::init_file(const struct stat *sb, std::string path)
 {
-	std::map<int, watch>::iterator pos;
 	watch *w;
+	std::map<int, watch>::iterator pos;
 
 	char *dir = NULL;
 	char *filename = NULL;
+
+	if (S_ISLNK(sb.st_mode)) {
+		watcher::init_link_file(sb, path);	
+	}
 
 	char *dbuf = new char[path.length() + 1];
 	char *fbuf = new char[path.length() + 1];

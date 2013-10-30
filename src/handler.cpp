@@ -112,6 +112,8 @@ handler::handle_file_event(struct inotify_event *e, std::string path)
 		//printf("%s was modified\n", e->name);
 		watcher::file_modify(e->wd, e->name);
 	} else if (e->mask & IN_CLOSE_WRITE) {
+		//printf("%s was write\n", e->name);
 		watcher::file_write(e->wd, e->name);
 	}
+	//printf("%s %d\n", e->name, e->mask);
 }

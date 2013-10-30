@@ -22,6 +22,7 @@ public:
 	static void dir_delete(int wd, char *path);
 	static void dir_modify(int wd, char *path);
 
+	static void init_link_file(const struct stat *sb, std::string path);
 	static void init_file(const struct stat *sb, std::string path);
 	static void add_file(const struct stat *sb, std::string path);
 	static void file_create(int wd, std::string name);
