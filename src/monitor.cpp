@@ -164,6 +164,15 @@ monitor::do_init_monitor(const char *fpath, const struct stat *sb,
 	switch (typeflag) {
 	case FTW_F:
 		watcher::init_file(sb, fpath);
+	
+		struct stat sb_link;
+		if (lstat(fpath, &sb_link) == -1) {
+			logger::fatal("[%s %d]lstat error: %s", __FILE__, 
+					__LINE__, ERRSTR);
+		}
+		if (S_ISLNK(sb_link.st_mode)) {
+			watcher::init_link_file(&sb_link, fpath);	
+		}
 		break;
 	case FTW_D:
 		wd = inotify_add_watch(monitor::inotify_fd, fpath, 

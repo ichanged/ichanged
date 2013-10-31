@@ -26,6 +26,8 @@ public:
 	static bool is_path_hidden(const char *fpath);
 
 	static pthread_t thread_id;
+	static int inotify_fd;
+	static int mask;
 private:
 	static int do_init_monitor(const char *fpath, const struct stat *sb,
 		int typeflag);
@@ -36,8 +38,6 @@ private:
 		sizeof(struct inotify_event) + NAME_MAX + 1;
 
 	static std::string dir;
-	static int inotify_fd;
-	static int mask;
 };
 
 #endif
