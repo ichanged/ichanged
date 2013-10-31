@@ -7,13 +7,15 @@
 watch::watch()
 {}
 
-watch::watch(const struct stat *s, bool new_create, std::string path)
+watch::watch(const struct stat *s, bool new_create, std::string path,
+		bool link)
 :
-node(s, new_create),
+node(s, new_create, link),
 _path(path),
 _file_change(false),
 _history_exist(false)
 {
+	
 }
 
 watch::~watch()
@@ -74,10 +76,20 @@ watch::is_change()
 	return false;
 }
 
-void
-watch::file_init(const struct stat *s, std::string filename)
+int
+watch::get_file_count()
 {
-	this->_file_map[filename] = file(s, false, filename);
+	return this->_file_map.size();	
+}
+
+void
+watch::file_init(const struct stat *s, std::string filename, bool link, 
+		std::string link_path)
+{
+	this->_file_map[filename] = file(s, false, filename, link);
+	if (link == true) {
+		this->_file_map[filename].set_link_path(link_path);
+	}
 }
 
 bool
@@ -86,7 +98,8 @@ watch::file_create(std::string filename)
 	struct stat s; 
 
 	if (this->_get_file_stat(filename, &s)) {
-		this->_file_map[filename] = file(&s, true, filename);
+		//TODO
+		this->_file_map[filename] = file(&s, true, filename, false);
 		this->_file_map[filename].set_time();
 		this->_file_change = true;
 		this->_file_set.insert(filename);

@@ -76,11 +76,12 @@ watcher::dir_attrib(int wd, char *path)
 	}
 }
 
-void
+std::string
 watcher::init_link_file(const struct stat *sb, std::string path)
 {
 	int wd;
 	std::string tmp;
+	std::string link_path;
 	char *dir = NULL;
 	char *filename = NULL;
 	char buf[1024] = {0};			
@@ -99,17 +100,21 @@ watcher::init_link_file(const struct stat *sb, std::string path)
 	filename = basename(fbuf);
 
 	tmp.assign(dir);
+	link_path.assign(buf);
 	if (watcher::_wd_map.find(tmp) == watcher::_wd_map.end()) {
 		wd = inotify_add_watch(monitor::inotify_fd, dir, 
 				monitor::mask);
 		watcher::_watch_map[wd] = watch(sb, false, tmp);
 		watcher::_wd_map[path] = wd;
-		watcher::_watch_map[wd].file_init(sb, filename);
-	}  
+		watcher::_watch_map[wd].file_init(sb, filename, false);
+	}
+
+	return link_path; 
 }
 
 void
-watcher::init_file(const struct stat *sb, std::string path)
+watcher::init_file(const struct stat *sb, std::string path, bool link, 
+		std::string link_path)
 {	
 	watch *w;
 	std::map<int, watch>::iterator pos;
@@ -130,7 +135,7 @@ watcher::init_file(const struct stat *sb, std::string path)
 		++pos) {
 		w = &pos->second;
 		if(w->get_path() == dir) {
-			w->file_init(sb, filename);
+			w->file_init(sb, filename, link, link_path);
 			break;
 		}
 	}
@@ -191,6 +196,20 @@ watcher::file_modify(int wd, std::string name)
 void
 watcher::file_delete(int wd, std::string name)
 {
+	watch *w;
+	int wd_link;
+	std::string link_path;
+	char *dir = NULL;
+	char *dbuf = new char[path.length() + 1];
+
+	w = &watcher::_watch_map[wd];
+	if (w._file_map[name].is_link()){
+		link_path = w->_file_map[filename].get_link_path();
+		strcpy(dbuf, link_path.c_str());
+		dir = dirname(dbuf);
+
+		wd = wd_link;
+	}
 	if (watcher::_watch_map[wd].file_delete(name)) {
 		watcher::_watch_set.insert(wd);
 	}

@@ -7,12 +7,13 @@ node::node()
 {
 }
 
-node::node(const struct stat *stat_tmp, bool new_create)
+node::node(const struct stat *stat_tmp, bool new_create, bool link)
 :
 _modify(false),
 _attrib(false),
 _delete(false),
-_change(false)
+_change(false),
+_link(link)
 {
 	this->new_create = new_create;
 	if (new_create) {
@@ -51,6 +52,18 @@ node::set_time()
 	strncpy(this->_chg_time, tmp, 20);
 }
 
+void
+node::set_link_path(std::string link_path)
+{
+	this->_link_path = link_path;
+}
+
+std::string
+node::get_link_path()
+{
+	return this->_link_path;
+}
+
 bool
 node::is_new_create()
 {
@@ -79,6 +92,12 @@ bool
 node::is_delete()
 {
 	return this->_delete;
+}
+
+bool
+node::is_link()
+{
+	return this->_link;
 }
 
 off_t
