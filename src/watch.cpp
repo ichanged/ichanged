@@ -76,6 +76,18 @@ watch::is_change()
 	return false;
 }
 
+bool
+watch::is_file_link(std::string filename)
+{
+	return this->_file_map[filename].is_link();	
+}
+
+std::string
+watch::get_file_link_path(std::string filename)
+{
+	return this->_file_map[filename].get_link_path();	
+}
+
 int
 watch::get_file_count()
 {

@@ -78,7 +78,7 @@ main(int argc, char *argv[])
 		
 		logger::init();
 		monitor::init();
-		//window::init();
+		window::init();
 		record::init();
 	} catch(Error &x) {
 		logger::fatal("[%s %d] %s", x.get_file(), x.get_line(), 
@@ -86,7 +86,7 @@ main(int argc, char *argv[])
 	}
 
 	monitor::wait();
-	//window::wait();
+	window::wait();
 
 	return 0;
 }

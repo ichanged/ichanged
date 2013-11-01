@@ -197,18 +197,24 @@ void
 watcher::file_delete(int wd, std::string name)
 {
 	watch *w;
-	int wd_link;
+	char *dbuf;
 	std::string link_path;
 	char *dir = NULL;
-	char *dbuf = new char[path.length() + 1];
 
+	// 删除链接文件
+	if (watcher::_watch_map[wd].file_delete(name)) {
+		watcher::_watch_set.insert(wd);
+	}
+
+	// 删除链接文件的源文件
 	w = &watcher::_watch_map[wd];
-	if (w._file_map[name].is_link()){
-		link_path = w->_file_map[filename].get_link_path();
+	if (w->is_file_link(name)){
+		link_path = w->get_file_link_path(name);
+		dbuf = new char[link_path.length() + 1];
 		strcpy(dbuf, link_path.c_str());
 		dir = dirname(dbuf);
 
-		wd = wd_link;
+		wd = watcher::_wd_map[dir];
 	}
 	if (watcher::_watch_map[wd].file_delete(name)) {
 		watcher::_watch_set.insert(wd);

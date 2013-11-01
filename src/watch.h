@@ -23,6 +23,8 @@ public:
 	bool modify();
 
 	bool is_change();
+	bool is_file_link(std::string filename);
+	std::string get_file_link_path(std::string filename);
 	int  get_file_count(); 
 	void file_init(const struct stat *s, std::string filename, 
 			bool link, std::string link_path = "");
