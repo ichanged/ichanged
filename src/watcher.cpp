@@ -105,7 +105,7 @@ watcher::init_link_file(const struct stat *sb, std::string path)
 		wd = inotify_add_watch(monitor::inotify_fd, dir, 
 				monitor::mask);
 		watcher::_watch_map[wd] = watch(sb, false, tmp);
-		watcher::_wd_map[path] = wd;
+		watcher::_wd_map[tmp] = wd;
 		watcher::_watch_map[wd].file_init(sb, filename, false);
 	}
 
@@ -198,8 +198,10 @@ watcher::file_delete(int wd, std::string name)
 {
 	watch *w;
 	char *dbuf;
-	std::string link_path;
+	char *fbuf;
 	char *dir = NULL;
+	char *filename = NULL;
+	std::string link_path;
 
 	// 删除链接文件
 	if (watcher::_watch_map[wd].file_delete(name)) {
@@ -211,13 +213,16 @@ watcher::file_delete(int wd, std::string name)
 	if (w->is_file_link(name)){
 		link_path = w->get_file_link_path(name);
 		dbuf = new char[link_path.length() + 1];
+		fbuf = new char[link_path.length() + 1];
 		strcpy(dbuf, link_path.c_str());
 		dir = dirname(dbuf);
+		strcpy(fbuf, link_path.c_str());
+		filename = basename(fbuf); 
 
 		wd = watcher::_wd_map[dir];
-	}
-	if (watcher::_watch_map[wd].file_delete(name)) {
-		watcher::_watch_set.insert(wd);
+		if (watcher::_watch_map[wd].file_delete(filename)) {
+			watcher::_watch_set.insert(wd);
+		}
 	}
 }
 
