@@ -163,18 +163,7 @@ monitor::do_init_monitor(const char *fpath, const struct stat *sb,
 
 	switch (typeflag) {
 	case FTW_F: {
-		bool link = false;
-		struct stat sb_link;
-		std::string link_path = ""; 
-		if (lstat(fpath, &sb_link) == -1) {
-			logger::fatal("[%s %d]lstat error: %s", __FILE__, 
-					__LINE__, ERRSTR);
-		}
-		if (S_ISLNK(sb_link.st_mode)) {
-			link = true;
-			link_path = watcher::init_link_file(&sb_link, fpath);	
-		}
-		watcher::init_file(sb, fpath, link, link_path);
+		watcher::init_file(sb, fpath);
 		break;
 	}
 	case FTW_D: {

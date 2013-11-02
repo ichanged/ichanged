@@ -76,47 +76,118 @@ watcher::dir_attrib(int wd, char *path)
 	}
 }
 
-std::string
-watcher::init_link_file(const struct stat *sb, std::string path)
-{
-	int wd;
-	std::string tmp;
-	std::string link_path;
-	char *dir = NULL;
-	char *filename = NULL;
-	char buf[1024] = {0};			
+//std::string
+//watcher::init_link_file(const struct stat *sb, std::string path)
+//{
+//	int wd;
+//	std::string tmp;
+//	std::string link_path;
+//	std::map<std::string, int>::iterator iter;
+//	char *dir = NULL;
+//	char *filename = NULL;
+//	char buf[1024] = {0};			
+//
+//	char *dbuf = new char[path.length() + 1];
+//	char *fbuf = new char[path.length() + 1];
+//
+//	if (readlink(path.c_str(), buf, sizeof(buf)) == -1) {
+//		logger::fatal("[%s %d]readlink error: %s", __FILE__, __LINE__,
+//				ERRSTR);
+//	}
+//
+//	strcpy(dbuf, buf);
+//	dir = dirname(dbuf);
+//	strcpy(fbuf, buf);
+//	filename = basename(fbuf);
+//
+//	tmp.assign(dir);
+//	link_path.assign(buf);
+//	iter = watcher::_wd_map.find(tmp);
+//	if (iter == watcher::_wd_map.end()) {
+//		wd = inotify_add_watch(monitor::inotify_fd, dir, 
+//				monitor::mask);
+//		watcher::_watch_map[wd] = watch(sb, false, tmp);
+//		watcher::_wd_map[tmp] = wd;
+//		watcher::_watch_map[wd].file_init(sb, filename, false);
+//	}
+//
+//	return link_path; 
+//}
+//
+//void
+//watcher::add_link_file(const struct stat *sb, std::string path)
+//{
+//	int wd;
+//	std::string tmp;
+//	std::string link_path;
+//	std::map<std::string, int>::iterator iter;
+//	char *dir = NULL;
+//	char *filename = NULL;
+//	char buf[1024] = {0};			
+//
+//	char *dbuf = new char[path.length() + 1];
+//	char *fbuf = new char[path.length() + 1];
+//
+//	if (readlink(path.c_str(), buf, sizeof(buf)) == -1) {
+//		logger::fatal("[%s %d]readlink error: %s", __FILE__, __LINE__,
+//				ERRSTR);
+//	}
+//
+//	strcpy(dbuf, buf);
+//	dir = dirname(dbuf);
+//	strcpy(fbuf, buf);
+//	filename = basename(fbuf);
+//
+//	tmp.assign(dir);
+//	link_path.assign(buf);
+//	iter = watcher::_wd_map.find(tmp);
+//	if (iter == watcher::_wd_map.end()) {
+//		wd = inotify_add_watch(monitor::inotify_fd, dir, 
+//				monitor::mask);
+//		watcher::_watch_map[wd] = watch(sb, true, tmp);
+//		watcher::_wd_map[tmp] = wd;
+//		watcher::_watch_map[wd].file_init(sb, filename, false);
+//	}
+//}
 
-	char *dbuf = new char[path.length() + 1];
-	char *fbuf = new char[path.length() + 1];
-
-	if (readlink(path.c_str(), buf, sizeof(buf)) == -1) {
-		logger::fatal("[%s %d]readlink error: %s", __FILE__, __LINE__,
-				ERRSTR);
-	}
-
-	strcpy(dbuf, buf);
-	dir = dirname(dbuf);
-	strcpy(fbuf, buf);
-	filename = basename(fbuf);
-
-	tmp.assign(dir);
-	link_path.assign(buf);
-	if (watcher::_wd_map.find(tmp) == watcher::_wd_map.end()) {
-		wd = inotify_add_watch(monitor::inotify_fd, dir, 
-				monitor::mask);
-		watcher::_watch_map[wd] = watch(sb, false, tmp);
-		watcher::_wd_map[tmp] = wd;
-		watcher::_watch_map[wd].file_init(sb, filename, false);
-	}
-
-	return link_path; 
-}
+//void
+//watcher::init_file(const struct stat *sb, std::string path, bool link, 
+//		std::string link_path)
+//{	
+//	watch *w;
+//	std::map<int, watch>::iterator pos;
+//
+//	char *dir = NULL;
+//	char *filename = NULL;
+//
+//	char *dbuf = new char[path.length() + 1];
+//	char *fbuf = new char[path.length() + 1];
+//
+//	strcpy(dbuf, path.c_str());
+//	dir = dirname(dbuf);
+//
+//	strcpy(fbuf, path.c_str());
+//	filename = basename(fbuf);
+//
+//	for(pos = watcher::_watch_map.begin(); pos != watcher::_watch_map.end();
+//		++pos) {
+//		w = &pos->second;
+//		if(w->get_path() == dir) {
+//			w->file_init(sb, filename, link, link_path);
+//			break;
+//		}
+//	}
+//}
 
 void
-watcher::init_file(const struct stat *sb, std::string path, bool link, 
-		std::string link_path)
+watcher::init_file(const struct stat *sb, std::string path)
 {	
+	int wd;
 	watch *w;
+	bool link = false;
+	struct stat sb_link;
+	char buf[1024] = {0};
+	std::string link_path = "";
 	std::map<int, watch>::iterator pos;
 
 	char *dir = NULL;
@@ -125,19 +196,57 @@ watcher::init_file(const struct stat *sb, std::string path, bool link,
 	char *dbuf = new char[path.length() + 1];
 	char *fbuf = new char[path.length() + 1];
 
+	// 获取当前文件路径的目录名和文件名
 	strcpy(dbuf, path.c_str());
 	dir = dirname(dbuf);
-
 	strcpy(fbuf, path.c_str());
 	filename = basename(fbuf);
 
+	// 判断是否是链接文件，如果是，获取其源文件路径
+	if (lstat(path.c_str(), &sb_link) == -1) {
+		logger::fatal("[%s %d]lstat error: %s", __FILE__, __LINE__, 
+				ERRSTR);		
+	}
+	if (S_ISLNK(sb_link.st_mode)) {
+		link = true;	
+	}
+	if (link) {
+		if (readlink(path.c_str(), buf, sizeof(buf)) == -1) {
+			logger::fatal("[%s %d]readlink error: %s", __FILE__, __LINE__,
+					ERRSTR);
+		}
+	}
+	link_path.assign(buf);
+	// 如果链接文件在当前目录
+	if (link_path.find("/") == std::string::npos) {
+		link_path = (std::string)dir + "/" + link_path;	
+	}
+
+	// 查找此文件目录是否处于监控中，如果不包含，则添加监控
 	for(pos = watcher::_watch_map.begin(); pos != watcher::_watch_map.end();
 		++pos) {
 		w = &pos->second;
 		if(w->get_path() == dir) {
-			w->file_init(sb, filename, link, link_path);
 			break;
 		}
+	}
+	if (pos == watcher::_watch_map.end()) {
+		wd = inotify_add_watch(monitor::inotify_fd, dir, 
+				monitor::mask);
+		watcher::_watch_map[wd] = watch(sb, false, dir, false, true);
+		watcher::_wd_map[dir] = wd;
+		w = &watcher::_watch_map[wd];
+	}
+	w->file_init(sb, filename, link, link_path);
+
+	if (link) {
+		if (stat(link_path.c_str(), &sb_link) == -1) {
+			logger::fatal("[%s %d]stat error: %s", __FILE__, 
+					__LINE__, ERRSTR);
+		}
+		return init_file(&sb_link, link_path); 
+	} else {
+		return;
 	}
 }
 
@@ -171,25 +280,43 @@ watcher::add_file(const struct stat *sb, std::string path)
 
 void
 watcher::file_create(int wd, std::string name)
-{
-	if (watcher::_watch_map[wd].file_create(name)) {
-		watcher::_watch_set.insert(wd);
+{	
+//	struct stat s;
+//	std::string path;
+
+	if (!watcher::_watch_map[wd].is_linked()) {
+		if (watcher::_watch_map[wd].file_create(name)) {
+			watcher::_watch_set.insert(wd);
+		}
 	}
+//		path = watcher::_watch_map[wd].get_path() + "/" + name;
+//
+//		if (lstat(path.c_str() , &s) == -1) {
+//			logger::fatal("[%s %d]lstat error: %s", __FILE__, 
+//					__LINE__, ERRSTR);
+//		}
+//		if (S_ISLNK(s.st_mode)) {
+//			watcher::link_file(&s, path, true);	
+//		}
 }
 
 void
 watcher::file_attrib(int wd, std::string name)
 {
-	if (watcher::_watch_map[wd].file_attrib(name)) {
-		watcher::_watch_set.insert(wd);
+	if (!watcher::_watch_map[wd].is_linked()) {
+		if (watcher::_watch_map[wd].file_attrib(name)) {
+			watcher::_watch_set.insert(wd);
+		}
 	}
 }
 
 void
 watcher::file_modify(int wd, std::string name)
 {
-	if (watcher::_watch_map[wd].file_modify(name)) {
-		watcher::_watch_set.insert(wd);
+	if (!watcher::_watch_map[wd].is_linked()) {
+		if (watcher::_watch_map[wd].file_modify(name)) {
+			watcher::_watch_set.insert(wd);
+		}
 	}
 }
 
@@ -203,35 +330,36 @@ watcher::file_delete(int wd, std::string name)
 	char *filename = NULL;
 	std::string link_path;
 
-	// 删除链接文件
-	if (watcher::_watch_map[wd].file_delete(name)) {
-		watcher::_watch_set.insert(wd);
-	}
-
-	// 删除链接文件的源文件
-	w = &watcher::_watch_map[wd];
-	if (w->is_file_link(name)){
-		link_path = w->get_file_link_path(name);
-		dbuf = new char[link_path.length() + 1];
-		fbuf = new char[link_path.length() + 1];
-		strcpy(dbuf, link_path.c_str());
-		dir = dirname(dbuf);
-		strcpy(fbuf, link_path.c_str());
-		filename = basename(fbuf); 
-
-		wd = watcher::_wd_map[dir];
-		if (watcher::_watch_map[wd].file_delete(filename)) {
-			watcher::_watch_set.insert(wd);
-		}
-	}
+//	// 删除链接文件
+//	if (watcher::_watch_map[wd].file_delete(name)) {
+//		watcher::_watch_set.insert(wd);
+//	}
+//
+//	// 删除链接文件的源文件
+//	w = &watcher::_watch_map[wd];
+//	if (w->is_link_file(name)){
+//		link_path = w->get_file_link_path(name);
+//		dbuf = new char[link_path.length() + 1];
+//		fbuf = new char[link_path.length() + 1];
+//		strcpy(dbuf, link_path.c_str());
+//		dir = dirname(dbuf);
+//		strcpy(fbuf, link_path.c_str());
+//		filename = basename(fbuf); 
+//
+//		wd = watcher::_wd_map[dir];
+//		if (watcher::_watch_map[wd].file_delete(filename)) {
+//			watcher::_watch_set.insert(wd);
+//		}
+//	}
 }
 
 void
 watcher::file_write(int wd, std::string name)
 {
-	if (watcher::_watch_map[wd].file_write(name)) {
-		watcher::_watch_set.insert(wd);	
-	}	
+	if (!watcher::_watch_map[wd].is_linked()) {
+		if (watcher::_watch_map[wd].file_write(name)) {
+			watcher::_watch_set.insert(wd);	
+	}	}	
 }
 
 void

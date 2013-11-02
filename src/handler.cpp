@@ -53,43 +53,6 @@ handler::handle_dir_event(struct inotify_event *e, std::string path)
 	}
 }
 
-//void
-//handler::handle_file_event(struct inotify_event *e, std::string path)
-//{
-//	struct stat buf;
-//	/* 如果有新的普通文件被创建，则向监控下添加文件 */
-//	if (e->mask & IN_CREATE) {
-//		printf("%s is created\n", path.c_str());
-//		if (stat(path.c_str(), &buf) == -1) {
-//			printf("ERROR when try to get stat ---create file");	
-//		}	
-//		//watcher::file_create(e->wd, e->name);
-//	}
-//	/* 如果已有的文件权限被改变，则记录新的权限 */
-//	if (e->mask & IN_ATTRIB) {
-//		printf("%s is attribed\n", path.c_str());
-//		if (stat(path.c_str(), &buf) == -1) {
-//			printf("ERROR when try to get stat ---attrib file");	
-//		}	
-//		//watcher::file_attrib(e->wd, e->name);
-//	}
-//	/* 如果已有的文件被修改，则记录文件新的属性 */
-//	if (e->mask & IN_MODIFY) {
-//		printf("%s is modified\n", path.c_str());
-//		if (stat(path.c_str(), &buf) == -1) {
-//			printf("ERROR when try to get stat ---modify file");	
-//		}	
-//		//watcher::file_modify(e->wd, e->name);
-//	}
-//	if (e->mask & IN_DELETE || e->mask & IN_MOVE) {
-//		printf("%s is deleted\n", path.c_str());
-//		if (stat(path.c_str(), &buf) == -1) {
-//			printf("ERROR when try to get stat ---delete file");	
-//		}	
-//		//watcher/file_delete/:e->:wde->(,name);
-//	}
-//}
-
 void
 handler::handle_file_event(struct inotify_event *e, std::string path)
 {

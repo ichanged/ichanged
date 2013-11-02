@@ -3,17 +3,19 @@
 #include "watch.h"
 #include "file.h"
 #include "logger.h"
+#include "watcher.h"
 
 watch::watch()
 {}
 
 watch::watch(const struct stat *s, bool new_create, std::string path,
-		bool link)
+		bool link, bool linked)
 :
 node(s, new_create, link),
 _path(path),
 _file_change(false),
-_history_exist(false)
+_history_exist(false),
+_linked(linked)	
 {
 	
 }
@@ -77,9 +79,15 @@ watch::is_change()
 }
 
 bool
-watch::is_file_link(std::string filename)
+watch::is_link_file(std::string filename)
 {
 	return this->_file_map[filename].is_link();	
+}
+
+bool
+watch::is_linked()
+{
+	return this->_linked;
 }
 
 std::string
@@ -117,6 +125,7 @@ watch::file_create(std::string filename)
 		this->_file_set.insert(filename);
 		return true;
 	}
+
 	return false;
 }
 

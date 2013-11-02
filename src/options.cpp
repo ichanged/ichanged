@@ -6,7 +6,7 @@
 #include "options.h"
 
 /* 监控目录 */
-std::string options::directory = "/home/faye/ichanged/";
+std::string options::directory = "/home/faye/ich/";
 /* 界面刷新时间间隔 */
 uint32_t options::interval = 2;
 /* 排除监控的文件、目录 */

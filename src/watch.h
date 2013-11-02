@@ -13,7 +13,7 @@ class watch : public node{
 public:
 	watch();
 	watch(const struct stat *s, bool new_create, std::string path, 
-			bool link = false);
+			bool link = false, bool linked = false);
 	~watch();
 
 	std::string get_path();
@@ -23,7 +23,8 @@ public:
 	bool modify();
 
 	bool is_change();
-	bool is_file_link(std::string filename);
+	bool is_link_file(std::string filename);
+	bool is_linked();
 	std::string get_file_link_path(std::string filename);
 	int  get_file_count(); 
 	void file_init(const struct stat *s, std::string filename, 
@@ -43,6 +44,7 @@ private:
 	std::string _path;
 	bool _file_change;
 	bool _history_exist;
+	bool _linked;
 	std::map<std::string, file> _file_map;
 	std::set<std::string> _file_set;
 };
