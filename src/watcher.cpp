@@ -303,20 +303,16 @@ watcher::file_create(int wd, std::string name)
 void
 watcher::file_attrib(int wd, std::string name)
 {
-	if (!watcher::_watch_map[wd].is_linked()) {
-		if (watcher::_watch_map[wd].file_attrib(name)) {
-			watcher::_watch_set.insert(wd);
-		}
+	if (watcher::_watch_map[wd].file_attrib(name)) {
+		watcher::_watch_set.insert(wd);
 	}
 }
 
 void
 watcher::file_modify(int wd, std::string name)
 {
-	if (!watcher::_watch_map[wd].is_linked()) {
-		if (watcher::_watch_map[wd].file_modify(name)) {
-			watcher::_watch_set.insert(wd);
-		}
+	if (watcher::_watch_map[wd].file_modify(name)) {
+		watcher::_watch_set.insert(wd);
 	}
 }
 
@@ -356,10 +352,9 @@ watcher::file_delete(int wd, std::string name)
 void
 watcher::file_write(int wd, std::string name)
 {
-	if (!watcher::_watch_map[wd].is_linked()) {
-		if (watcher::_watch_map[wd].file_write(name)) {
-			watcher::_watch_set.insert(wd);	
-	}	}	
+	if (watcher::_watch_map[wd].file_write(name)) {
+		watcher::_watch_set.insert(wd);	
+	}	
 }
 
 void
