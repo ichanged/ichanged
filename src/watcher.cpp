@@ -331,9 +331,9 @@ watcher::file_delete(int wd, std::string name)
 	std::string link_path;
 
 //	// 删除链接文件
-//	if (watcher::_watch_map[wd].file_delete(name)) {
-//		watcher::_watch_set.insert(wd);
-//	}
+	if (watcher::_watch_map[wd].file_delete(name)) {
+		watcher::_watch_set.insert(wd);
+	}
 //
 //	// 删除链接文件的源文件
 //	w = &watcher::_watch_map[wd];

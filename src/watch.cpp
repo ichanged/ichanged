@@ -134,6 +134,9 @@ watch::file_modify(std::string filename)
 {
 	struct stat s;
 
+	if (this->_file_map.find(filename) == this->_file_map.end()) {
+		return false;	
+	}
 	if (this->_get_file_stat(filename, &s)) {
 		this->_file_map[filename].modify(&s);
 		this->_file_change = true;
@@ -148,6 +151,9 @@ watch::file_attrib(std::string filename)
 {
 	struct stat s;
 
+	if (this->_file_map.find(filename) == this->_file_map.end()) {
+		return false;	
+	}
 	if (this->_get_file_stat(filename, &s)) {
 		this->_file_map[filename].attrib(&s);
 		this->_file_change = true;
@@ -160,6 +166,9 @@ watch::file_attrib(std::string filename)
 bool
 watch::file_delete(std::string filename)
 {
+	if (this->_file_map.find(filename) == this->_file_map.end()) {
+		return false;	
+	}
 	if (this->_file_map[filename].new_create) {
 		this->_file_set.erase(filename);
 		return false;	
