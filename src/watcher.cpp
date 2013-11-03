@@ -253,8 +253,13 @@ watcher::init_file(const struct stat *sb, std::string path)
 void
 watcher::add_file(const struct stat *sb, std::string path)
 {
-	std::map<int, watch>::iterator pos;
+	int wd;
 	watch *w;
+	bool link = false;
+	struct stat sb_link;
+	char buf[1024] = {0};
+	std::string link_path = "";
+	std::map<int, watch>::iterator pos;
 
 	char *dir = NULL;
 	char *filename = NULL;
@@ -268,36 +273,89 @@ watcher::add_file(const struct stat *sb, std::string path)
 	strcpy(fbuf, path.c_str());
 	filename = basename(fbuf);
 
+	// 判断是否是链接文件，如果是，获取其源文件路径
+	if (lstat(path.c_str(), &sb_link) == -1) {
+		logger::fatal("[%s %d]lstat error: %s", __FILE__, __LINE__, 
+				ERRSTR);		
+	}
+	if (S_ISLNK(sb_link.st_mode)) {
+		link = true;	
+	}
+	if (link) {
+		if (readlink(path.c_str(), buf, sizeof(buf)) == -1) {
+			logger::fatal("[%s %d]readlink error: %s", __FILE__, 
+					__LINE__, ERRSTR);
+		}
+	}
+	link_path.assign(buf);
+	// 如果链接文件在当前目录
+	if (link_path.find("/") == std::string::npos) {
+		link_path = (std::string)dir + "/" + link_path;	
+	}
+
+	// 查找此文件目录是否处于监控中，如果不包含，则添加监控
 	for(pos = watcher::_watch_map.begin(); pos != watcher::_watch_map.end();
 		++pos) {
 		w = &pos->second;
 		if(w->get_path() == dir) {
-			w->file_create(filename);
 			break;
 		}
 	}
+	if (pos == watcher::_watch_map.end()) {
+		wd = inotify_add_watch(monitor::inotify_fd, dir, 
+				monitor::mask);
+		watcher::_watch_map[wd] = watch(sb, true, dir, false, true);
+		watcher::_wd_map[dir] = wd;
+		watcher::_watch_set.insert(wd);
+		w = &watcher::_watch_map[wd];
+		
+	}
+	w->file_create(filename, link, link_path);
+
+	if (link) {
+		if (stat(link_path.c_str(), &sb_link) == -1) {
+			logger::fatal("[%s %d]stat error: %s", __FILE__, 
+					__LINE__, ERRSTR);
+		}
+		return watcher::add_file(&sb_link, link_path); 
+	} else {
+		return;
+	}
+//	for(pos = watcher::_watch_map.begin(); pos != watcher::_watch_map.end();
+//		++pos) {
+//		w = &pos->second;
+//		if(w->get_path() == dir) {
+//			w->file_create(filename);
+//			break;
+//		}
+//	}
+
 }
 
 void
 watcher::file_create(int wd, std::string name)
 {	
-//	struct stat s;
-//	std::string path;
+	watch *w;
+	struct stat s;
+	std::string path;
+	std::string link_path;
 
 	if (!watcher::_watch_map[wd].is_linked()) {
-		if (watcher::_watch_map[wd].file_create(name)) {
+		w = &watcher::_watch_map[wd];	
+		if (w->file_create(name)) {
 			watcher::_watch_set.insert(wd);
 		}
+		if (w->is_link_file(name)) {
+			link_path = w->get_file_link_path(name);
+			if (lstat(link_path.c_str(), &s) == -1) {
+				logger::fatal("[%s %d]lstat error: %s", 
+						__FILE__, __LINE__, ERRSTR);		
+			}
+			return add_file(&s, link_path);
+		} else {
+			return;
+		}
 	}
-//		path = watcher::_watch_map[wd].get_path() + "/" + name;
-//
-//		if (lstat(path.c_str() , &s) == -1) {
-//			logger::fatal("[%s %d]lstat error: %s", __FILE__, 
-//					__LINE__, ERRSTR);
-//		}
-//		if (S_ISLNK(s.st_mode)) {
-//			watcher::link_file(&s, path, true);	
-//		}
 }
 
 void

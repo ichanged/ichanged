@@ -29,7 +29,8 @@ public:
 	int  get_file_count(); 
 	void file_init(const struct stat *s, std::string filename, 
 			bool link, std::string link_path = "");
-	bool file_create(std::string filename);
+	bool file_create(std::string filename, bool link = false, 
+			std::string link_path = "");
 	bool file_modify(std::string filename);
 	bool file_attrib(std::string filename);
 	bool file_delete(std::string filename);

@@ -107,22 +107,26 @@ watch::file_init(const struct stat *s, std::string filename, bool link,
 		std::string link_path)
 {
 	this->_file_map[filename] = file(s, false, filename, link);
-	if (link == true) {
+	if (link) {
 		this->_file_map[filename].set_link_path(link_path);
 	}
 }
 
 bool
-watch::file_create(std::string filename)
+watch::file_create(std::string filename, bool link, std::string link_path)
 {
 	struct stat s; 
 
 	if (this->_get_file_stat(filename, &s)) {
 		//TODO
-		this->_file_map[filename] = file(&s, true, filename, false);
+		this->_file_map[filename] = file(&s, true, filename, link);
 		this->_file_map[filename].set_time();
 		this->_file_change = true;
 		this->_file_set.insert(filename);
+
+		if (link) {
+			this->_file_map[filename].set_link_path(link_path);
+		}
 		return true;
 	}
 
