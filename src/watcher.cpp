@@ -320,33 +320,41 @@ void
 watcher::file_delete(int wd, std::string name)
 {
 	watch *w;
+	int wd_link;
 	char *dbuf;
 	char *fbuf;
 	char *dir = NULL;
 	char *filename = NULL;
 	std::string link_path;
 
-//	// 删除链接文件
+	// 删除链接文件
 	if (watcher::_watch_map[wd].file_delete(name)) {
 		watcher::_watch_set.insert(wd);
-	}
-//
-//	// 删除链接文件的源文件
-//	w = &watcher::_watch_map[wd];
-//	if (w->is_link_file(name)){
-//		link_path = w->get_file_link_path(name);
-//		dbuf = new char[link_path.length() + 1];
-//		fbuf = new char[link_path.length() + 1];
-//		strcpy(dbuf, link_path.c_str());
-//		dir = dirname(dbuf);
-//		strcpy(fbuf, link_path.c_str());
-//		filename = basename(fbuf); 
-//
-//		wd = watcher::_wd_map[dir];
+	}	
+
+	// 删除链接文件的源文件
+	w = &watcher::_watch_map[wd];
+	if (w->is_link_file(name)){
+		link_path = w->get_file_link_path(name);
+		dbuf = new char[link_path.length() + 1];
+		fbuf = new char[link_path.length() + 1];
+		strcpy(dbuf, link_path.c_str());
+		dir = dirname(dbuf);
+		strcpy(fbuf, link_path.c_str());
+		filename = basename(fbuf); 
+
+		wd_link = watcher::_wd_map[dir];
+		if (wd_link == wd) {
+			return;
+		}
+		watcher::file_delete(wd, filename);
 //		if (watcher::_watch_map[wd].file_delete(filename)) {
 //			watcher::_watch_set.insert(wd);
 //		}
-//	}
+
+	} else {
+		return;
+	}
 }
 
 void
