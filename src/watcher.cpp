@@ -222,6 +222,7 @@ watcher::init_file(const struct stat *sb, std::string path)
 		link_path = (std::string)dir + "/" + link_path;	
 	}
 
+	//TODO
 	// 查找此文件目录是否处于监控中，如果不包含，则添加监控
 	for(pos = watcher::_watch_map.begin(); pos != watcher::_watch_map.end();
 		++pos) {
@@ -298,6 +299,8 @@ watcher::add_file(const struct stat *sb, std::string path)
 		++pos) {
 		w = &pos->second;
 		if(w->get_path() == dir) {
+			wd = watcher::_wd_map[dir];
+			watcher::_watch_set.insert(wd);
 			break;
 		}
 	}
@@ -310,6 +313,7 @@ watcher::add_file(const struct stat *sb, std::string path)
 		w = &watcher::_watch_map[wd];
 		
 	}
+
 	w->file_create(filename, link, link_path);
 
 	if (link) {
@@ -342,19 +346,25 @@ watcher::file_create(int wd, std::string name)
 
 	if (!watcher::_watch_map[wd].is_linked()) {
 		w = &watcher::_watch_map[wd];	
-		if (w->file_create(name)) {
-			watcher::_watch_set.insert(wd);
+		path = w->get_path() + "/" + name; 
+		if (stat(path.c_str(), &s) == -1) {
+			logger::fatal("[%s %d]stat error: %s", __FILE__, 
+					__LINE__, ERRSTR);
 		}
-		if (w->is_link_file(name)) {
-			link_path = w->get_file_link_path(name);
-			if (lstat(link_path.c_str(), &s) == -1) {
-				logger::fatal("[%s %d]lstat error: %s", 
-						__FILE__, __LINE__, ERRSTR);		
-			}
-			return add_file(&s, link_path);
-		} else {
-			return;
-		}
+		return add_file(&s, path);
+//		if (w->file_create(name)) {
+//			watcher::_watch_set.insert(wd);
+//		}
+//		if (w->is_link_file(name)) {
+//			link_path = w->get_file_link_path(name);
+//			if (lstat(link_path.c_str(), &s) == -1) {
+//				logger::fatal("[%s %d]lstat error: %s", 
+//						__FILE__, __LINE__, ERRSTR);		
+//			}
+//			return add_file(&s, link_path);
+//		} else {
+//			return;
+//		}
 	}
 }
 
