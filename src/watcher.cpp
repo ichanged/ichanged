@@ -7,6 +7,7 @@
 #include "watcher.h"
 #include "logger.h"
 #include "monitor.h"
+#include "record.h"
 
 std::map<int, watch> watcher::_watch_map;
 std::map<std::string, int> watcher::_wd_map;
@@ -29,6 +30,7 @@ watcher::add_watch(int wd, const struct stat *sb, std::string path)
 	watcher::_watch_map[wd] = watch(sb, true, path);
 	watcher::_watch_map[wd].set_time();
 	watcher::_wd_map[path] = wd;
+	record::change_flag = true;
 	watcher::_watch_set.insert(wd);
 }
 
@@ -47,6 +49,7 @@ watcher::dir_delete(int wd, char *path)
 	wd = watcher::_wd_map[path_tmp];
 	if (watcher::_watch_map[wd].idelete()) {
 		watcher::_watch_set.insert(wd);	
+		record::change_flag = true;
 	}	
 
 	monitor::remove_monitor(wd);
@@ -61,6 +64,7 @@ watcher::dir_modify(int wd, char *path)
 	wd = watcher::_wd_map[path_tmp];
 	if (watcher::_watch_map[wd].modify()) {
 		watcher::_watch_set.insert(wd);
+		record::change_flag = true;
 	}
 }
 
@@ -73,6 +77,7 @@ watcher::dir_attrib(int wd, char *path)
 	wd = watcher::_wd_map[path_tmp];
 	if (watcher::_watch_map[wd].attrib()) {
 		watcher::_watch_set.insert(wd);
+		record::change_flag = true;
 	}
 }
 
@@ -315,6 +320,7 @@ watcher::add_file(const struct stat *sb, std::string path)
 	}
 
 	w->file_create(filename, link, link_path);
+	record::change_flag = true;
 
 	if (link) {
 		if (stat(link_path.c_str(), &sb_link) == -1) {
@@ -365,6 +371,7 @@ watcher::file_attrib(int wd, std::string name)
 {
 	if (watcher::_watch_map[wd].file_attrib(name)) {
 		watcher::_watch_set.insert(wd);
+		record::change_flag = true;
 	}
 }
 
@@ -373,6 +380,7 @@ watcher::file_modify(int wd, std::string name)
 {
 	if (watcher::_watch_map[wd].file_modify(name)) {
 		watcher::_watch_set.insert(wd);
+		record::change_flag = true;
 	}
 }
 
@@ -390,6 +398,7 @@ watcher::file_delete(int wd, std::string name)
 	// 删除链接文件
 	if (watcher::_watch_map[wd].file_delete(name)) {
 		watcher::_watch_set.insert(wd);
+		record::change_flag = true;
 	}	
 
 	// 删除链接文件的源文件
@@ -407,6 +416,7 @@ watcher::file_delete(int wd, std::string name)
 		if (wd_link == wd) {
 			return;
 		}
+		record::change_flag = true;
 		watcher::file_delete(wd_link, filename);
 //		if (watcher::_watch_map[wd].file_delete(filename)) {
 //			watcher::_watch_set.insert(wd);

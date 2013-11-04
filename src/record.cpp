@@ -4,6 +4,7 @@
 #include "record.h"
 
 std::ofstream record::file; 
+bool record::change_flag = false;  
 
 void
 record::init()

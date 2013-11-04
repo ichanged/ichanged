@@ -14,6 +14,7 @@ public:
 	static void close();
 
 	static std::ofstream file;
+	static bool change_flag;
 };
 
 #endif

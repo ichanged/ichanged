@@ -6,9 +6,9 @@
 #include "options.h"
 
 /* 监控目录 */
-std::string options::directory = "/home/faye/ich/";
+std::string options::directory = "/tmp";
 /* 界面刷新时间间隔 */
-uint32_t options::interval = 2;
+uint32_t options::interval = 5;
 /* 排除监控的文件、目录 */
 std::vector<std::string> options::exclude;
 /* 是否监控隐藏文件、目录 */

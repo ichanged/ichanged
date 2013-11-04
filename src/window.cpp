@@ -70,8 +70,6 @@ window::start(void *arg)
 	window::draw_summary();
 	window::draw_status_bar();
 
-//	wprintw(window::event_list, "hello");
-//	wrefresh(window::event_list);
 	memset(&sa, 0, sizeof(struct sigaction));
 	sa.sa_handler = win_resize;
 
@@ -84,8 +82,6 @@ window::start(void *arg)
 		wrefresh(window::event_list);
 		sleep(options::interval);
 	}
-//	while(wgetch(window::status) != 27) {
-//	}
 
 	endwin();
 	
@@ -199,7 +195,9 @@ window::draw_event()
 				pos->get_type_string().c_str(), 
 				base_size.c_str(), current_size.c_str(),
 				pos->get_chg_time(), pos->get_path().c_str());		
-		record::event_to_file(output);
+		if (record::change_flag) {	
+			record::event_to_file(output);
+		}
 		wprintw(window::event_list, output);
 		wrefresh(window::event_list);
 	}

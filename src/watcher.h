@@ -10,6 +10,7 @@
 
 #include "event.h"
 #include "watch.h"
+#include "record.h"
 
 class watcher {
 public:
