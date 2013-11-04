@@ -415,7 +415,7 @@ watcher::file_delete(int wd, std::string name)
 		if (wd_link == wd) {
 			return;
 		}
-		watcher::file_delete(wd, filename);
+		watcher::file_delete(wd_link, filename);
 //		if (watcher::_watch_map[wd].file_delete(filename)) {
 //			watcher::_watch_set.insert(wd);
 //		}
