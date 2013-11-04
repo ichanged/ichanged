@@ -218,7 +218,7 @@ watcher::init_file(const struct stat *sb, std::string path)
 	}
 	link_path.assign(buf);
 	// 如果链接文件在当前目录
-	if (link_path.find("/") == std::string::npos) {
+	if (link_path[0] != '/') {
 		link_path = (std::string)dir + "/" + link_path;	
 	}
 
@@ -325,14 +325,6 @@ watcher::add_file(const struct stat *sb, std::string path)
 	} else {
 		return;
 	}
-//	for(pos = watcher::_watch_map.begin(); pos != watcher::_watch_map.end();
-//		++pos) {
-//		w = &pos->second;
-//		if(w->get_path() == dir) {
-//			w->file_create(filename);
-//			break;
-//		}
-//	}
 
 }
 
