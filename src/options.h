@@ -22,6 +22,8 @@ public:
 	static long threshold;  
 	/* ichanged记录变化的文件 */
 	static std::string filename; 
+	/* 日志放置目录 */
+	static std::string log_path;
 
 };
 

@@ -49,7 +49,7 @@ watcher::dir_delete(int wd, char *path)
 	wd = watcher::_wd_map[path_tmp];
 	if (watcher::_watch_map[wd].idelete()) {
 		watcher::_watch_set.insert(wd);	
-		record::change_flag = true;
+		//record::event_to_file();
 	}	
 
 	monitor::remove_monitor(wd);
@@ -64,7 +64,6 @@ watcher::dir_modify(int wd, char *path)
 	wd = watcher::_wd_map[path_tmp];
 	if (watcher::_watch_map[wd].modify()) {
 		watcher::_watch_set.insert(wd);
-		record::change_flag = true;
 	}
 }
 
@@ -209,7 +208,7 @@ watcher::init_file(const struct stat *sb, std::string path)
 
 	// 判断是否是链接文件，如果是，获取其源文件路径
 	if (lstat(path.c_str(), &sb_link) == -1) {
-		logger::fatal("[%s %d]lstat error: %s", __FILE__, __LINE__, 
+		logger::warn("[%s %d]lstat error: %s", __FILE__, __LINE__, 
 				ERRSTR);		
 	}
 	if (S_ISLNK(sb_link.st_mode)) {
@@ -247,7 +246,7 @@ watcher::init_file(const struct stat *sb, std::string path)
 
 	if (link) {
 		if (stat(link_path.c_str(), &sb_link) == -1) {
-			logger::fatal("[%s %d]stat error: %s", __FILE__, 
+			logger::warn("[%s %d]stat error: %s", __FILE__, 
 					__LINE__, ERRSTR);
 		}
 		return init_file(&sb_link, link_path); 
@@ -346,8 +345,7 @@ watcher::file_create(int wd, std::string name)
 		w = &watcher::_watch_map[wd];	
 		path = w->get_path() + "/" + name; 
 		if (stat(path.c_str(), &s) == -1) {
-			logger::fatal("[%s %d]stat error: %s", __FILE__, 
-					__LINE__, ERRSTR);
+			return;
 		}
 		return add_file(&s, path);
 //		if (w->file_create(name)) {
@@ -432,6 +430,7 @@ watcher::file_write(int wd, std::string name)
 {
 	if (watcher::_watch_map[wd].file_write(name)) {
 		watcher::_watch_set.insert(wd);	
+		record::change_flag = true;
 	}	
 }
 
