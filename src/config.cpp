@@ -26,7 +26,7 @@ config::write_config(Config &cfg)
 	std::vector<std::string>::iterator iter;
 
 	Setting &root = cfg.getRoot();	
-	root.add("log_path", Setting::TypeString) = "ichanged.cfg";  		
+	root.add("log_path", Setting::TypeString) = "change.log";  		
 	root.add("interval", Setting::TypeInt) = 5;
 	root.add("directory", Setting::TypeString) = "/tmp";
 
