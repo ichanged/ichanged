@@ -9,7 +9,6 @@
 /*
  * 监视事件模块
  */
-
 typedef int (*ftw_func)(const char *fpath, const struct stat *sb, int typeflag);
 
 class monitor {

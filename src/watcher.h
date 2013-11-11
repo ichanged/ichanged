@@ -14,6 +14,7 @@
 
 class watcher {
 public:
+	static bool is_watch_exist(std::string path);
 	static void init_watch(int wd, const struct stat *sb, std::string path);
 	static void add_watch(int wd, const struct stat *sb, std::string path);
 	static watch get_watch(int wd);

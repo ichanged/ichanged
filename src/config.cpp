@@ -32,10 +32,10 @@ config::write_config(Config &cfg)
 
 	Setting &exclude = root.add("exclude", Setting::TypeArray);
 
-//	for (iter = options::exclude.begin(); iter != options::exclude.end();
-//			iter++) {
-//		exclude.add(*iter, Setting::TypeString);	
-//	}
+	for (iter = options::exclude.begin(); iter != options::exclude.end();
+			iter++) {
+		exclude.add(*iter, Setting::TypeString);	
+	}
 
 	root.add("threshold", Setting::TypeInt) = 0;
 

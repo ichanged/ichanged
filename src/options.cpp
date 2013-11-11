@@ -7,7 +7,7 @@
 #include "config.h"
 
 /* 监控目录 */
-std::string options::directory = "/tmp";
+std::string options::directory = "/home/faye/ich";
 /* 界面刷新时间间隔 */
 uint32_t options::interval = 2;
 /* 排除监控的文件、目录 */
@@ -76,7 +76,6 @@ options::print_usage()
 	"    -e, --exclude=PATH    Skip file or directory specified by PATH.\n"
 	"    -t  --threshold	  Set threshold to show change when size of files beyonds it.\n"
 	"    -l  --log path	  Set the path of log file\n"
-	"    -w, --watch-hidden    Watch hidden files and directories.\n"
-	"    -f  --config file	  Use configuration of config file ichanged.cfg\n",
+	"    -w, --watch-hidden    Watch hidden files and directories.\n",
 	options::interval, options::directory.c_str());
 }
