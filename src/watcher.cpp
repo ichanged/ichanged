@@ -319,9 +319,21 @@ watcher::file_delete(int wd, std::string name)
 	int wd_link;
 	char *dbuf;
 	char *fbuf;
+	struct stat sb;
 	char *dir = NULL;
 	char *filename = NULL;
+	std::string path;
 	std::string link_path;
+ 
+	path = watcher::_watch_map[wd].get_path() + "/" + name;
+	if (stat(path.c_str(), &sb) == -1) {
+		logger::warn("[%s %d]stat error: %s", __FILE__, 
+				__LINE__, ERRSTR);
+	}
+	if (!S_ISREG(sb.st_mode)) {
+		dir_delete(wd, (char *)name.c_str());		
+		return;
+	}
 
 	// 删除链接文件
 	if (watcher::_watch_map[wd].file_delete(name)) {
