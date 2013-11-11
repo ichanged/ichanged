@@ -27,11 +27,15 @@ watcher::init_watch(int wd, const struct stat *sb, std::string path)
 void
 watcher::add_watch(int wd, const struct stat *sb, std::string path)
 {
+	watch *w = NULL;
+
 	watcher::_watch_map[wd] = watch(sb, true, path);
+	w = &watcher::_watch_map[wd];
 	watcher::_watch_map[wd].set_time();
 	watcher::_wd_map[path] = wd;
-	record::change_flag = true;
 	watcher::_watch_set.insert(wd);
+	record::event_to_file(event::TYPE_CREATE, w->get_base_size(),
+		w->get_current_size(), w->get_path());
 }
 
 watch
@@ -43,13 +47,13 @@ watcher::get_watch(int wd)
 void
 watcher::dir_delete(int wd, char *path)
 {
+	//TODO
 	std::string path_tmp;
 
 	path_tmp = watcher::_watch_map[wd].get_path() + "/" + std::string(path); 
 	wd = watcher::_wd_map[path_tmp];
 	if (watcher::_watch_map[wd].idelete()) {
 		watcher::_watch_set.insert(wd);	
-		//record::event_to_file();
 	}	
 
 	monitor::remove_monitor(wd);
@@ -76,119 +80,16 @@ watcher::dir_attrib(int wd, char *path)
 	wd = watcher::_wd_map[path_tmp];
 	if (watcher::_watch_map[wd].attrib()) {
 		watcher::_watch_set.insert(wd);
-		record::change_flag = true;
 	}
 }
-
-//std::string
-//watcher::init_link_file(const struct stat *sb, std::string path)
-//{
-//	int wd;
-//	std::string tmp;
-//	std::string link_path;
-//	std::map<std::string, int>::iterator iter;
-//	char *dir = NULL;
-//	char *filename = NULL;
-//	char buf[1024] = {0};			
-//
-//	char *dbuf = new char[path.length() + 1];
-//	char *fbuf = new char[path.length() + 1];
-//
-//	if (readlink(path.c_str(), buf, sizeof(buf)) == -1) {
-//		logger::fatal("[%s %d]readlink error: %s", __FILE__, __LINE__,
-//				ERRSTR);
-//	}
-//
-//	strcpy(dbuf, buf);
-//	dir = dirname(dbuf);
-//	strcpy(fbuf, buf);
-//	filename = basename(fbuf);
-//
-//	tmp.assign(dir);
-//	link_path.assign(buf);
-//	iter = watcher::_wd_map.find(tmp);
-//	if (iter == watcher::_wd_map.end()) {
-//		wd = inotify_add_watch(monitor::inotify_fd, dir, 
-//				monitor::mask);
-//		watcher::_watch_map[wd] = watch(sb, false, tmp);
-//		watcher::_wd_map[tmp] = wd;
-//		watcher::_watch_map[wd].file_init(sb, filename, false);
-//	}
-//
-//	return link_path; 
-//}
-//
-//void
-//watcher::add_link_file(const struct stat *sb, std::string path)
-//{
-//	int wd;
-//	std::string tmp;
-//	std::string link_path;
-//	std::map<std::string, int>::iterator iter;
-//	char *dir = NULL;
-//	char *filename = NULL;
-//	char buf[1024] = {0};			
-//
-//	char *dbuf = new char[path.length() + 1];
-//	char *fbuf = new char[path.length() + 1];
-//
-//	if (readlink(path.c_str(), buf, sizeof(buf)) == -1) {
-//		logger::fatal("[%s %d]readlink error: %s", __FILE__, __LINE__,
-//				ERRSTR);
-//	}
-//
-//	strcpy(dbuf, buf);
-//	dir = dirname(dbuf);
-//	strcpy(fbuf, buf);
-//	filename = basename(fbuf);
-//
-//	tmp.assign(dir);
-//	link_path.assign(buf);
-//	iter = watcher::_wd_map.find(tmp);
-//	if (iter == watcher::_wd_map.end()) {
-//		wd = inotify_add_watch(monitor::inotify_fd, dir, 
-//				monitor::mask);
-//		watcher::_watch_map[wd] = watch(sb, true, tmp);
-//		watcher::_wd_map[tmp] = wd;
-//		watcher::_watch_map[wd].file_init(sb, filename, false);
-//	}
-//}
-
-//void
-//watcher::init_file(const struct stat *sb, std::string path, bool link, 
-//		std::string link_path)
-//{	
-//	watch *w;
-//	std::map<int, watch>::iterator pos;
-//
-//	char *dir = NULL;
-//	char *filename = NULL;
-//
-//	char *dbuf = new char[path.length() + 1];
-//	char *fbuf = new char[path.length() + 1];
-//
-//	strcpy(dbuf, path.c_str());
-//	dir = dirname(dbuf);
-//
-//	strcpy(fbuf, path.c_str());
-//	filename = basename(fbuf);
-//
-//	for(pos = watcher::_watch_map.begin(); pos != watcher::_watch_map.end();
-//		++pos) {
-//		w = &pos->second;
-//		if(w->get_path() == dir) {
-//			w->file_init(sb, filename, link, link_path);
-//			break;
-//		}
-//	}
-//}
 
 void
 watcher::init_file(const struct stat *sb, std::string path)
 {	
 	int wd;
 	watch *w;
-	bool link = false;
+	bool is_link = false;
+	bool is_dir = true;
 	struct stat sb_link;
 	char buf[1024] = {0};
 	std::string link_path = "";
@@ -212,9 +113,12 @@ watcher::init_file(const struct stat *sb, std::string path)
 				ERRSTR);		
 	}
 	if (S_ISLNK(sb_link.st_mode)) {
-		link = true;	
+		is_link = true;	
 	}
-	if (link) {
+	if (S_ISDIR(sb_link.st_mode)) {
+		is_dir = true;		
+	}
+	if (is_link) {
 		if (readlink(path.c_str(), buf, sizeof(buf)) == -1) {
 			logger::fatal("[%s %d]readlink error: %s", __FILE__, __LINE__,
 					ERRSTR);
@@ -226,7 +130,6 @@ watcher::init_file(const struct stat *sb, std::string path)
 		link_path = (std::string)dir + "/" + link_path;	
 	}
 
-	//TODO
 	// 查找此文件目录是否处于监控中，如果不包含，则添加监控
 	for(pos = watcher::_watch_map.begin(); pos != watcher::_watch_map.end();
 		++pos) {
@@ -242,10 +145,11 @@ watcher::init_file(const struct stat *sb, std::string path)
 		watcher::_wd_map[dir] = wd;
 		w = &watcher::_watch_map[wd];
 	}
-	w->file_init(sb, filename, link, link_path);
+	w->file_init(sb, filename, is_link, link_path);
 
-	if (link) {
+	if (is_link) {
 		if (stat(link_path.c_str(), &sb_link) == -1) {
+
 			logger::warn("[%s %d]stat error: %s", __FILE__, 
 					__LINE__, ERRSTR);
 		}
@@ -369,7 +273,6 @@ watcher::file_attrib(int wd, std::string name)
 {
 	if (watcher::_watch_map[wd].file_attrib(name)) {
 		watcher::_watch_set.insert(wd);
-		record::change_flag = true;
 	}
 }
 
@@ -378,7 +281,6 @@ watcher::file_modify(int wd, std::string name)
 {
 	if (watcher::_watch_map[wd].file_modify(name)) {
 		watcher::_watch_set.insert(wd);
-		record::change_flag = true;
 	}
 }
 

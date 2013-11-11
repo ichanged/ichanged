@@ -31,11 +31,10 @@ options::parse_args(int argc, char *argv[])
 		{"exclude", required_argument, NULL, 'e'},
 		{"threshold", required_argument, NULL, 't'},
 		{"long path", required_argument, NULL, 'l'},
-		{"watch-hidden", no_argument, NULL, 'w'},
-		{"config file", no_argument, NULL, 'f'}
+		{"watch-hidden", no_argument, NULL, 'w'}
 	};
 
-	while((opt = getopt_long(argc, argv, "i:d:e:t:l:wf", opts, NULL)) != -1) {
+	while((opt = getopt_long(argc, argv, "i:d:e:t:l:w", opts, NULL)) != -1) {
 		switch(opt) {
 		case 'i':
 			options::interval = atoi(optarg);
@@ -54,9 +53,6 @@ options::parse_args(int argc, char *argv[])
 			break;
 		case 'w':
 			options::watch_hidden = true;
-			break;
-		case 'f':
-			config::get_config();
 			break;
 		case '?':
 		case ':':
