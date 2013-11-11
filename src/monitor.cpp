@@ -167,13 +167,13 @@ monitor::do_init_monitor(const char *fpath, const struct stat *sb,
 		break;
 	}
 	case FTW_D: {
-		if (watcher::is_watch_exist(std::string(fpath))) {
+		if (watcher::is_watch_exist(std::string(fpath)) == false) {
 			wd = inotify_add_watch(monitor::inotify_fd, fpath, 
 					monitor::mask);
 			if (wd == -1) {
 				logger::warn("add watch to '%s' error: %s", fpath, ERRSTR);
 			}
-			watcher::init_watch(wd, sb, fpath);
+			watcher::init_watch(wd, sb, std::string(fpath));
 		}
 		break;
 	}

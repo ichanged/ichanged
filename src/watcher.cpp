@@ -59,9 +59,9 @@ watcher::init_watch(int wd, const struct stat *sb, std::string path)
 			logger::warn("[%s %d]stat error: %s", __FILE__, 
 					__LINE__, ERRSTR);
 		}
-		watcher::init_watch(wd_link, &sb_link, path);
+		watcher::init_watch(wd_link, &sb_link, link_path);
 	} else {
-		monitor::init_monitor(link_path);
+		monitor::init_monitor(path);
 	}
 }
 
@@ -288,19 +288,6 @@ watcher::file_create(int wd, std::string name)
 			return;
 		}
 		return add_file(&s, path);
-//		if (w->file_create(name)) {
-//			watcher::_watch_set.insert(wd);
-//		}
-//		if (w->is_link_file(name)) {
-//			link_path = w->get_file_link_path(name);
-//			if (lstat(link_path.c_str(), &s) == -1) {
-//				logger::fatal("[%s %d]lstat error: %s", 
-//						__FILE__, __LINE__, ERRSTR);		
-//			}
-//			return add_file(&s, link_path);
-//		} else {
-//			return;
-//		}
 	}
 }
 
