@@ -37,6 +37,7 @@ public:
 	bool file_write(std::string filename);
 
 	void generate_snapshot(std::vector<event> *event_vec);
+
 private:
 	std::string _get_file_path(std::string filename);
 	bool _get_file_stat(std::string filename, struct stat *s);

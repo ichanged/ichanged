@@ -42,6 +42,10 @@ watcher::init_watch(int wd, const struct stat *sb, std::string path)
 //				ERRSTR);		
 //	}
 //	if (S_ISLNK(sb_link.st_mode)) {
+//		watcher::_watch_map[wd].link_dir = true;
+//	}
+
+//	if (S_ISLNK(sb_link.st_mode)) {
 //		if (readlink(path.c_str(), buf, sizeof(buf)) == -1) {
 //			logger::fatal("[%s %d]readlink error: %s", __FILE__, 
 //					__LINE__, ERRSTR);
@@ -319,21 +323,21 @@ watcher::file_delete(int wd, std::string name)
 	int wd_link;
 	char *dbuf;
 	char *fbuf;
-	struct stat sb;
 	char *dir = NULL;
 	char *filename = NULL;
 	std::string path;
 	std::string link_path;
  
 	path = watcher::_watch_map[wd].get_path() + "/" + name;
-	if (stat(path.c_str(), &sb) == -1) {
-		logger::warn("[%s %d]stat error: %s", __FILE__, 
-				__LINE__, ERRSTR);
-	}
-	if (!S_ISREG(sb.st_mode)) {
-		dir_delete(wd, (char *)name.c_str());		
+	if (watcher::_wd_map.find(path) != watcher::_wd_map.end()) {
+		dir_delete(wd, (char *)name.c_str());
 		return;
 	}
+//	if (stat())
+//	if () {
+//		dir_delete(wd, (char *)name.c_str());		
+//		return;
+//	}
 
 	// 删除链接文件
 	if (watcher::_watch_map[wd].file_delete(name)) {
