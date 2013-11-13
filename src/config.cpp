@@ -17,7 +17,6 @@ config::init()
 	}
 
 	return;
-	// 如果没有配置文件
 }
 
 void

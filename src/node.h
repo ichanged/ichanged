@@ -26,8 +26,9 @@ public:
 	bool is_attrib();
 	bool is_delete();
 	bool is_link();
-
 	bool is_change();
+
+	struct stat *get_base();
 
 	bool new_create;
 protected:

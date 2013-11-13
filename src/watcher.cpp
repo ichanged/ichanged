@@ -402,6 +402,19 @@ watcher::unlock()
 	}
 }
 
+void
+watcher::export_file()
+{
+	watch *w = NULL;
+	std::map<int, watch>::iterator iter;	
+
+	for(iter = watcher::_watch_map.begin(); 
+			iter != watcher::_watch_map.end(); ++iter) {
+		w = &iter->second;	
+		w->export_file();
+	}
+}
+
 std::vector<event> *
 watcher::generate_snapshot()
 {

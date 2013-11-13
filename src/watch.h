@@ -25,8 +25,10 @@ public:
 	bool is_change();
 	bool is_link_file(std::string filename);
 	bool is_linked();
+
 	std::string get_file_link_path(std::string filename);
 	int  get_file_count(); 
+
 	void file_init(const struct stat *s, std::string filename, 
 			bool link, std::string link_path = "");
 	bool file_create(std::string filename, bool link = false, 
@@ -36,6 +38,7 @@ public:
 	bool file_delete(std::string filename);
 	bool file_write(std::string filename);
 
+	void export_file();
 	void generate_snapshot(std::vector<event> *event_vec);
 
 private:

@@ -5,15 +5,16 @@
 #include <stdlib.h>
 #include <string.h>
 
-#include "monitor.h"
 #include "error.h"
+#include "watch.h"
+#include "datum.h"
+#include "logger.h"
+#include "window.h"
+#include "monitor.h"
 #include "watcher.h"
 #include "handler.h"
-#include "logger.h"
-#include "watch.h"
 #include "options.h"
 #include "ichanged.h"
-#include "window.h"
 
 std::string monitor::dir;
 int monitor::inotify_fd = 0;
@@ -117,6 +118,7 @@ monitor::init_monitor(std::string dir)
 		logger::fatal("traverse directory '%s' to init monitor error",
 			dir.c_str());
 	}
+	datum::export_file();
 }
 
 void

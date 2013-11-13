@@ -1,9 +1,10 @@
 #include <sys/stat.h>
 
-#include "watch.h"
 #include "file.h"
-#include "logger.h"
+#include "datum.h"
+#include "watch.h"
 #include "event.h"
+#include "logger.h"
 #include "watcher.h"
 
 watch::watch()
@@ -225,6 +226,26 @@ watch::file_write(std::string filename)
 		}
 	}	
 	return false;
+}
+
+void
+watch::export_file()
+{
+	file *f = NULL;
+	struct stat *s;
+	std::map<std::string, file>::iterator iter;		
+
+	// 写入目录本身stat
+	s = this->get_base();
+	fwrite(s, sizeof(struct stat), 1, datum::fp);
+	
+	// 写入目录下各个文件stat 
+	for(iter = watch::_file_map.begin(); iter != watch::_file_map.end();
+			++iter) {
+		f = &iter->second;
+		s = f->get_base();
+		fwrite(s, sizeof(struct stat), 1, datum::fp);
+	}
 }
 
 void

@@ -15,9 +15,10 @@
 class watcher {
 public:
 	static bool is_watch_exist(std::string path);
+
+	static watch get_watch(int wd);
 	static void init_watch(int wd, const struct stat *sb, std::string path);
 	static void add_watch(int wd, const struct stat *sb, std::string path);
-	static watch get_watch(int wd);
 	static void remove_watch(int wd);
 
 	static void dir_attrib(int wd, char *path);
@@ -32,6 +33,7 @@ public:
 	static void file_delete(int wd, std::string name);
 	static void file_write(int wd, std::string name);
 
+	static void export_file();
 	static std::vector<event> *generate_snapshot();
 
 	static void lock();
