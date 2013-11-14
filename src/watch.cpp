@@ -231,20 +231,29 @@ watch::file_write(std::string filename)
 void
 watch::export_file()
 {
+	int length;
 	file *f = NULL;
-	struct stat *s;
+	char *name = NULL;
+	unsigned char len[2] = {0};
 	std::map<std::string, file>::iterator iter;		
 
-	// 写入目录本身stat
-	s = this->get_base();
-	fwrite(s, sizeof(struct stat), 1, datum::fp);
+	// 写入目录本身的信息
+	name = (char *)this->get_path().c_str();
+	length = strlen(name) + 1;
+	memcpy(len, &length, sizeof(len));
+
+	// 写入路径长度
+	fwrite(len, sizeof(len), 1, datum::fp);
+	// 写入路径
+	fwrite(name, strlen(name) + 1, 1, datum::fp);
+	// 写入文件stat
+	fwrite(&this->_base, sizeof(this->_base), 1, datum::fp);
 	
 	// 写入目录下各个文件stat 
 	for(iter = watch::_file_map.begin(); iter != watch::_file_map.end();
 			++iter) {
 		f = &iter->second;
-		s = f->get_base();
-		fwrite(s, sizeof(struct stat), 1, datum::fp);
+		f->get_base(this->get_path());
 	}
 }
 

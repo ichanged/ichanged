@@ -111,9 +111,3 @@ node::get_current_size()
 {
 	return this->_ns.st_size;
 }
-
-struct stat *
-node::get_base()
-{
-	return &this->_base;	
-}

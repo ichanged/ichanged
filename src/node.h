@@ -1,9 +1,11 @@
 #ifndef _NODE_H
 #define _NODE_H
 
-#include <sys/stat.h>
-#include <stdio.h>
 #include <vector>
+#include <time.h>
+#include <stdio.h>
+#include <limits.h>
+#include <sys/stat.h>
 
 #include "event.h"
 
@@ -28,7 +30,7 @@ public:
 	bool is_link();
 	bool is_change();
 
-	struct stat *get_base();
+	struct fstat *get_base();
 
 	bool new_create;
 protected:

@@ -2,6 +2,7 @@
 #include <string>
 
 #include "file.h"
+#include "datum.h"
 
 file::file()
 {
@@ -62,4 +63,22 @@ std::string
 file::get_filename()
 {
 	return this->_filename;
+}
+
+void
+file::get_base(std::string dir)
+{
+	int length;
+	std::string path;	
+	char *name = NULL;
+	unsigned char len[2] = {0};
+
+	path = dir + "/" + this->_filename;
+	name = (char *)path.c_str();
+	length = strlen(name) + 1;
+	memcpy(len, &length, sizeof(len));
+
+	fwrite(len, sizeof(len), 1, datum::fp);
+	fwrite(name, strlen(name) + 1, 1, datum::fp);
+	fwrite(&this->_base, sizeof(this->_base), 1, datum::fp);
 }

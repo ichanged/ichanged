@@ -1,9 +1,9 @@
 #ifndef _WATCH_H_
 #define _WATCH_H_
 
-#include <string>
 #include <map>
 #include <set>
+#include <string>
 #include <sys/stat.h>
 
 #include "node.h"
