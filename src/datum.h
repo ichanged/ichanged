@@ -3,10 +3,11 @@
 
 #include <iostream>
 #include <stdio.h>
+#include <limits.h>
 
 class datum {
 public:
-	//static void import();
+	static void import_file();
 	static void export_file();
 	static FILE *fp;
 private:

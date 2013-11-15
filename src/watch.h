@@ -40,6 +40,7 @@ public:
 
 	void export_file();
 	void generate_snapshot(std::vector<event> *event_vec);
+	void print();
 
 private:
 	std::string _get_file_path(std::string filename);

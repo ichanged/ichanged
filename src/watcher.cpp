@@ -29,44 +29,8 @@ watcher::is_watch_exist(std::string path)
 void
 watcher::init_watch(int wd, const struct stat *sb, std::string path)
 {
-//	int wd_link;
-//	char buf[1024] = {0};
-//	struct stat sb_link;
-//	std::string link_path;
-//
 	watcher::_watch_map[wd] = watch(sb, false, path);
 	watcher::_wd_map[path] = wd;
-
-//	if (lstat(path.c_str(), &sb_link) == -1) {
-//		logger::warn("[%s %d]lstat error: %s", __FILE__, __LINE__, 
-//				ERRSTR);		
-//	}
-//	if (S_ISLNK(sb_link.st_mode)) {
-//		watcher::_watch_map[wd].link_dir = true;
-//	}
-
-//	if (S_ISLNK(sb_link.st_mode)) {
-//		if (readlink(path.c_str(), buf, sizeof(buf)) == -1) {
-//			logger::fatal("[%s %d]readlink error: %s", __FILE__, 
-//					__LINE__, ERRSTR);
-//		}
-//		link_path.assign(buf);
-//
-//		wd_link = inotify_add_watch(monitor::inotify_fd, 
-//				link_path.c_str(), monitor::mask);
-//		if (wd_link == -1) {
-//			logger::warn("add watch to '%s' error: %s", 
-//					link_path.c_str(), ERRSTR);
-//		}
-//
-//		if (stat(link_path.c_str(), &sb_link) == -1) {
-//			logger::warn("[%s %d]stat error: %s", __FILE__, 
-//					__LINE__, ERRSTR);
-//		}
-//		watcher::init_watch(wd_link, &sb_link, link_path);
-//	} else {
-//		monitor::init_monitor(path);
-//	}
 }
 
 void
@@ -429,4 +393,17 @@ watcher::generate_snapshot()
 		}
 	}
 	return &watcher::_event_vec;
+}
+
+void
+watcher::print()
+{
+	watch *w;
+	std::map<int, watch>::iterator iter;
+
+	for(iter = watcher::_watch_map.begin();
+			iter != watcher::_watch_map.end(); ++iter) {
+		w = &iter->second;
+		w->print();	
+	}
 }

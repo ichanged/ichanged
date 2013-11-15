@@ -37,17 +37,17 @@ monitor::init()
 	monitor::mask = IN_ALL_EVENTS;
 
 	monitor::dir = options::directory;
-	monitor::init_monitor(options::directory);
-
-	status = pthread_create(&monitor::thread_id, NULL, monitor::start, NULL);
-	if(status != 0) {
-		throw Error(__FILE__, __LINE__, 
-				"create monitor thread error: %s", ERRSTR);
-	}
-	tid[0] = monitor::thread_id; 
-
-	logger::info("[%s %d] thread: %lu monitor module init completely", 
-			__FILE__, __LINE__, monitor::thread_id);
+//	monitor::init_monitor(options::directory);
+//
+//	status = pthread_create(&monitor::thread_id, NULL, monitor::start, NULL);
+//	if(status != 0) {
+//		throw Error(__FILE__, __LINE__, 
+//				"create monitor thread error: %s", ERRSTR);
+//	}
+//	tid[0] = monitor::thread_id; 
+//
+//	logger::info("[%s %d] thread: %lu monitor module init completely", 
+//			__FILE__, __LINE__, monitor::thread_id);
 }
 
 void

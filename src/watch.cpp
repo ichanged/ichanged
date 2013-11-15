@@ -337,3 +337,15 @@ watch::_get_stat(std::string path, struct stat *s)
 	}
 	return true;
 }
+
+void
+watch::print()
+{
+	std::map<std::string, file>::iterator iter;
+
+	for(iter = watch::_file_map.begin(); iter != watch::_file_map.end();
+			++iter) {
+		printf("%s\n", this->_path.c_str());
+		printf("%s\n", this->_get_file_path(iter->first).c_str());
+	}
+}
