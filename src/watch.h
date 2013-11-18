@@ -43,7 +43,7 @@ public:
 	void export_file();
 	void generate_snapshot(std::vector<event> *event_vec);
 	void check_datum_delete(int wd);
-	//void print();
+	void print();
 
 private:
 	std::string _get_file_path(std::string filename);

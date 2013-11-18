@@ -36,7 +36,7 @@ public:
 	static void export_file();
 	static std::vector<event> *generate_snapshot();
 	static void check_delete();
-	//static void print();
+	static void print();
 
 	static void lock();
 	static void unlock();

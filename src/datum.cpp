@@ -46,6 +46,7 @@ datum::import_file()
 	}
 	fclose(fp);
 
+	//watcher::print();
 	// 与当前实际文件情况比较，输出不同	
 	ret = ftw(options::directory.c_str(), (ftw_func)datum::compare, 500);
 	if(ret == -1) {
@@ -101,7 +102,7 @@ datum::deal_file(const char *fpath, const struct stat *sb)
 	
 	if (w_tmp->is_file_exist(filename)) {
 		ns = w_tmp->get_file(filename)->get_base();
-		w_tmp->set_read(true);
+		w_tmp->get_file(filename)->set_read(true);
 		if (sb->st_size != ns.st_size) {
 			watcher::file_modify(wd, filename);
 		}
