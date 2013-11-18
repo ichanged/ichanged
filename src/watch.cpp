@@ -26,6 +26,15 @@ watch::~watch()
 {
 }
 
+bool
+watch::is_file_exist(std::string filename)
+{
+	if (this->_file_map.find(filename) != this->_file_map.end()) {
+		return true;
+	}	
+	return false;
+}
+
 std::string
 watch::get_path()
 {
@@ -110,6 +119,12 @@ watch::get_file_count()
 	return this->_file_map.size();	
 }
 
+file
+watch::get_file(std::string filename)
+{
+	return this->_file_map[filename];		
+}
+
 void
 watch::file_init(const struct stat *s, std::string filename, bool link, 
 		std::string link_path)
@@ -126,23 +141,25 @@ watch::file_create(std::string filename, bool link, std::string link_path)
 	struct stat s; 
 	file *f = NULL;
 
-	if (this->_get_file_stat(filename, &s)) {
-		//TODO
-		f = &this->_file_map[filename];
-		this->_file_map[filename] = file(&s, true, filename, link);
-		this->_file_map[filename].set_time();
-		this->_file_change = true;
-		this->_file_set.insert(filename);
-		record::event_to_file(event::TYPE_CREATE, f->get_base_size(),
-				f->get_current_size(), this->_get_file_path(filename));
-
-		if (link) {
-			this->_file_map[filename].set_link_path(link_path);
-		}
-		return true;
+	if (!this->_get_file_stat(filename, &s)) {
+		return false;
 	}
+//	if (this->_file_map.find(filename) != this->_file_map.end()) {
+//		return false;	
+//	}
+	f = &this->_file_map[filename];
+	this->_file_map[filename] = file(&s, true, filename, link);
+	this->_file_map[filename].set_time();
+	this->_file_change = true;
+	this->_file_set.insert(filename);
+	record::event_to_file(event::TYPE_CREATE, f->get_base_size(),
+			f->get_current_size(), this->_get_file_path(filename));
 
-	return false;
+	if (link) {
+		this->_file_map[filename].set_link_path(link_path);
+	}
+	return true;
+
 }
 
 bool
@@ -253,7 +270,7 @@ watch::export_file()
 	for(iter = watch::_file_map.begin(); iter != watch::_file_map.end();
 			++iter) {
 		f = &iter->second;
-		f->get_base(this->get_path());
+		f->export_file(this->get_path());
 	}
 }
 
@@ -338,14 +355,14 @@ watch::_get_stat(std::string path, struct stat *s)
 	return true;
 }
 
-void
-watch::print()
-{
-	std::map<std::string, file>::iterator iter;
-
-	for(iter = watch::_file_map.begin(); iter != watch::_file_map.end();
-			++iter) {
-		printf("%s\n", this->_path.c_str());
-		printf("%s\n", this->_get_file_path(iter->first).c_str());
-	}
-}
+//void
+//watch::print()
+//{
+//	std::map<std::string, file>::iterator iter;
+//
+//	for(iter = watch::_file_map.begin(); iter != watch::_file_map.end();
+//			++iter) {
+//		printf("%s\n", this->_path.c_str());
+//		printf("%s\n", this->_get_file_path(iter->first).c_str());
+//	}
+//}

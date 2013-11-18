@@ -66,7 +66,7 @@ file::get_filename()
 }
 
 void
-file::get_base(std::string dir)
+file::export_file(std::string dir)
 {
 	int length;
 	std::string path;	

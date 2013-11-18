@@ -30,7 +30,7 @@ public:
 	bool is_link();
 	bool is_change();
 
-	struct fstat *get_base();
+	struct stat get_base();
 
 	bool new_create;
 protected:
@@ -39,6 +39,9 @@ protected:
 	bool _delete;
 	bool _change;
 	bool _link;
+
+	// for datum
+	bool _read;
 
 	char _chg_time[25];
 	std::string _link_path;

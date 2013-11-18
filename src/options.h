@@ -24,6 +24,10 @@ public:
 	static std::string filename; 
 	/* 日志放置目录 */
 	static std::string log_path;
+	/* 导入基准文件*/
+	static bool is_import;
+	/* 导出基准文件*/
+	static bool is_export;
 
 };
 

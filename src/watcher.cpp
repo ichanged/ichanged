@@ -395,15 +395,15 @@ watcher::generate_snapshot()
 	return &watcher::_event_vec;
 }
 
-void
-watcher::print()
-{
-	watch *w;
-	std::map<int, watch>::iterator iter;
-
-	for(iter = watcher::_watch_map.begin();
-			iter != watcher::_watch_map.end(); ++iter) {
-		w = &iter->second;
-		w->print();	
-	}
-}
+//void
+//watcher::print()
+//{
+//	watch *w;
+//	std::map<int, watch>::iterator iter;
+//
+//	for(iter = watcher::_watch_map.begin();
+//			iter != watcher::_watch_map.end(); ++iter) {
+//		w = &iter->second;
+//		w->print();	
+//	}
+//}

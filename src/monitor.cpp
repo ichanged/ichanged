@@ -37,17 +37,24 @@ monitor::init()
 	monitor::mask = IN_ALL_EVENTS;
 
 	monitor::dir = options::directory;
-//	monitor::init_monitor(options::directory);
-//
-//	status = pthread_create(&monitor::thread_id, NULL, monitor::start, NULL);
-//	if(status != 0) {
-//		throw Error(__FILE__, __LINE__, 
-//				"create monitor thread error: %s", ERRSTR);
-//	}
-//	tid[0] = monitor::thread_id; 
-//
-//	logger::info("[%s %d] thread: %lu monitor module init completely", 
-//			__FILE__, __LINE__, monitor::thread_id);
+	if (options::is_import) {
+		datum::import_file();
+	} else {
+		monitor::init_monitor(options::directory);
+	}
+	if (options::is_export) {
+		datum::export_file();
+	}
+
+	status = pthread_create(&monitor::thread_id, NULL, monitor::start, NULL);
+	if(status != 0) {
+		throw Error(__FILE__, __LINE__, 
+				"create monitor thread error: %s", ERRSTR);
+	}
+	tid[0] = monitor::thread_id; 
+
+	logger::info("[%s %d] thread: %lu monitor module init completely", 
+			__FILE__, __LINE__, monitor::thread_id);
 }
 
 void
@@ -118,7 +125,6 @@ monitor::init_monitor(std::string dir)
 		logger::fatal("traverse directory '%s' to init monitor error",
 			dir.c_str());
 	}
-	datum::export_file();
 }
 
 void

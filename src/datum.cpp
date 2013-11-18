@@ -1,6 +1,7 @@
 #include "datum.h"
 #include "logger.h"
 #include "monitor.h"
+#include "options.h"
 #include "watcher.h"
 
 FILE *datum::fp = NULL;
@@ -10,6 +11,7 @@ void
 datum::import_file()
 {
 	int wd;
+	int ret;
 	int length;
 	struct stat s;
 	char name[PATH_MAX + 1];
@@ -42,8 +44,29 @@ datum::import_file()
 			watcher::init_file(&s, name);		
 		}
 	}
-	watcher::print();
 	fclose(fp);
+
+	// 与当前实际文件情况比较，输出不同	
+	ret = ftw(options::directory.c_str(), (ftw_func)datum::compare, 500);
+	if(ret == -1) {
+		logger::fatal("traverse directory '%s' to add monitor error",
+			options::directory.c_str());
+	}
+}
+
+int
+datum::compare(const char *fpath, const struct stat *sb, int typeflag)
+{
+	switch (typeflag) {
+	case FTW_F:
+		datum::deal_file(fpath, sb);
+		break;
+	case FTW_D:
+		datum::deal_dir(fpath, sb);
+		break;
+	}
+
+	return 0;
 }
 
 void
@@ -54,3 +77,66 @@ datum::export_file()
 	fclose(fp);
 }
 
+void
+datum::deal_file(const char *fpath, const struct stat *sb)
+{
+	int wd;
+	watch w_tmp;
+	struct stat ns;
+	char *dir = NULL;
+	char *filename = NULL;
+
+	char *dbuf = new char[strlen(fpath) + 1];
+	char *fbuf = new char[strlen(fpath) + 1];
+	strcpy(dbuf, fpath);
+	dir = dirname(dbuf);
+	strcpy(fbuf, fpath);
+	filename = basename(fbuf);
+		
+	wd = watcher::_wd_map[dir];
+	w_tmp = watcher::get_watch(wd);
+	
+	if (w_tmp.is_file_exist(filename)) {
+		ns = w_tmp.get_file(filename).get_base();
+		if (sb->st_size != ns.st_size) {
+			watcher::file_modify(wd, filename);
+		}
+		if (sb->st_mode != ns.st_mode) {
+			watcher::file_attrib(wd, filename);
+		}
+	} else {
+		watcher::add_file(sb, fpath);	
+	}
+
+	delete dbuf;
+	delete fbuf;
+}
+
+void
+datum::deal_dir(const char *fpath, const struct stat *sb)
+{
+	int wd;
+	struct stat ns;
+	std::string dir;
+	watch w_tmp;
+
+	dir.assign(fpath);
+	if (!watcher::is_watch_exist(dir)) {
+		wd = inotify_add_watch(monitor::inotify_fd, fpath, monitor::mask);
+		if (-1 == wd) {
+			logger::warn("add watch to '%s' error", fpath);
+		}
+		watcher::add_watch(wd, sb, fpath);
+	} else {
+		wd = watcher::_wd_map[dir];
+		w_tmp = watcher::get_watch(wd);
+		ns = w_tmp.get_base();
+
+		if (ns.st_size != sb->st_size) {
+			watcher::dir_modify(wd, (char *)fpath);	
+		}
+		if (ns.st_mode != sb->st_mode) {
+			watcher::dir_attrib(wd, (char *)fpath);
+		}
+	}
+}

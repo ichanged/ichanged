@@ -18,7 +18,7 @@ public:
 	bool write(const struct stat *s);
 
 	std::string get_filename();
-	void get_base(std::string dir);
+	void export_file(std::string dir);
 
 private:
 	std::string _filename;

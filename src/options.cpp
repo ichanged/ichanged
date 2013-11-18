@@ -20,6 +20,10 @@ long options::threshold = 0;
 std::string options::filename = "change.log";
 /* 日志记录的路径*/
 std::string options::log_path = "ichanged.log";
+/* 导入基准文件*/
+bool options::is_import = false;
+/* 导出基准文件*/
+bool options::is_export = false;
 
 void
 options::parse_args(int argc, char *argv[])
@@ -31,10 +35,12 @@ options::parse_args(int argc, char *argv[])
 		{"exclude", required_argument, NULL, 'e'},
 		{"threshold", required_argument, NULL, 't'},
 		{"long path", required_argument, NULL, 'l'},
+		{"import datum file", required_argument, NULL, 'm'},
+		{"export datum file", no_argument, NULL, 'x'},
 		{"watch-hidden", no_argument, NULL, 'w'}
 	};
 
-	while((opt = getopt_long(argc, argv, "i:d:e:t:l:w", opts, NULL)) != -1) {
+	while((opt = getopt_long(argc, argv, "i:d:e:t:l:mxw", opts, NULL)) != -1) {
 		switch(opt) {
 		case 'i':
 			options::interval = atoi(optarg);
@@ -53,6 +59,12 @@ options::parse_args(int argc, char *argv[])
 			break;
 		case 'w':
 			options::watch_hidden = true;
+			break;
+		case 'm':
+			options::is_import = true;
+			break;
+		case 'x':
+			options::is_export = true;
 			break;
 		case '?':
 		case ':':
@@ -76,6 +88,8 @@ options::print_usage()
 	"    -e, --exclude=PATH    Skip file or directory specified by PATH.\n"
 	"    -t  --threshold	  Set threshold to show change when size of files beyonds it.\n"
 	"    -l  --log path	  Set the path of log file\n"
-	"    -w, --watch-hidden    Watch hidden files and directories.\n",
+	"    -w, --watch-hidden    Watch hidden files and directories.\n"
+	"    -m  --import datum   import datum file 'datum'\n"
+	"    -x  --export datum   export datum to file 'datum'\n",
 	options::interval, options::directory.c_str());
 }

@@ -23,11 +23,13 @@ public:
 	bool modify();
 
 	bool is_change();
-	bool is_link_file(std::string filename);
 	bool is_linked();
+	bool is_link_file(std::string filename);
+	bool is_file_exist(std::string filename);
 
 	std::string get_file_link_path(std::string filename);
 	int  get_file_count(); 
+	file get_file(std::string filename);
 
 	void file_init(const struct stat *s, std::string filename, 
 			bool link, std::string link_path = "");
@@ -40,12 +42,12 @@ public:
 
 	void export_file();
 	void generate_snapshot(std::vector<event> *event_vec);
-	void print();
+	//void print();
 
 private:
 	std::string _get_file_path(std::string filename);
-	bool _get_file_stat(std::string filename, struct stat *s);
 	bool _get_stat(std::string path, struct stat *s);
+	bool _get_file_stat(std::string filename, struct stat *s);
 
 	std::string _path;
 	bool _file_change;

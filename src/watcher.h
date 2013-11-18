@@ -35,13 +35,14 @@ public:
 
 	static void export_file();
 	static std::vector<event> *generate_snapshot();
-	static void print();
+	//static void print();
 
 	static void lock();
 	static void unlock();
+
+	static std::map<std::string, int> _wd_map;
 private:
 	static std::map<int, watch> _watch_map;
-	static std::map<std::string, int> _wd_map;
 	static std::set<int> _watch_set;
 
 	static std::vector<event> _event_vec;

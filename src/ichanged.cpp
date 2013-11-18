@@ -26,7 +26,7 @@ sigint_handler(int sig)
 {
 	flag = 1;
 	pthread_kill(tid[0], SIGQUIT);
-//	pthread_kill(tid[1], SIGQUIT);
+	pthread_kill(tid[1], SIGQUIT);
 //	for(i = 0; i < THREAD_NUM; i++) {
 //		logger::info("[%s %d] thread: %lu will be killed", __FILE__,
 //				__LINE__, tid[i]);
@@ -81,16 +81,15 @@ main(int argc, char *argv[])
 		
 		logger::init();
 		monitor::init();
-		datum::import_file();
-		//window::init();
+		window::init();
 		record::init();
 	} catch(Error &x) {
 		logger::fatal("[%s %d] %s", x.get_file(), x.get_line(), 
 				x.what());
 	}
 
-	//monitor::wait();
-	//window::wait();
+	monitor::wait();
+	window::wait();
 
 	return 0;
 }
