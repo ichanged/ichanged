@@ -6,10 +6,10 @@
 void
 handler::handle_event(struct inotify_event *e)
 {
-	watch w = watcher::get_watch(e->wd);
+	watch *w = watcher::get_watch(e->wd);
 	std::string path;
 
-	path = w.get_path();
+	path = w->get_path();
 	if (!(e->mask & IN_DELETE_SELF) && !(e->mask & IN_MOVE_SELF)) {
 		if (e->len > 0) {
 			path += "/";

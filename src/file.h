@@ -9,7 +9,7 @@ class file : public node{
 public:
 	file();
 	file(const struct stat *s, bool new_create, std::string filename,
-			bool link);
+			bool read, bool link);
 	~file();
 
 	void modify(const struct stat *ns);

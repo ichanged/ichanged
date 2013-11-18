@@ -12,7 +12,7 @@
 class node {
 public:
 	node();
-	node(const struct stat *base, bool new_create, bool link);
+	node(const struct stat *base, bool new_create, bool read, bool link);
 	~node();
 
 	off_t get_base_size();
@@ -22,6 +22,8 @@ public:
 	void set_time();
 	void set_link_path(std::string link_path);
 	std::string get_link_path();
+	void set_read(bool flag);
+	bool get_read();
 
 	bool is_new_create();
 	bool is_modify();
@@ -38,10 +40,11 @@ protected:
 	bool _attrib;
 	bool _delete;
 	bool _change;
-	bool _link;
-
 	// for datum
 	bool _read;
+	// for symlink
+	bool _link;
+
 
 	char _chg_time[25];
 	std::string _link_path;

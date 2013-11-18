@@ -15,6 +15,7 @@ public:
 	static void export_file();
 	static void deal_file(const char *fpath, const struct stat *sb); 
 	static void deal_dir(const char *fpath, const struct stat *sb);
+
 	static FILE *fp;
 private:
 	static const char *_filename;

@@ -52,6 +52,8 @@ datum::import_file()
 		logger::fatal("traverse directory '%s' to add monitor error",
 			options::directory.c_str());
 	}
+
+	watcher::check_delete();
 }
 
 int
@@ -81,7 +83,7 @@ void
 datum::deal_file(const char *fpath, const struct stat *sb)
 {
 	int wd;
-	watch w_tmp;
+	watch *w_tmp;
 	struct stat ns;
 	char *dir = NULL;
 	char *filename = NULL;
@@ -95,9 +97,11 @@ datum::deal_file(const char *fpath, const struct stat *sb)
 		
 	wd = watcher::_wd_map[dir];
 	w_tmp = watcher::get_watch(wd);
+	w_tmp->set_read(true);
 	
-	if (w_tmp.is_file_exist(filename)) {
-		ns = w_tmp.get_file(filename).get_base();
+	if (w_tmp->is_file_exist(filename)) {
+		ns = w_tmp->get_file(filename)->get_base();
+		w_tmp->set_read(true);
 		if (sb->st_size != ns.st_size) {
 			watcher::file_modify(wd, filename);
 		}
@@ -118,7 +122,7 @@ datum::deal_dir(const char *fpath, const struct stat *sb)
 	int wd;
 	struct stat ns;
 	std::string dir;
-	watch w_tmp;
+	watch *w_tmp;
 
 	dir.assign(fpath);
 	if (!watcher::is_watch_exist(dir)) {
@@ -130,7 +134,8 @@ datum::deal_dir(const char *fpath, const struct stat *sb)
 	} else {
 		wd = watcher::_wd_map[dir];
 		w_tmp = watcher::get_watch(wd);
-		ns = w_tmp.get_base();
+		ns = w_tmp->get_base();
+		w_tmp->set_read(true);
 
 		if (ns.st_size != sb->st_size) {
 			watcher::dir_modify(wd, (char *)fpath);	

@@ -29,7 +29,7 @@ watcher::is_watch_exist(std::string path)
 void
 watcher::init_watch(int wd, const struct stat *sb, std::string path)
 {
-	watcher::_watch_map[wd] = watch(sb, false, path);
+	watcher::_watch_map[wd] = watch(sb, false, path, false);
 	watcher::_wd_map[path] = wd;
 }
 
@@ -38,7 +38,7 @@ watcher::add_watch(int wd, const struct stat *sb, std::string path)
 {
 	watch *w = NULL;
 
-	watcher::_watch_map[wd] = watch(sb, true, path);
+	watcher::_watch_map[wd] = watch(sb, true, path, true);
 	w = &watcher::_watch_map[wd];
 	watcher::_watch_map[wd].set_time();
 	watcher::_wd_map[path] = wd;
@@ -47,10 +47,10 @@ watcher::add_watch(int wd, const struct stat *sb, std::string path)
 		w->get_current_size(), w->get_path());
 }
 
-watch
+watch *
 watcher::get_watch(int wd)
 {
-	return watcher::_watch_map[wd];
+	return &watcher::_watch_map[wd];
 }
 
 void
@@ -146,7 +146,7 @@ watcher::init_file(const struct stat *sb, std::string path)
 	if (pos == watcher::_watch_map.end()) {
 		wd = inotify_add_watch(monitor::inotify_fd, dir, 
 				monitor::mask);
-		watcher::_watch_map[wd] = watch(sb, false, dir, false, true);
+		watcher::_watch_map[wd] = watch(sb, false, dir, false, false, true);
 		watcher::_wd_map[dir] = wd;
 		w = &watcher::_watch_map[wd];
 	}
@@ -224,7 +224,7 @@ watcher::add_file(const struct stat *sb, std::string path)
 	if (pos == watcher::_watch_map.end()) {
 		wd = inotify_add_watch(monitor::inotify_fd, dir, 
 				monitor::mask);
-		watcher::_watch_map[wd] = watch(sb, true, dir, false, true);
+		watcher::_watch_map[wd] = watch(sb, true, dir, true, false, true);
 		watcher::_wd_map[dir] = wd;
 		watcher::_watch_set.insert(wd);
 		w = &watcher::_watch_map[wd];
@@ -297,11 +297,6 @@ watcher::file_delete(int wd, std::string name)
 		dir_delete(wd, (char *)name.c_str());
 		return;
 	}
-//	if (stat())
-//	if () {
-//		dir_delete(wd, (char *)name.c_str());		
-//		return;
-//	}
 
 	// 删除链接文件
 	if (watcher::_watch_map[wd].file_delete(name)) {
@@ -395,6 +390,26 @@ watcher::generate_snapshot()
 	return &watcher::_event_vec;
 }
 
+void
+watcher::check_delete()
+{
+	int wd;
+	watch *w = NULL;
+	std::map<int, watch>::iterator iter;
+	
+	for (iter = watcher::_watch_map.begin(); iter != watcher::_watch_map.end();
+			++iter) {
+		wd = iter->first;
+		w = &iter->second;		
+
+		// 目录是否被读过，没有被读过，则是未被删除
+		if (!w->get_read()) {
+			watcher::dir_delete(wd, (char *)w->get_path().c_str());	
+		}
+
+		w->check_datum_delete(wd);
+	}
+}
 //void
 //watcher::print()
 //{

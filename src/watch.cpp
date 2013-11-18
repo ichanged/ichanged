@@ -10,10 +10,10 @@
 watch::watch()
 {}
 
-watch::watch(const struct stat *s, bool new_create, std::string path,
+watch::watch(const struct stat *s, bool new_create, std::string path, bool read,
 		bool link, bool linked)
 :
-node(s, new_create, link),
+node(s, new_create, read, link),
 _path(path),
 _file_change(false),
 _history_exist(false),
@@ -119,17 +119,17 @@ watch::get_file_count()
 	return this->_file_map.size();	
 }
 
-file
+file *
 watch::get_file(std::string filename)
 {
-	return this->_file_map[filename];		
+	return &this->_file_map[filename];		
 }
 
 void
 watch::file_init(const struct stat *s, std::string filename, bool link, 
 		std::string link_path)
 {
-	this->_file_map[filename] = file(s, false, filename, link);
+	this->_file_map[filename] = file(s, false, filename, false, link);
 	if (link) {
 		this->_file_map[filename].set_link_path(link_path);
 	}
@@ -144,11 +144,11 @@ watch::file_create(std::string filename, bool link, std::string link_path)
 	if (!this->_get_file_stat(filename, &s)) {
 		return false;
 	}
-//	if (this->_file_map.find(filename) != this->_file_map.end()) {
-//		return false;	
-//	}
+	if (this->_file_map.find(filename) != this->_file_map.end()) {
+		return false;	
+	}
 	f = &this->_file_map[filename];
-	this->_file_map[filename] = file(&s, true, filename, link);
+	this->_file_map[filename] = file(&s, true, filename, true, link);
 	this->_file_map[filename].set_time();
 	this->_file_change = true;
 	this->_file_set.insert(filename);
@@ -353,6 +353,21 @@ watch::_get_stat(std::string path, struct stat *s)
 		return false;
 	}
 	return true;
+}
+
+void
+watch::check_datum_delete(int wd)
+{
+	file *f = NULL;
+	std::map<std::string, file>::iterator iter; 
+
+	for (iter = this->_file_map.begin(); iter != this->_file_map.end();
+			++iter) {
+		f = &iter->second;		
+		if (!f->get_read()) {
+			watcher::file_delete(wd, iter->first);			
+		}
+	}
 }
 
 //void

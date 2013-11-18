@@ -13,7 +13,7 @@ class watch : public node{
 public:
 	watch();
 	watch(const struct stat *s, bool new_create, std::string path, 
-			bool link = false, bool linked = false);
+			bool read, bool link = false, bool linked = false);
 	~watch();
 
 	std::string get_path();
@@ -29,7 +29,7 @@ public:
 
 	std::string get_file_link_path(std::string filename);
 	int  get_file_count(); 
-	file get_file(std::string filename);
+	file *get_file(std::string filename);
 
 	void file_init(const struct stat *s, std::string filename, 
 			bool link, std::string link_path = "");
@@ -42,6 +42,7 @@ public:
 
 	void export_file();
 	void generate_snapshot(std::vector<event> *event_vec);
+	void check_datum_delete(int wd);
 	//void print();
 
 private:

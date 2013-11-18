@@ -7,12 +7,13 @@ node::node()
 {
 }
 
-node::node(const struct stat *stat_tmp, bool new_create, bool link)
+node::node(const struct stat *stat_tmp, bool new_create, bool read, bool link)
 :
 _modify(false),
 _attrib(false),
 _delete(false),
 _change(false),
+_read(read),
 _link(link)
 {
 	this->new_create = new_create;
@@ -62,6 +63,18 @@ std::string
 node::get_link_path()
 {
 	return this->_link_path;
+}
+
+void
+node::set_read(bool flag)
+{
+	this->_read = flag;
+}
+
+bool
+node::get_read()
+{
+	return this->_read;
 }
 
 bool

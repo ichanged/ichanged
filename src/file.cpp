@@ -8,9 +8,9 @@ file::file()
 {
 }
 
-file::file(const struct stat *s, bool new_create, std::string filename, 
-		bool link = false)
-:node(s, new_create, link)
+file::file(const struct stat *s, bool new_create, std::string filename,
+		bool read, bool link = false)
+:node(s, new_create, read, link)
 {
 	this->_filename = filename;
 }
