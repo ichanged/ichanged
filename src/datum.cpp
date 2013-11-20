@@ -13,6 +13,8 @@ datum::import_file()
 	int wd;
 	int ret;
 	int length;
+	char flag_num;
+	bool flag;
 	struct stat s;
 	char name[PATH_MAX + 1];
 
@@ -21,6 +23,9 @@ datum::import_file()
 	while (true) {
 		memset(name, 0, sizeof(name));
 		if (!fread(&length, 2, 1, fp)) {
+			break;
+		}
+		if (!fread(&flag_num, 1, 1, fp)) {
 			break;
 		}
 		if (!fread(name, length, 1, fp)) {
@@ -38,7 +43,12 @@ datum::import_file()
 						__FILE__, __LINE__, name,
 						ERRSTR);
 			}
-			watcher::init_watch(wd, &s, name);	
+			if (flag_num == 1) {
+				flag = true;	
+			} else {
+				flag = false;
+			}
+			watcher::init_watch(wd, &s, name, flag);	
 		}
 		if (S_ISREG(s.st_mode)) {
 			watcher::init_file(&s, name);		

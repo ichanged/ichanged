@@ -70,6 +70,7 @@ file::export_file(std::string dir)
 {
 	int length;
 	std::string path;	
+	char flag = 0;
 	char *name = NULL;
 	unsigned char len[2] = {0};
 
@@ -79,6 +80,7 @@ file::export_file(std::string dir)
 	memcpy(len, &length, sizeof(len));
 
 	fwrite(len, sizeof(len), 1, datum::fp);
+	fwrite(&flag, sizeof(flag), 1, datum::fp);
 	fwrite(name, strlen(name) + 1, 1, datum::fp);
 	fwrite(&this->_base, sizeof(this->_base), 1, datum::fp);
 }

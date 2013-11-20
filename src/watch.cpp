@@ -249,6 +249,7 @@ void
 watch::export_file()
 {
 	int length;
+	char flag;
 	file *f = NULL;
 	char *name = NULL;
 	unsigned char len[2] = {0};
@@ -261,6 +262,13 @@ watch::export_file()
 
 	// 写入路径长度
 	fwrite(len, sizeof(len), 1, datum::fp);
+	if (this->is_linked()) {
+		flag = 1;
+	} else {
+		flag = 0;
+	}
+	// 写入是否为被链接的目录（不属于监控目录下）
+	fwrite(&flag, sizeof(char), 1, datum::fp);
 	// 写入路径
 	fwrite(name, strlen(name) + 1, 1, datum::fp);
 	// 写入文件stat

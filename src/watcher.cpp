@@ -27,9 +27,9 @@ watcher::is_watch_exist(std::string path)
 }
 
 void
-watcher::init_watch(int wd, const struct stat *sb, std::string path)
+watcher::init_watch(int wd, const struct stat *sb, std::string path, bool linked)
 {
-	watcher::_watch_map[wd] = watch(sb, false, path, false);
+	watcher::_watch_map[wd] = watch(sb, false, path, false, false, linked);
 	watcher::_wd_map[path] = wd;
 }
 
