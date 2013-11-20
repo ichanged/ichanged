@@ -34,10 +34,13 @@ watcher::init_watch(int wd, const struct stat *sb, std::string path, bool linked
 }
 
 void
-watcher::add_watch(int wd, const struct stat *sb, std::string path)
+watcher::add_watch(int wd, const struct stat *sb, std::string path, bool exist)
 {
 	watch *w = NULL;
 
+	if (exist && (!watcher::_watch_map[wd].is_delete())) {
+		return;
+	}
 	watcher::_watch_map[wd] = watch(sb, true, path, true);
 	w = &watcher::_watch_map[wd];
 	watcher::_watch_map[wd].set_time();

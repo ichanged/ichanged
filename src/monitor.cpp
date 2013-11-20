@@ -217,11 +217,16 @@ monitor::do_add_monitor(const char *fpath, const struct stat *sb,
 		watcher::add_file(sb, fpath);
 		break;
 	case FTW_D:
-		wd = inotify_add_watch(monitor::inotify_fd, fpath, monitor::mask);
-		if(-1 == wd) {
-			logger::warn("add watch to '%s' error", fpath);
+		if (!watcher::is_watch_exist(std::string(fpath))) {
+			wd = inotify_add_watch(monitor::inotify_fd, fpath, monitor::mask);
+			if(-1 == wd) {
+				logger::warn("add watch to '%s' error", fpath);
+			}
+			watcher::add_watch(wd, sb, fpath, false);
+		} else {
+			wd = watcher::_wd_map[std::string(fpath)];
+			watcher::add_watch(wd, sb, fpath, true);
 		}
-		watcher::add_watch(wd, sb, fpath);
 		break;
 	default:
 		break;

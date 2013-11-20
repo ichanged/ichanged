@@ -20,7 +20,8 @@ public:
 	static watch *get_watch(int wd);
 	static void init_watch(int wd, const struct stat *sb, std::string path,
 			bool linked = false);
-	static void add_watch(int wd, const struct stat *sb, std::string path);
+	static void add_watch(int wd, const struct stat *sb, std::string path,
+			bool exist);
 	static void remove_watch(int wd);
 
 	static void dir_attrib(int wd, char *path);

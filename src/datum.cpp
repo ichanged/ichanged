@@ -161,7 +161,7 @@ datum::deal_dir(const char *fpath, const struct stat *sb)
 		if (-1 == wd) {
 			logger::warn("add watch to '%s' error", fpath);
 		}
-		watcher::add_watch(wd, sb, fpath);
+		watcher::add_watch(wd, sb, fpath, true);
 	} else {
 		wd = watcher::_wd_map[dir];
 		w_tmp = watcher::get_watch(wd);
