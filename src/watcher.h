@@ -7,6 +7,7 @@
 #include <map>
 #include <set>
 #include <vector>
+#include <limits.h>
 
 #include "event.h"
 #include "watch.h"
@@ -23,6 +24,7 @@ public:
 
 	static void dir_attrib(int wd, char *path);
 	static void dir_delete(int wd, char *path);
+	static void dir_delete_datum(int wd);
 	static void dir_modify(int wd, char *path);
 
 	static void init_file(const struct stat *sb, std::string path); 

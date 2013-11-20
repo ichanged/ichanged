@@ -144,9 +144,9 @@ watch::file_create(std::string filename, bool link, std::string link_path)
 	if (!this->_get_file_stat(filename, &s)) {
 		return false;
 	}
-	if (this->_file_map.find(filename) != this->_file_map.end()) {
-		return false;	
-	}
+//	if (this->_file_map.find(filename) != this->_file_map.end()) {
+//		return false;	
+//	}
 	f = &this->_file_map[filename];
 	this->_file_map[filename] = file(&s, true, filename, true, link);
 	this->_file_map[filename].set_time();

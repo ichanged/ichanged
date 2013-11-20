@@ -56,7 +56,6 @@ watcher::get_watch(int wd)
 void
 watcher::dir_delete(int wd, char *path)
 {
-	//TODO
 	std::string path_tmp;
 
 	path_tmp = watcher::_watch_map[wd].get_path() + "/" + std::string(path); 
@@ -64,6 +63,16 @@ watcher::dir_delete(int wd, char *path)
 	if (watcher::_watch_map[wd].idelete()) {
 		watcher::_watch_set.insert(wd);	
 	}	
+
+	monitor::remove_monitor(wd);
+}
+
+void
+watcher::dir_delete_datum(int wd)
+{
+	if (watcher::_watch_map[wd].idelete()) {
+		watcher::_watch_set.insert(wd);
+	}
 
 	monitor::remove_monitor(wd);
 }
@@ -99,7 +108,7 @@ watcher::init_file(const struct stat *sb, std::string path)
 	watch *w;
 	bool is_link = false;
 	struct stat sb_link;
-	char buf[1024] = {0};
+	char buf[PATH_MAX] = {0};
 	std::string link_path = "";
 	std::map<int, watch>::iterator pos;
 
@@ -146,7 +155,13 @@ watcher::init_file(const struct stat *sb, std::string path)
 	if (pos == watcher::_watch_map.end()) {
 		wd = inotify_add_watch(monitor::inotify_fd, dir, 
 				monitor::mask);
-		watcher::_watch_map[wd] = watch(sb, false, dir, false, false, true);
+		struct stat sb_dir;
+		if (stat(dir, &sb_dir) == -1) {
+			logger::warn("[%s %d]stat error: %s", __FILE__, 
+					__LINE__, ERRSTR);
+		}
+		watcher::_watch_map[wd] = watch(&sb_dir, false, dir, false, 
+				false, true);
 		watcher::_wd_map[dir] = wd;
 		w = &watcher::_watch_map[wd];
 	}
@@ -224,7 +239,13 @@ watcher::add_file(const struct stat *sb, std::string path)
 	if (pos == watcher::_watch_map.end()) {
 		wd = inotify_add_watch(monitor::inotify_fd, dir, 
 				monitor::mask);
-		watcher::_watch_map[wd] = watch(sb, true, dir, true, false, true);
+		struct stat sb_dir;
+		if (stat(dir, &sb_dir) == -1) {
+			logger::warn("[%s %d]stat error: %s", __FILE__, 
+					__LINE__, ERRSTR);
+		}
+		watcher::_watch_map[wd] = watch(&sb_dir, true, dir, true, 
+				false, true);
 		watcher::_wd_map[dir] = wd;
 		watcher::_watch_set.insert(wd);
 		w = &watcher::_watch_map[wd];
@@ -402,11 +423,14 @@ watcher::check_delete()
 		wd = iter->first;
 		w = &iter->second;		
 
-		// 目录是否被读过，没有被读过，则是未被删除
 		if (!w->get_read()) {
-			watcher::dir_delete(wd, (char *)w->get_path().c_str());	
+			watcher::dir_delete_datum(wd); 
 		}
-
+		// 目录是否被读过，没有被读过，则是未被删除
+//		if (!w->get_read()) {
+//			watcher::dir_delete(wd, (char *)w->get_path().c_str());	
+//		}
+//
 		w->check_datum_delete(wd);
 	}
 }

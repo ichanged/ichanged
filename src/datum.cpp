@@ -84,8 +84,11 @@ void
 datum::deal_file(const char *fpath, const struct stat *sb)
 {
 	int wd;
-	watch *w_tmp;
 	struct stat ns;
+	char buf[PATH_MAX] = {0};
+	struct stat sb_link;
+	watch *w_tmp = NULL;
+	file *f_tmp = NULL;
 	char *dir = NULL;
 	char *filename = NULL;
 
@@ -98,16 +101,33 @@ datum::deal_file(const char *fpath, const struct stat *sb)
 		
 	wd = watcher::_wd_map[dir];
 	w_tmp = watcher::get_watch(wd);
+	f_tmp = w_tmp->get_file(filename);
 	w_tmp->set_read(true);
 	
 	if (w_tmp->is_file_exist(filename)) {
-		ns = w_tmp->get_file(filename)->get_base();
-		w_tmp->get_file(filename)->set_read(true);
+		ns = f_tmp->get_base();
+		f_tmp->set_read(true);
 		if (sb->st_size != ns.st_size) {
 			watcher::file_modify(wd, filename);
 		}
 		if (sb->st_mode != ns.st_mode) {
 			watcher::file_attrib(wd, filename);
+		}
+
+		if (lstat(fpath, &sb_link) == -1) {
+			logger::warn("[%s %d]lstat error: %s", __FILE__, 
+					__LINE__, ERRSTR);			
+		}
+		if (S_ISLNK(sb_link.st_mode)) {
+			if (readlink(fpath, buf, sizeof(buf)) == -1) {
+				logger::fatal("[%s %d]readlink error: %s", 
+						__FILE__, __LINE__, ERRSTR);
+			}
+			if (stat(buf, &sb_link)) {
+				logger::warn("[%s %d]lstat error: %s", __FILE__, 
+						__LINE__, ERRSTR);			
+			}
+			datum::deal_file(buf, &sb_link);
 		}
 	} else {
 		watcher::add_file(sb, fpath);	
