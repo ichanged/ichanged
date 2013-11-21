@@ -33,21 +33,35 @@ watcher::init_watch(int wd, const struct stat *sb, std::string path, bool linked
 	watcher::_wd_map[path] = wd;
 }
 
-void
-watcher::add_watch(int wd, const struct stat *sb, std::string path, bool exist)
+int
+watcher::add_watch(const struct stat *sb, std::string path, bool link, 
+		bool linked)
 {
+	int wd;
 	watch *w = NULL;
 
-	if (exist && (!watcher::_watch_map[wd].is_delete())) {
-		return;
+	if (!watcher::is_watch_exist(path)) {
+		wd = inotify_add_watch(monitor::inotify_fd, path.c_str(), 
+				monitor::mask);
+		if (wd == -1) {
+			logger::warn("add watch to '%s' error", path.c_str());
+		}
+	} else {
+		wd = watcher::_wd_map[path];
+		if (!watcher::_watch_map[wd].is_delete()) {
+			return wd;	
+		}
 	}
-	watcher::_watch_map[wd] = watch(sb, true, path, true);
-	w = &watcher::_watch_map[wd];
-	watcher::_watch_map[wd].set_time();
+	
+	watcher::_watch_map[wd] = watch(sb, true, path, true, link, linked);
 	watcher::_wd_map[path] = wd;
+	w = &watcher::_watch_map[wd];
+	w->set_time();
 	watcher::_watch_set.insert(wd);
 	record::event_to_file(event::TYPE_CREATE, w->get_base_size(),
 		w->get_current_size(), w->get_path());
+
+	return wd;
 }
 
 watch *
@@ -165,6 +179,7 @@ watcher::init_file(const struct stat *sb, std::string path)
 		}
 		watcher::_watch_map[wd] = watch(&sb_dir, false, dir, false, 
 				false, true);
+		watcher::_watch_map[wd].set_time();
 		watcher::_wd_map[dir] = wd;
 		w = &watcher::_watch_map[wd];
 	}
@@ -240,17 +255,19 @@ watcher::add_file(const struct stat *sb, std::string path)
 		}
 	}
 	if (pos == watcher::_watch_map.end()) {
-		wd = inotify_add_watch(monitor::inotify_fd, dir, 
-				monitor::mask);
+//		wd = inotify_add_watch(monitor::inotify_fd, dir, 
+//				monitor::mask);
 		struct stat sb_dir;
 		if (stat(dir, &sb_dir) == -1) {
 			logger::warn("[%s %d]stat error: %s", __FILE__, 
 					__LINE__, ERRSTR);
 		}
-		watcher::_watch_map[wd] = watch(&sb_dir, true, dir, true, 
-				false, true);
-		watcher::_wd_map[dir] = wd;
-		watcher::_watch_set.insert(wd);
+		wd = watcher::add_watch(&sb_dir, dir);
+//		watcher::_watch_map[wd] = watch(&sb_dir, true, dir, true, 
+//				false, true);
+//		watcher::_watch_map[wd].set_time();
+//		watcher::_wd_map[dir] = wd;
+//		watcher::_watch_set.insert(wd);
 		w = &watcher::_watch_map[wd];
 		
 	}

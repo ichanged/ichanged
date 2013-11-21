@@ -197,7 +197,6 @@ int
 monitor::do_add_monitor(const char *fpath, const struct stat *sb,
 	int typeflag)
 {
-	int wd;
 	std::vector<std::string>::iterator iter;
 	std::string sfpath = std::string(fpath);
 
@@ -217,16 +216,17 @@ monitor::do_add_monitor(const char *fpath, const struct stat *sb,
 		watcher::add_file(sb, fpath);
 		break;
 	case FTW_D:
-		if (!watcher::is_watch_exist(std::string(fpath))) {
-			wd = inotify_add_watch(monitor::inotify_fd, fpath, monitor::mask);
-			if(-1 == wd) {
-				logger::warn("add watch to '%s' error", fpath);
-			}
-			watcher::add_watch(wd, sb, fpath, false);
-		} else {
-			wd = watcher::_wd_map[std::string(fpath)];
-			watcher::add_watch(wd, sb, fpath, true);
-		}
+//		if (!watcher::is_watch_exist(std::string(fpath))) {
+//			wd = inotify_add_watch(monitor::inotify_fd, fpath, monitor::mask);
+//			if(-1 == wd) {
+//				logger::warn("add watch to '%s' error", fpath);
+//			}
+//			watcher::add_watch(wd, sb, fpath, false);
+//		} else {
+//			wd = watcher::_wd_map[std::string(fpath)];
+//			watcher::add_watch(wd, sb, fpath, true);
+//		}
+		watcher::add_watch(sb, fpath);
 		break;
 	default:
 		break;
