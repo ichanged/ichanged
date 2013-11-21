@@ -18,7 +18,7 @@ public:
 	static bool is_watch_exist(std::string path);
 
 	static watch *get_watch(int wd);
-	static void init_watch(int wd, const struct stat *sb, std::string path,
+	static int init_watch(const struct stat *sb, std::string path,
 			bool linked = false);
 	static int add_watch(const struct stat *sb, std::string path,
 			bool link = false, bool _linked = false);

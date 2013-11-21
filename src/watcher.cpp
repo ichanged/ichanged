@@ -26,11 +26,25 @@ watcher::is_watch_exist(std::string path)
 	return false;
 }
 
-void
-watcher::init_watch(int wd, const struct stat *sb, std::string path, bool linked)
+int
+watcher::init_watch(const struct stat *sb, std::string path, bool linked)
 {
+	int wd;
+
+	if (watcher::is_watch_exist(path)) {
+		return watcher::_wd_map[path];
+	}
+
+	wd = inotify_add_watch(monitor::inotify_fd, path.c_str(), monitor::mask);
+	if (wd == -1) {
+		logger::warn("add watch to '%s' error: %s", path.c_str(), 
+				ERRSTR);
+	}
+
 	watcher::_watch_map[wd] = watch(sb, false, path, false, false, linked);
 	watcher::_wd_map[path] = wd;
+
+	return wd;
 }
 
 int
@@ -44,7 +58,8 @@ watcher::add_watch(const struct stat *sb, std::string path, bool link,
 		wd = inotify_add_watch(monitor::inotify_fd, path.c_str(), 
 				monitor::mask);
 		if (wd == -1) {
-			logger::warn("add watch to '%s' error", path.c_str());
+			logger::warn("add watch to '%s' error: %s", 
+					path.c_str(), ERRSTR);
 		}
 	} else {
 		wd = watcher::_wd_map[path];
@@ -170,17 +185,12 @@ watcher::init_file(const struct stat *sb, std::string path)
 		}
 	}
 	if (pos == watcher::_watch_map.end()) {
-		wd = inotify_add_watch(monitor::inotify_fd, dir, 
-				monitor::mask);
 		struct stat sb_dir;
 		if (stat(dir, &sb_dir) == -1) {
 			logger::warn("[%s %d]stat error: %s", __FILE__, 
 					__LINE__, ERRSTR);
 		}
-		watcher::_watch_map[wd] = watch(&sb_dir, false, dir, false, 
-				false, true);
-		watcher::_watch_map[wd].set_time();
-		watcher::_wd_map[dir] = wd;
+		wd = watcher::init_watch(&sb_dir, dir, true);
 		w = &watcher::_watch_map[wd];
 	}
 	w->file_init(sb, filename, is_link, link_path);
@@ -255,19 +265,12 @@ watcher::add_file(const struct stat *sb, std::string path)
 		}
 	}
 	if (pos == watcher::_watch_map.end()) {
-//		wd = inotify_add_watch(monitor::inotify_fd, dir, 
-//				monitor::mask);
 		struct stat sb_dir;
 		if (stat(dir, &sb_dir) == -1) {
 			logger::warn("[%s %d]stat error: %s", __FILE__, 
 					__LINE__, ERRSTR);
 		}
 		wd = watcher::add_watch(&sb_dir, dir);
-//		watcher::_watch_map[wd] = watch(&sb_dir, true, dir, true, 
-//				false, true);
-//		watcher::_watch_map[wd].set_time();
-//		watcher::_wd_map[dir] = wd;
-//		watcher::_watch_set.insert(wd);
 		w = &watcher::_watch_map[wd];
 		
 	}

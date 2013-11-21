@@ -10,7 +10,6 @@ const char *datum::_filename = "datum";
 void
 datum::import_file()
 {
-	int wd;
 	int ret;
 	int length;
 	char flag_num;
@@ -36,19 +35,19 @@ datum::import_file()
 		}
 		
 		if (S_ISDIR(s.st_mode)) {
-			wd = inotify_add_watch(monitor::inotify_fd, name, 
-					monitor::mask);
-			if(-1 == wd) {
-				logger::warn("[%s %d]add watch to '%s' error: %s", 
-						__FILE__, __LINE__, name,
-						ERRSTR);
-			}
+//			wd = inotify_add_watch(monitor::inotify_fd, name, 
+//					monitor::mask);
+//			if(-1 == wd) {
+//				logger::warn("[%s %d]add watch to '%s' error: %s", 
+//						__FILE__, __LINE__, name,
+//						ERRSTR);
+//			}
 			if (flag_num == 1) {
 				flag = true;	
 			} else {
 				flag = false;
 			}
-			watcher::init_watch(wd, &s, name, flag);	
+			watcher::init_watch(&s, name, flag);	
 		}
 		if (S_ISREG(s.st_mode)) {
 			watcher::init_file(&s, name);		
