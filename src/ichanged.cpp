@@ -27,12 +27,6 @@ sigint_handler(int sig)
 	flag = 1;
 	pthread_kill(tid[0], SIGQUIT);
 	pthread_kill(tid[1], SIGQUIT);
-//	for(i = 0; i < THREAD_NUM; i++) {
-//		logger::info("[%s %d] thread: %lu will be killed", __FILE__,
-//				__LINE__, tid[i]);
-//		pthread_kill(tid[i], SIGQUIT);
-//	}
-//	logger::info("[%s %d] ichanged stop waiting", __FILE__, __LINE__);	
 	exit(EXIT_SUCCESS);
 }
 

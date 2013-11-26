@@ -1,11 +1,13 @@
 #include "monitor.h"
 #include "handler.h"
 #include "watcher.h"
+#include "options.h"
 #include "logger.h"
 
 void
 handler::handle_event(struct inotify_event *e)
 {
+	std::vector<std::string>::iterator iter;
 	watch *w = watcher::get_watch(e->wd);
 	std::string path;
 
@@ -14,6 +16,16 @@ handler::handle_event(struct inotify_event *e)
 		if (e->len > 0) {
 			path += "/";
 			path += e->name;
+		}
+	}
+
+	if(!options::watch_hidden && monitor::is_path_hidden(path.c_str())) {
+		return;
+	}
+	for (iter = options::exclude.begin(); iter != options::exclude.end();
+		++iter) {
+		if (path.compare(0, path.length(), *iter) == 0) {
+			return;
 		}
 	}
 
@@ -56,26 +68,27 @@ handler::handle_dir_event(struct inotify_event *e, std::string path)
 void
 handler::handle_file_event(struct inotify_event *e, std::string path)
 {
-	if (monitor::is_path_hidden(path.c_str())) {
-		return;
-	}	
+//	if (monitor::is_path_hidden(path.c_str())) {
+//		return;
+//	}	
 	if (e->mask & IN_CREATE) {
-		//printf("%s %d was created\n", e->name, e->wd);
+	//	printf("%s %d was created\n", e->name, e->wd);
 		watcher::file_create(e->wd, e->name);		
 	}
 	if (e->mask & IN_ATTRIB) {
-		//printf("%s %d was attribed\n", e->name, e->wd);
+	//	printf("%s %d was attribed\n", e->name, e->wd);
 		watcher::file_attrib(e->wd, e->name);
 	}
 	if (e->mask & IN_DELETE || e->mask & IN_MOVED_FROM) {
-		//printf("%s %d was deleted\n", e->name, e->wd);
+	//	printf("%s %d was deleted\n", e->name, e->wd);
 		watcher::file_delete(e->wd, e->name);
 	}
 	if (e->mask & IN_MODIFY) {
-		//printf("%s %d was modified\n", e->name, e->wd);
+	//	printf("%s %d was modified\n", e->name, e->wd);
 		watcher::file_modify(e->wd, e->name);
 	} else if (e->mask & IN_CLOSE_WRITE) {
-		//printf("%s %d was write\n", e->name, e->wd);
+	//	printf("%s %d was write\n", e->name, e->wd);
 		watcher::file_write(e->wd, e->name);
 	}
+	printf("%s\n", e->name);
 }

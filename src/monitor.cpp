@@ -163,7 +163,7 @@ monitor::do_init_monitor(const char *fpath, const struct stat *sb,
 	// 如果当前目录是配置了不监控的特定目录，则直接返回
 	for (iter = options::exclude.begin(); iter != options::exclude.end();
 		++iter) {
-		if (sfpath.compare(0, iter->length(), *iter) == 0) {
+		if (sfpath.compare(0, sfpath.length(), *iter) == 0) {
 			return 0;
 		}
 	}
@@ -174,14 +174,6 @@ monitor::do_init_monitor(const char *fpath, const struct stat *sb,
 		break;
 	}
 	case FTW_D: {
-//		if (watcher::is_watch_exist(std::string(fpath)) == false) {
-//			wd = inotify_add_watch(monitor::inotify_fd, fpath, 
-//					monitor::mask);
-//			if (wd == -1) {
-//				logger::warn("add watch to '%s' error: %s", fpath, ERRSTR);
-//			}
-//			watcher::init_watch(wd, sb, std::string(fpath));
-//		}
 		watcher::init_watch(sb, std::string(fpath));
 		break;
 	}
@@ -206,7 +198,7 @@ monitor::do_add_monitor(const char *fpath, const struct stat *sb,
 	}
 	for (iter = options::exclude.begin(); iter != options::exclude.end();
 		++iter) {
-		if (sfpath.compare(0, iter->length(), *iter) == 0) {
+		if (sfpath.compare(0, sfpath.length(), *iter) == 0) {
 			return 0;
 		}
 	}

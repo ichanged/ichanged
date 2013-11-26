@@ -24,6 +24,7 @@ public:
 	std::string get_link_path();
 	void set_read(bool flag);
 	bool get_read();
+	void set_delete(bool flag);
 
 	bool is_new_create();
 	bool is_modify();

@@ -77,6 +77,12 @@ node::get_read()
 	return this->_read;
 }
 
+void
+node::set_delete(bool flag)
+{
+	this->_delete = flag;
+}
+
 bool
 node::is_new_create()
 {

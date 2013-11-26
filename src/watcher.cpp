@@ -7,6 +7,7 @@
 #include "watcher.h"
 #include "logger.h"
 #include "monitor.h"
+#include "options.h"
 #include "record.h"
 
 std::map<int, watch> watcher::_watch_map;
@@ -54,18 +55,18 @@ watcher::add_watch(const struct stat *sb, std::string path, bool link,
 	int wd;
 	watch *w = NULL;
 
-	if (!watcher::is_watch_exist(path)) {
-		wd = inotify_add_watch(monitor::inotify_fd, path.c_str(), 
-				monitor::mask);
-		if (wd == -1) {
-			logger::warn("add watch to '%s' error: %s", 
-					path.c_str(), ERRSTR);
-		}
-	} else {
+	if (watcher::is_watch_exist(path)) {
 		wd = watcher::_wd_map[path];
 		if (!watcher::_watch_map[wd].is_delete()) {
 			return wd;	
 		}
+	}
+
+	wd = inotify_add_watch(monitor::inotify_fd, path.c_str(), 
+			monitor::mask);
+	if (wd == -1) {
+		logger::warn("add watch to '%s' error: %s", 
+				path.c_str(), ERRSTR);
 	}
 	
 	watcher::_watch_map[wd] = watch(sb, true, path, true, link, linked);
@@ -91,6 +92,9 @@ watcher::dir_delete(int wd, char *path)
 	std::string path_tmp;
 
 	path_tmp = watcher::_watch_map[wd].get_path() + "/" + std::string(path); 
+	if (watcher::_wd_map.find(path_tmp) == watcher::_wd_map.end()) {
+		return;
+	}
 	wd = watcher::_wd_map[path_tmp];
 	if (watcher::_watch_map[wd].idelete()) {
 		watcher::_watch_set.insert(wd);	
@@ -216,6 +220,7 @@ watcher::add_file(const struct stat *sb, std::string path)
 	char buf[1024] = {0};
 	std::string link_path = "";
 	std::map<int, watch>::iterator pos;
+	std::vector<std::string>::iterator iter;
 
 	char *dir = NULL;
 	char *filename = NULL;
@@ -229,6 +234,17 @@ watcher::add_file(const struct stat *sb, std::string path)
 	strcpy(fbuf, path.c_str());
 	filename = basename(fbuf);
 
+	// 是否是隐藏文件或者不监控的文件
+	if(!options::watch_hidden && monitor::is_path_hidden(path.c_str())) {
+		return;
+	}
+	for (iter = options::exclude.begin(); iter != options::exclude.end();
+		++iter) {
+		if (path.compare(0, iter->length(), *iter) == 0) {
+			return;
+		}
+	}
+	
 	if (S_ISDIR(sb->st_mode)) {
 		monitor::add_monitor(path);	
 		return;
@@ -236,7 +252,7 @@ watcher::add_file(const struct stat *sb, std::string path)
 
 	// 判断是否是链接文件，如果是，获取其源文件路径
 	if (lstat(path.c_str(), &sb_link) == -1) {
-		logger::fatal("[%s %d]lstat error: %s", __FILE__, __LINE__, 
+		logger::warn("[%s %d]lstat error: %s", __FILE__, __LINE__, 
 				ERRSTR);		
 	}
 	if (S_ISLNK(sb_link.st_mode)) {
@@ -270,7 +286,7 @@ watcher::add_file(const struct stat *sb, std::string path)
 			logger::warn("[%s %d]stat error: %s", __FILE__, 
 					__LINE__, ERRSTR);
 		}
-		wd = watcher::add_watch(&sb_dir, dir);
+		wd = watcher::add_watch(&sb_dir, dir, false, true);
 		w = &watcher::_watch_map[wd];
 		
 	}
@@ -449,11 +465,6 @@ watcher::check_delete()
 		if (!w->get_read()) {
 			watcher::dir_delete_datum(wd); 
 		}
-		// 目录是否被读过，没有被读过，则是未被删除
-//		if (!w->get_read()) {
-//			watcher::dir_delete(wd, (char *)w->get_path().c_str());	
-//		}
-//
 		w->check_datum_delete(wd);
 	}
 }

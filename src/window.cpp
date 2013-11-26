@@ -179,9 +179,6 @@ window::draw_event()
       	event_vec = watcher::generate_snapshot();
 	watcher::unlock();
 
-//	if (record::change_flag) {
-//		record::get_time();
-//	}
 	for(pos = event_vec->begin(); pos != event_vec->end(); ++pos) {
 		if (abs(pos->get_base_size() - pos->get_current_size())
 				< options::threshold) { 
@@ -197,9 +194,6 @@ window::draw_event()
 				pos->get_type_string().c_str(), 
 				base_size.c_str(), current_size.c_str(),
 				pos->get_chg_time(), pos->get_path().c_str());		
-//		if (record::change_flag) {	
-//			record::event_to_file(output);
-//		}
 		wprintw(window::event_list, output);
 		wrefresh(window::event_list);
 	}

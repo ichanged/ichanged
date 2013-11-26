@@ -55,7 +55,7 @@ options::parse_args(int argc, char *argv[])
 			options::threshold = atoi(optarg); 
 			break;
 		case 'l':
-			options::log_path = std::string(optarg);
+			options::filename = std::string(optarg);
 			break;
 		case 'w':
 			options::watch_hidden = true;

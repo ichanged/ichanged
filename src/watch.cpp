@@ -5,6 +5,7 @@
 #include "watch.h"
 #include "event.h"
 #include "logger.h"
+#include "options.h"
 #include "watcher.h"
 
 watch::watch()
@@ -73,6 +74,7 @@ bool
 watch::idelete()
 {
 	if (this->new_create) {
+		this->_delete = true;
 		this->_change = false;
 		this->_history_exist = true;
 		return false;
@@ -144,9 +146,13 @@ watch::file_create(std::string filename, bool link, std::string link_path)
 	if (!this->_get_file_stat(filename, &s)) {
 		return false;
 	}
-//	if (this->_file_map.find(filename) != this->_file_map.end()) {
-//		return false;	
-//	}
+
+	if (this->is_file_exist(filename)) {
+		if (!this->_file_map[filename].is_delete()) {
+			return false;
+		}
+	}
+
 	f = &this->_file_map[filename];
 	this->_file_map[filename] = file(&s, true, filename, true, link);
 	this->_file_map[filename].set_time();
@@ -213,6 +219,7 @@ watch::file_delete(std::string filename)
 		return false;	
 	}
 	if (this->_file_map[filename].new_create) {
+		this->_file_map[filename].set_delete(true);
 		this->_file_set.erase(filename);
 		return false;	
 	}
@@ -232,9 +239,12 @@ watch::file_write(std::string filename)
 	struct stat s;
 	file *f = NULL;
 
-	// TODO
+//	if (!this->is_file_exist(filename)) {
+//		return false;	
+//	}
 	if (this->_get_file_stat(filename, &s)) {
 		if (this->_file_map[filename].write(&s)) {
+			f = &this->_file_map[filename];
 			this->_file_change = true;
 			this->_file_set.insert(filename);
 			record::event_to_file(event::TYPE_MODIFY, f->get_base_size(),
