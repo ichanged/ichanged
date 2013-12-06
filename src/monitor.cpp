@@ -28,7 +28,7 @@ monitor::init()
 
 	std::cout << "starting monitor, please wait..." << std::endl;
 	monitor::inotify_fd = inotify_init();
-	if(monitor::inotify_fd == -1) {
+	if (monitor::inotify_fd == -1) {
 		throw Error(__FILE__, __LINE__, 
 				"create inotify file descriptor error");
 	}

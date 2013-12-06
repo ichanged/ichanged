@@ -6,7 +6,6 @@
 #include "logger.h"
 #include "error.h"
 #include "config.h"
-#include "datum.h"
 #include "ichanged.h"
 
 pthread_t tid[THREAD_NUM]; 
@@ -74,9 +73,9 @@ main(int argc, char *argv[])
 		options::parse_args(argc, argv);
 		
 		logger::init();
+		record::init();
 		monitor::init();
 		window::init();
-		record::init();
 	} catch(Error &x) {
 		logger::fatal("[%s %d] %s", x.get_file(), x.get_line(), 
 				x.what());

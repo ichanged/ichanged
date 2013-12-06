@@ -292,7 +292,6 @@ watcher::add_file(const struct stat *sb, std::string path)
 	}
 
 	w->file_create(filename, link, link_path);
-	record::change_flag = true;
 
 	if (link) {
 		if (stat(link_path.c_str(), &sb_link) == -1) {
@@ -361,7 +360,6 @@ watcher::file_delete(int wd, std::string name)
 	// 删除链接文件
 	if (watcher::_watch_map[wd].file_delete(name)) {
 		watcher::_watch_set.insert(wd);
-		record::change_flag = true;
 	}	
 
 	// 删除链接文件的源文件
@@ -379,7 +377,6 @@ watcher::file_delete(int wd, std::string name)
 		if (wd_link == wd) {
 			return;
 		}
-		record::change_flag = true;
 		watcher::file_delete(wd_link, filename);
 //		if (watcher::_watch_map[wd].file_delete(filename)) {
 //			watcher::_watch_set.insert(wd);
@@ -395,7 +392,6 @@ watcher::file_write(int wd, std::string name)
 {
 	if (watcher::_watch_map[wd].file_write(name)) {
 		watcher::_watch_set.insert(wd);	
-		record::change_flag = true;
 	}	
 }
 

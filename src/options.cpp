@@ -89,7 +89,7 @@ options::print_usage()
 	"    -t  --threshold	  Set threshold to show change when size of files beyonds it.\n"
 	"    -l  --log path	  Set the path of log file\n"
 	"    -w, --watch-hidden    Watch hidden files and directories.\n"
-	"    -m  --import datum   import datum file 'datum'\n"
-	"    -x  --export datum   export datum to file 'datum'\n",
+	"    -m  --import datum    import datum file 'datum'\n"
+	"    -x  --export datum    export datum to file 'datum'\n",
 	options::interval, options::directory.c_str());
 }

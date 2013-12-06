@@ -90,5 +90,4 @@ handler::handle_file_event(struct inotify_event *e, std::string path)
 	//	printf("%s %d was write\n", e->name, e->wd);
 		watcher::file_write(e->wd, e->name);
 	}
-	printf("%s\n", e->name);
 }

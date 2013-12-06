@@ -110,10 +110,10 @@ datum::deal_file(const char *fpath, const struct stat *sb)
 		
 	wd = watcher::_wd_map[dir];
 	w_tmp = watcher::get_watch(wd);
-	f_tmp = w_tmp->get_file(filename);
 	w_tmp->set_read(true);
 	
 	if (w_tmp->is_file_exist(filename)) {
+		f_tmp = w_tmp->get_file(filename);
 		ns = f_tmp->get_base();
 		f_tmp->set_read(true);
 		if (sb->st_size != ns.st_size) {
