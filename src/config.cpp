@@ -37,6 +37,9 @@ config::write_config(Config &cfg)
 	}
 
 	root.add("threshold", Setting::TypeInt) = 0;
+	root.add("watch_hidden", Setting::TypeBoolean) = false;
+	root.add("is_import", Setting::TypeBoolean) = false;
+	root.add("is_export", Setting::TypeBoolean) = false;
 
 	cfg.writeFile(config::_filename.c_str());
 }
@@ -47,7 +50,7 @@ config::get_config()
 	Config cfg;
 	int interval;
 	int threshold;
-	bool watch_hidden;
+	bool watch_hidden, is_import, is_export;
 	std::string log_path;
 	std::string directory;
 
@@ -83,6 +86,12 @@ config::get_config()
 		if (log_path.size() > 0) {
 			options::directory = directory;
 		}
+	}
+	if (cfg.lookupValue("is_import", is_import)) {
+		options::is_import = is_import;	
+	}
+	if (cfg.lookupValue("is_export", is_export)) {
+		options::is_export = is_export;
 	}
 
    	try {

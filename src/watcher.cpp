@@ -170,7 +170,7 @@ watcher::init_file(const struct stat *sb, std::string path)
 	}
 	if (is_link) {
 		if (readlink(path.c_str(), buf, sizeof(buf)) == -1) {
-			logger::fatal("[%s %d]readlink error: %s", __FILE__, __LINE__,
+			logger::warn("[%s %d]readlink error: %s", __FILE__, __LINE__,
 					ERRSTR);
 		}
 	}
@@ -260,7 +260,7 @@ watcher::add_file(const struct stat *sb, std::string path)
 	}
 	if (link) {
 		if (readlink(path.c_str(), buf, sizeof(buf)) == -1) {
-			logger::fatal("[%s %d]readlink error: %s", __FILE__, 
+			logger::warn("[%s %d]readlink error: %s", __FILE__, 
 					__LINE__, ERRSTR);
 		}
 	}
@@ -295,7 +295,7 @@ watcher::add_file(const struct stat *sb, std::string path)
 
 	if (link) {
 		if (stat(link_path.c_str(), &sb_link) == -1) {
-			logger::fatal("[%s %d]stat error: %s", __FILE__, 
+			logger::warn("[%s %d]stat error: %s", __FILE__, 
 					__LINE__, ERRSTR);
 		}
 		return watcher::add_file(&sb_link, link_path); 
