@@ -9,6 +9,7 @@ _type(0),
 _base_size(0),
 _current_size(0)
 {
+	this->_chg_time[0] = 0;
 }
 
 event::~event()
@@ -16,7 +17,7 @@ event::~event()
 }
 
 void
-event::set_path(const std::string path)
+event::set_path(const std::string &path)
 {
 	this->_path = path;
 }

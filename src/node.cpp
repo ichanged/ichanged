@@ -4,7 +4,16 @@
 #include "node.h"
 
 node::node()
+:
+new_create(false),
+_modify(false),
+_attrib(false),
+_delete(false),
+_change(false),
+_read(false),
+_link(false)
 {
+	
 }
 
 node::node(const struct stat *stat_tmp, bool new_create, bool read, bool link)

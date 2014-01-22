@@ -10,7 +10,7 @@ public:
 	event();
 	virtual ~event();
 
-	void set_path(const std::string path);
+	void set_path(const std::string &path);
 	std::string get_path();
 
 	void set_chg_time(const char *time);

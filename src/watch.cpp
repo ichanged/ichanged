@@ -9,7 +9,14 @@
 #include "watcher.h"
 
 watch::watch()
-{}
+:node(),
+_path(""),
+_file_change(false),
+_history_exist(false),
+_linked(false)
+{
+	
+}
 
 watch::watch(const struct stat *s, bool new_create, std::string path, bool read,
 		bool link, bool linked)
@@ -172,12 +179,13 @@ bool
 watch::file_modify(std::string filename)
 {
 	struct stat s;
-	file *f = NULL;
 
 	if (this->_file_map.find(filename) == this->_file_map.end()) {
 		return false;	
 	}
 	if (this->_get_file_stat(filename, &s)) {
+		file *f = NULL;
+
 		f = &this->_file_map[filename];
 		this->_file_map[filename].modify(&s);
 		this->_file_change = true;
@@ -193,12 +201,13 @@ bool
 watch::file_attrib(std::string filename)
 {
 	struct stat s;
-	file *f = NULL;
 
 	if (this->_file_map.find(filename) == this->_file_map.end()) {
 		return false;	
 	}
 	if (this->_get_file_stat(filename, &s)) {
+		file *f = NULL;
+
 		f = &this->_file_map[filename];
 		this->_file_map[filename].attrib(&s);
 		this->_file_change = true;
