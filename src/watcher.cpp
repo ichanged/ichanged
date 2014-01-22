@@ -343,11 +343,6 @@ void
 watcher::file_delete(int wd, std::string name)
 {
 	watch *w;
-	int wd_link;
-	char *dbuf;
-	char *fbuf;
-	char *dir = NULL;
-	char *filename = NULL;
 	std::string path;
 	std::string link_path;
  
@@ -365,6 +360,12 @@ watcher::file_delete(int wd, std::string name)
 	// 删除链接文件的源文件
 	w = &watcher::_watch_map[wd];
 	if (w->is_link_file(name)){
+		int wd_link;
+		char *dbuf;
+		char *fbuf;
+		char *dir = NULL;
+		char *filename = NULL;
+
 		link_path = w->get_file_link_path(name);
 		dbuf = new char[link_path.length() + 1];
 		fbuf = new char[link_path.length() + 1];

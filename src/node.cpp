@@ -13,6 +13,7 @@ _change(false),
 _read(false),
 _link(false)
 {
+	this->_chg_time[0] = 0;
 	
 }
 

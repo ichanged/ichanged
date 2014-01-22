@@ -246,18 +246,21 @@ bool
 watch::file_write(std::string filename)
 {
 	struct stat s;
-	file *f = NULL;
 
 //	if (!this->is_file_exist(filename)) {
 //		return false;	
 //	}
 	if (this->_get_file_stat(filename, &s)) {
 		if (this->_file_map[filename].write(&s)) {
+			file *f = NULL;	
+		
 			f = &this->_file_map[filename];
 			this->_file_change = true;
 			this->_file_set.insert(filename);
-			record::event_to_file(event::TYPE_MODIFY, f->get_base_size(),
-				f->get_current_size(), this->_get_file_path(filename));
+			record::event_to_file(event::TYPE_MODIFY, 
+					f->get_base_size(),
+					f->get_current_size(), 
+					this->_get_file_path(filename));
 			return true;
 		}
 	}	
