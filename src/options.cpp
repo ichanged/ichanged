@@ -25,6 +25,8 @@ bool options::is_import = false;
 /* 导出基准文件*/
 bool options::is_export = false;
 
+std::string options::pidfile = "/var/run";
+
 void
 options::parse_args(int argc, char *argv[])
 {

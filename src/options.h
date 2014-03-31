@@ -28,6 +28,8 @@ public:
 	static bool is_import;
 	/* 导出基准文件*/
 	static bool is_export;
+	
+	static std::string pidfile;
 
 };
 

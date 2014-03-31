@@ -51,8 +51,7 @@ config::get_config()
 	int interval;
 	int threshold;
 	bool watch_hidden, is_import, is_export;
-	std::string log_path;
-	std::string directory;
+	std::string log_path, directory, pidfile;
 
 	try {
 		cfg.readFile(config::_filename.c_str());	
@@ -92,6 +91,9 @@ config::get_config()
 	}
 	if (cfg.lookupValue("is_export", is_export)) {
 		options::is_export = is_export;
+	}
+	if (cfg.lookupValue("pidfile", pidfile)) {
+		options::pidfile = pidfile;
 	}
 
    	try {
