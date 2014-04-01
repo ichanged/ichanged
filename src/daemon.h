@@ -3,9 +3,6 @@
 
 #include <unistd.h>
 
-class daemon {
-public:
-	static void init();
-};
+extern void ich_daemon_init(); 
 
 #endif
