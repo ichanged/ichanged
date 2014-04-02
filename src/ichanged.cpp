@@ -6,13 +6,18 @@
 #include "logger.h"
 #include "error.h"
 #include "config.h"
+#include "daemon.h"
 #include "ichanged.h"
+
+static void ich_handler(int signo);
 
 static int ich_terminate; 
 struct ich_sig_t ich_signals[] = {
 	{SIGINT, ich_handler},
 	{SIGCHLD, ich_handler}
 };
+pthread_t tid[THREAD_NUM]; 
+int flag = 0;
 
 void
 ich_handler(int signo)
@@ -20,10 +25,10 @@ ich_handler(int signo)
 	switch (signo) {
 	
 	case SIGINT:
-		sig_terminate = 1;
+		ich_terminate = 1;
 		break;
 	case SIGQUIT:
-		sig_terminate = 1;
+		ich_terminate = 1;
 		break;
 	default:
 		break;
@@ -73,8 +78,7 @@ main(int argc, char *argv[])
 	logger::init();
 
 	memset(&sa, 0, sizeof(sa));	
-	for (i = 0; i < sizeof(ich_signals) / sizeof(ich_signals[0]);
-			i++) {
+	for (i = 0; i < sizeof(ich_signals)/sizeof(ich_signals[0]); i++) {
 		sa.sa_handler = ich_signals[i].handler;
 		if (sigaction(ich_signals[i].signo, &sa, NULL) < 0) {
 			logger::error("[%s:%d] sigaction error: %s", __FILE__,

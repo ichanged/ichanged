@@ -17,7 +17,7 @@ public:
 	static void wait();
 	static void destroy();
 
-	static void *start(void *arg);
+//	static void *start(void *arg);
 	static void init_monitor(std::string dir);
 	static void add_monitor(std::string dir);
 	static void remove_monitor(int wd);
@@ -27,14 +27,15 @@ public:
 	static pthread_t thread_id;
 	static int inotify_fd;
 	static int mask;
+
+	static const int event_max_size =
+		sizeof(struct inotify_event) + NAME_MAX + 1;
 private:
 	static int do_init_monitor(const char *fpath, const struct stat *sb,
 		int typeflag);
 	static int do_add_monitor(const char *fpath, const struct stat *sb,
 		int typeflag);
 
-	static const int event_max_size =
-		sizeof(struct inotify_event) + NAME_MAX + 1;
 
 	static std::string dir;
 };

@@ -45,7 +45,7 @@ options::parse_args(int argc, char *argv[])
 		{"start", no_argument, NULL, 's'}
 	};
 
-	while((opt = getopt_long(argc, argv, "i:d:e:t:l:mxw", opts, NULL)) != -1) {
+	while((opt = getopt_long(argc, argv, "i:d:e:t:l:mxws", opts, NULL)) != -1) {
 		switch(opt) {
 		case 'i':
 			options::interval = atoi(optarg);

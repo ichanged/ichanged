@@ -21,6 +21,8 @@ int monitor::inotify_fd = 0;
 int monitor::mask = 0;
 pthread_t monitor::thread_id = 0;
 
+void monitor_start();
+
 void
 monitor::init()
 {
@@ -46,15 +48,16 @@ monitor::init()
 		datum::export_file();
 	}
 
-	status = pthread_create(&monitor::thread_id, NULL, monitor::start, NULL);
-	if(status != 0) {
-		throw Error(__FILE__, __LINE__, 
-				"create monitor thread error: %s", ERRSTR);
-	}
-	tid[0] = monitor::thread_id; 
-
-	logger::info("[%s %d] thread: %lu monitor module init completely", 
-			__FILE__, __LINE__, monitor::thread_id);
+	monitor_start();
+//	status = pthread_create(&monitor::thread_id, NULL, monitor::start, NULL);
+//	if(status != 0) {
+//		throw Error(__FILE__, __LINE__, 
+//				"create monitor thread error: %s", ERRSTR);
+//	}
+//	tid[0] = monitor::thread_id; 
+//
+//	logger::info("[%s %d] thread: %lu monitor module init completely", 
+//			__FILE__, __LINE__, monitor::thread_id);
 }
 
 void
@@ -81,8 +84,8 @@ monitor::destroy()
 			__LINE__);
 }
 
-void *
-monitor::start(void *arg)
+void
+monitor_start()
 {
 	int n;
 	char buf[monitor::event_max_size] = {0};
@@ -112,8 +115,41 @@ monitor::start(void *arg)
 		/* 释放事件内存 */
 		free(e);
 	}
-	return NULL;
 }
+
+//void *
+//monitor::start(void *arg)
+//{
+//	int n;
+//	char buf[monitor::event_max_size] = {0};
+//
+//	while(true) {
+//		size_t size;
+//		struct inotify_event *pe = NULL, *e = NULL;
+//
+//		/* 读取inotify_event结构体 */
+//		n = read(monitor::inotify_fd, buf, monitor::event_max_size);
+//		if(n == -1) {
+//			logger::fatal("read event from inotify error: %s", 
+//					__FILE__, __LINE__, ERRSTR);
+//		}
+//		pe = (struct inotify_event *)buf;
+//		size = sizeof(struct inotify_event) + pe->len;
+//		e = (struct inotify_event *)malloc(size);
+//		if(e == NULL) {
+//			logger::fatal("failed to allocate memory for" 
+//					" inotify_event: %s", ERRSTR);
+//		}
+//
+//		/* 将读取的事件拷贝到分配的内存中 */
+//		memcpy(e, buf, size);
+//		/* 事件处理模块对事件进行处理 */
+//		handler::handle_event(e);	
+//		/* 释放事件内存 */
+//		free(e);
+//	}
+//	return NULL;
+//}
 
 void
 monitor::init_monitor(std::string dir)

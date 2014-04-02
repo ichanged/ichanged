@@ -1,4 +1,5 @@
-#include "log.h"
+#include "logger.h"
+#include "monitor.h"
 #include "daemon.h"
 #include "config.h"
 #include "options.h"
@@ -22,9 +23,12 @@ ich_daemon_init()
 	fprintf(fp, "%d", getpid());		
 	fclose(fp);
 
+	while (1) {
+		
+	}
 	// init
-	record::init();
-
+//	record::init();
+//	monitor::init();
 }
 
 //void
