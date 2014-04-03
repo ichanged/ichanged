@@ -57,7 +57,7 @@ watch::attrib()
 		this->_change = true;
 		this->set_time();
 		record::event_to_file(event::TYPE_DELETE, this->get_base_size(),
-			this->get_current_size(), this->get_path());
+			this->get_current_size(), this->get_path().c_str());
 		return true;
 	}
 	return false;
