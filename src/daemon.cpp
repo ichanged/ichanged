@@ -24,7 +24,7 @@ ich_daemon_init()
 	fclose(fp);
 
 	// init
-	record::init();
+//	record::init();
 	monitor::init();
 }
 

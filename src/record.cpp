@@ -6,6 +6,10 @@
 
 static FILE *ich_fp = NULL;
 
+static void ich_get_time();
+
+static void ich_get_type(int type);
+
 void
 ich_record_init()
 {

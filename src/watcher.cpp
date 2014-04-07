@@ -74,8 +74,8 @@ watcher::add_watch(const struct stat *sb, std::string path, bool link,
 	w = &watcher::_watch_map[wd];
 	w->set_time();
 	watcher::_watch_set.insert(wd);
-	record::event_to_file(event::TYPE_CREATE, w->get_base_size(),
-		w->get_current_size(), w->get_path().c_str());
+//	ich_event_to_file(event::TYPE_CREATE, w->get_base_size(),
+//		w->get_current_size(), w->get_path().c_str());
 
 	return wd;
 }

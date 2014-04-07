@@ -12,6 +12,11 @@
 
 extern void ich_record_init();
 
+extern void ich_event_to_file(int type, off_t base_size, off_t current_size, 
+		char *path);
+
+extern void ich_record_close();
+
 //class record {
 //public:
 //	static void init();
