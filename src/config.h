@@ -1,21 +1,29 @@
 #ifndef _CONFIG_H
 #define _CONFIG_H
 
-#include <iostream>
-#include <string>
-#include <vector>
-#include <libconfig.h++>
+#include <stdio.h>
 #include <string.h>
+#include <libconfig.h>
 
-using namespace libconfig;
+#define DEFAULT_FILE		"ichanged.cfg"
 
-class config {
-public:
-	static void init();
-	static void write_config(Config &cfg);
-	static void get_config(); 
-private:
-	static std::string _filename;
+struct ich_config_t {
+	char *dir;	
+	uint32_t intvl;
+	char **exclude;
+	int hidden;
+	long threshold;
+	char *filename;
+	char *log_path;
+	int is_import;
+	int is_export;
+	int is_daemon;
+	char *pidfile;
 };
+
+extern int ich_dirlen;
+extern struct ich_config_t ich_cfg; 
+
+extern void config_init();
 
 #endif
