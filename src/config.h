@@ -21,7 +21,6 @@ struct ich_config_t {
 	char *log_path;
 	int is_import;
 	int is_export;
-	int is_daemon;
 	char *pidfile;
 };
 
@@ -38,6 +37,8 @@ struct ich_read_str_t {
 };
 
 extern int ich_dirlen;
+extern int ich_daemon;
+extern int ich_end;
 extern struct ich_config_t ich_cfg; 
 
 extern void config_init();

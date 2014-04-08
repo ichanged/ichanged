@@ -2,6 +2,10 @@
 #include "logger.h"
 #include "options.h"
 
+int ich_dirlen = 0;
+int ich_daemon = 0;
+int ich_end = 0; 
+
 static struct ich_read_int_t ich_cfg_int[] = {
 	{config_lookup_int, "interval", &ich_cfg->intvl},
 	{config_lookup_int, "watch_hidden", &ich_cfg->hide},
@@ -25,7 +29,7 @@ config_init()
 	config_setting_t *set;
 	struct ich_read_int_t *t;
 
-	config_init(&);
+	config_init(&cfg);
 	if (!config_read_file(&cfg, DEFAULT_FILE)) {
 		SWS_log_fatal("%s", config_error_line(&cfg));
 	}
@@ -47,7 +51,7 @@ config_init()
 	}
 	
 	set = config_lookup(&cfg, "exclude");  	
-	count = config_setting_length;
+	ich_dirlen = config_setting_length;
 	for (i = 0; i < count; i++) {
 		ich_cfg->exclude[i] = config_setting_lookup_string(set, i);		
 	}
