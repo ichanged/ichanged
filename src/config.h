@@ -7,6 +7,10 @@
 
 #define DEFAULT_FILE		"ichanged.cfg"
 
+typedef int (*ich_cfg_int_pt)(const config_t *config, const char *path, int *value);
+typedef int (*ich_cfg_str_pt)(const config_t *config, const char *path, 
+		const char **value);
+
 struct ich_config_t {
 	char *dir;	
 	uint32_t intvl;
@@ -19,6 +23,18 @@ struct ich_config_t {
 	int is_export;
 	int is_daemon;
 	char *pidfile;
+};
+
+struct ich_read_int_t {
+	ich_cfg_int_pt func; 	
+	char *path;
+	int *value;
+};
+
+struct ich_read_str_t {
+	ich_cfg_str_pt func;
+	char *path;
+	char **value;
 };
 
 extern int ich_dirlen;
