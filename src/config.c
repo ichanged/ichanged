@@ -1,59 +1,59 @@
+#include "log.h"
 #include "config.h"
-#include "logger.h"
 #include "options.h"
 
 int ich_dirlen = 0;
 int ich_daemon = 0;
 int ich_end = 0; 
+struct ich_config_t ich_cfg; 
+
 
 static struct ich_read_int_t ich_cfg_int[] = {
-	{config_lookup_int, "interval", &ich_cfg->intvl},
-	{config_lookup_int, "watch_hidden", &ich_cfg->hide},
-	{config_lookup_int, "threshold", &ich_cfg->threshold},
-	{config_lookup_int, "is_import", &ich_cfg->import},
-	{config_lookup_int, "is_export", &ich_cfg->export},
-	{config_lookup_int, "is_daemon", &ich_cfg->daemon}
+	{config_lookup_int, "interval", &ich_cfg.intvl},
+	{config_lookup_int, "watch_hidden", &ich_cfg.hide},
+	{config_lookup_int, "threshold", &ich_cfg.threshold}
 };
 
 static struct ich_read_str_t ich_cfg_str[] = {
-	{config_lookup_string, "directory", &ich_cfg->dir},
-	{config_lookup_string, "log_path", &ich_cfg->logfile},
-	{config_lookup_string, "pidfile", &ich_cfg->pidfile}
+	{config_lookup_string, "directory", &ich_cfg.dir},
+	{config_lookup_string, "log_path", &ich_cfg.logfile},
+	{config_lookup_string, "pidfile", &ich_cfg.pidfile}
 };
 
 void
-config_init()
+ich_config_init()
 {
-	int i, count;
+	int i;
 	config_t cfg;	
 	config_setting_t *set;
-	struct ich_read_int_t *t;
+	struct ich_read_int_t *it;
+	struct ich_read_str_t *st;
 
 	config_init(&cfg);
 	if (!config_read_file(&cfg, DEFAULT_FILE)) {
 		SWS_log_fatal("%s", config_error_line(&cfg));
 	}
 
-	t = ich_cfg_int;
-	for (i = 0; i < sizeof(t) / sizeof(t[0]); i++) {
-		if (t[i]->func(&cfg, t[i]->path, t[i]->value) < 0)	{
+	it = ich_cfg_int;
+	for (i = 0; i < sizeof(it) / sizeof(it[0]); i++) {
+		if (it[i].func(&cfg, it[i].path, it[i].value) < 0)	{
 			SWS_log_error("[%s:%d], read %s of configuration error",
 					__FILE__, __LINE__, config_error_line(&cfg));	
 		}
 	}
 
-	t = ich_cfg_str;
-	for (i = 0; i < sizeof(t) / sizeof(t[0]); i++) {
-		if (t[i]->func(&cfg, t[i]->path, t[i]->value) < 0)	{
+	st = ich_cfg_str;
+	for (i = 0; i < sizeof(st) / sizeof(st[0]); i++) {
+		if (st[i].func(&cfg, st[i].path, st[i].value) < 0)	{
 			SWS_log_error("[%s:%d], read %s of configuration error",
 					__FILE__, __LINE__, config_error_line(&cfg));	
 		}
 	}
 	
 	set = config_lookup(&cfg, "exclude");  	
-	ich_dirlen = config_setting_length;
-	for (i = 0; i < count; i++) {
-		ich_cfg->exclude[i] = config_setting_lookup_string(set, i);		
+	ich_dirlen = config_setting_length(set);
+	for (i = 0; i < ich_dirlen; i++) {
+		ich_cfg.exclude[i] = config_setting_get_string_elem(set, i);		
 	}
 
 }
