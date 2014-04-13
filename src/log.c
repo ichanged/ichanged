@@ -1,17 +1,26 @@
 #include "log.h"
-#include "utils.h"
 
-/**
- * 将日志语句写入文件
- * @param level 日志等级
- * @param log 日志字符串
- */
 static void SWS_log_to_file(int level, const char *log);
+
+static void SWS_err_exit1(const char *format, ...);
 
 /* 日志文件的文件指针 */
 static FILE *SWS_log_fp = NULL;
 /* 日志文件的文件描述符 */
 static int SWS_log_fd = 0;
+
+void
+SWS_err_exit1(const char *format, ...)
+{
+	va_list ap;
+	char buf[1024];
+
+	va_start(ap, format);
+	vsprintf(buf, format, ap);
+	fprintf(stderr, "%s: %s\n", buf, strerror(errno));
+	va_end(ap);
+	exit(EXIT_FAILURE);
+}
 
 /**
  * 初始化日志模块
@@ -25,12 +34,12 @@ SWS_log_init()
 	SWS_log_fp = fopen(SWS_LOG_PATH, "a");
 #endif
 	if(SWS_log_fp == NULL) {
-		err_exit1("[%s %d] open log file '%s' error", __FILE__, __LINE__,
+		SWS_err_exit1("[%s %d] open log file '%s' error", __FILE__, __LINE__,
 			SWS_LOG_PATH);
 	}
 	SWS_log_fd = fileno(SWS_log_fp);
 	if(SWS_log_fd == -1) {
-		err_exit1("[%s %d] get log file stream fd error", __FILE__,
+		SWS_err_exit1("[%s %d] get log file stream fd error", __FILE__,
 			__LINE__);
 	}
 }
@@ -169,18 +178,18 @@ SWS_log_to_file(int level, const char *log)
 
 	/* 对日志文件加锁 */
 	if(-1 == lockf(SWS_log_fd, F_LOCK, 0)) {
-		err_exit1("[%s %d] lock file '%s' error", __FILE__, __LINE__,
+		SWS_err_exit1("[%s %d] lock file '%s' error", __FILE__, __LINE__,
 			SWS_LOG_PATH);
 	}
 
 	/* 如果日志文件超出大小限制则清空 */
 	if(-1 == fstat(SWS_log_fd, &sb)) {
-		err_exit1("[%s %d] get log file '%s' status error", __FILE__, __LINE__,
+		SWS_err_exit1("[%s %d] get log file '%s' status error", __FILE__, __LINE__,
 			SWS_LOG_PATH);
 	}
 	if(sb.st_size > 10 * 1024 * 1024) {
 		if(-1 == ftruncate(SWS_log_fd, 0)) {
-			err_exit1("[%s %d] truncate file '%s' error", __FILE__, __LINE__,
+			SWS_err_exit1("[%s %d] truncate file '%s' error", __FILE__, __LINE__,
 				SWS_LOG_PATH);
 		}
 	}
@@ -197,7 +206,7 @@ SWS_log_to_file(int level, const char *log)
 
 	/* 对日志文件解锁 */
 	if(-1 == lockf(SWS_log_fd, F_ULOCK, 0)) {
-		err_exit1("[%s %d] unlock file '%s' error", __FILE__, __LINE__,
+		SWS_err_exit1("[%s %d] unlock file '%s' error", __FILE__, __LINE__,
 			SWS_LOG_PATH);
 	}
 }
