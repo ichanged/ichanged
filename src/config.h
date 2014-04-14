@@ -20,6 +20,8 @@ struct ich_config_t {
 	int threshold;
 	const char *logfile;
 	const char *pidfile;
+	int import;
+	int dexport;
 };
 
 struct ich_read_int_t {

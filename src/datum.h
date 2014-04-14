@@ -9,17 +9,22 @@
 #include <iostream>
 #include <limits.h>
 
-class datum {
-public:
-	static void import_file();
-	static int compare(const char *fpath, const struct stat *sb, int typeflag); 
-	static void export_file();
-	static void deal_file(const char *fpath, const struct stat *sb); 
-	static void deal_dir(const char *fpath, const struct stat *sb);
+#define	ICH_DATUM_FILE		"datum"	
 
-	static FILE *fp;
-private:
-	static const char *_filename;
-};
+extern void ich_import_file();
+extern void ich_export_file();
+
+//class datum {
+//public:
+//	static void import_file();
+//	static int compare(const char *fpath, const struct stat *sb, int typeflag); 
+//	static void export_file();
+//	static void deal_file(const char *fpath, const struct stat *sb); 
+//	static void deal_dir(const char *fpath, const struct stat *sb);
+//
+//	static FILE *fp;
+//private:
+//	static const char *_filename;
+//};
 
 #endif

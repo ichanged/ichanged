@@ -11,7 +11,9 @@ struct ich_config_t ich_cfg;
 static struct ich_read_int_t ich_cfg_int[] = {
 	{config_lookup_int, "interval", &ich_cfg.intvl},
 	{config_lookup_int, "watch_hidden", &ich_cfg.hide},
-	{config_lookup_int, "threshold", &ich_cfg.threshold}
+	{config_lookup_int, "threshold", &ich_cfg.threshold},
+	{config_lookup_int, "import", &ich_cfg.dimport},
+	{config_lookup_int, "export", &ich_cfg.dexport}
 };
 
 static struct ich_read_str_t ich_cfg_str[] = {
@@ -31,13 +33,13 @@ ich_config_init()
 
 	config_init(&cfg);
 	if (!config_read_file(&cfg, DEFAULT_FILE)) {
-		SWS_log_fatal("%s", config_error_line(&cfg));
+		ich_log_fatal("%s", config_error_line(&cfg));
 	}
 
 	it = ich_cfg_int;
 	for (i = 0; i < sizeof(it) / sizeof(it[0]); i++) {
 		if (it[i].func(&cfg, it[i].path, it[i].value) < 0)	{
-			SWS_log_error("[%s:%d], read %s of configuration error",
+			ich_log_error("[%s:%d], read %s of configuration error",
 					__FILE__, __LINE__, config_error_line(&cfg));	
 		}
 	}
@@ -45,7 +47,7 @@ ich_config_init()
 	st = ich_cfg_str;
 	for (i = 0; i < sizeof(st) / sizeof(st[0]); i++) {
 		if (st[i].func(&cfg, st[i].path, st[i].value) < 0)	{
-			SWS_log_error("[%s:%d], read %s of configuration error",
+			ich_log_error("[%s:%d], read %s of configuration error",
 					__FILE__, __LINE__, config_error_line(&cfg));	
 		}
 	}

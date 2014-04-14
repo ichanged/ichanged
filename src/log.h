@@ -18,14 +18,14 @@
 #define LOG_INFO	(1)
 #define LOG_DEBUG	(0)
 
-#define SWS_LOG_PATH 		"ich_error.log"
+#define ich_LOG_PATH 		"ich_error.log"
 
-extern void SWS_log_init();
-extern void SWS_log_end();
-extern void SWS_log_debug(const char *format, ...);
-extern void SWS_log_info(const char *format, ...);
-extern void SWS_log_warn(const char *format, ...);
-extern void SWS_log_error(const char *format, ...);
-extern void SWS_log_fatal(const char *format, ...);
+extern void ich_log_init();
+extern void ich_log_end();
+extern void ich_log_debug(const char *format, ...);
+extern void ich_log_info(const char *format, ...);
+extern void ich_log_warn(const char *format, ...);
+extern void ich_log_error(const char *format, ...);
+extern void ich_log_fatal(const char *format, ...);
 
 #endif
