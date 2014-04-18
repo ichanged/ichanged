@@ -2,6 +2,9 @@
 
 static struct pair *map[HASH_TABLE_LENGTH];
 
+static int get_hash_key(char *str);
+static int is_exist(char *str, int value);
+
 int
 get_hash_key(char *str)
 {
@@ -12,7 +15,7 @@ get_hash_key(char *str)
 		hash = hash * seed + (*str++);
 	}
 
-	return (hash % M);
+	return (hash % HASH_TABLE_LENGTH);
 }
 
 void
@@ -23,6 +26,7 @@ insert(char *str, int value)
 
 	if (map[key] == NULL) {
 		map[key] = (struct pair *)malloc(sizeof(struct pair));
+		strcpy(map[key]->path, str);
 		map[key]->value = value;
 		map[key]->next = NULL;
 		return;
@@ -38,12 +42,13 @@ int
 is_exist(char *str, int value)
 {
 	int key = get_hash_key(str);	
-	struct *p = map[key];
+	struct pair *p = map[key];
 
 	while (p != NULL) {
 		if (p->value == value) {
 			return 1;
 		}		
+		p = p->next;
 	}
 
 	return 0;
@@ -53,10 +58,13 @@ int
 serach(char *str)
 {
 	int key = get_hash_key(str);	
-	struct *p = map[key];
+	struct pair *p = map[key];
 
 	while (p != NULL) {
-		if (strcpy(p))
+		if (!strcmp(str, p->path)) {
+			return p->value;				
+		}
+		p = p->next;
 	}
 
 	return -1;
@@ -65,6 +73,10 @@ serach(char *str)
 int
 main()
 {
+	insert("hello", 1);
+	insert("world", 2);
+	
+	printf("%d\n", serach("world"));
 
 	return 0;
 }
