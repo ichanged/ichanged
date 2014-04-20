@@ -6,40 +6,37 @@
 #include <limits.h>
 #include <pthread.h>
 
-#define ICH_EVENT_MAX	(sizeof(struct inotify_event) + NAME_MAX + 1)
-
+/*
+ * 监视事件模块
+ */
 typedef int (*ftw_func)(const char *fpath, const struct stat *sb, int typeflag);
 
-extern void ich_monitor_init();
-extern void ich_monitor_destroy();
+class monitor {
+public:
+	static void init();
+	static void wait();
+	static void destroy();
 
-//class monitor {
-//public:
-//	static void init();
-//	static void wait();
-//	static void destroy();
-//
-////	static void *start(void *arg);
-//	static void init_monitor(std::string dir);
-//	static void add_monitor(std::string dir);
-//	static void remove_monitor(int wd);
-//
-//	static bool is_path_hidden(const char *fpath);
-//
-//	static pthread_t thread_id;
-//	static int inotify_fd;
-//	static int mask;
-//
-//	static const int event_max_size =
-//		sizeof(struct inotify_event) + NAME_MAX + 1;
-//private:
-//	static int do_init_monitor(const char *fpath, const struct stat *sb,
-//		int typeflag);
-//	static int do_add_monitor(const char *fpath, const struct stat *sb,
-//		int typeflag);
-//
-//
-//	static std::string dir;
-//};
+	static void *start(void *arg);
+	static void init_monitor(std::string dir);
+	static void add_monitor(std::string dir);
+	static void remove_monitor(int wd);
+
+	static bool is_path_hidden(const char *fpath);
+
+	static pthread_t thread_id;
+	static int inotify_fd;
+	static int mask;
+private:
+	static int do_init_monitor(const char *fpath, const struct stat *sb,
+		int typeflag);
+	static int do_add_monitor(const char *fpath, const struct stat *sb,
+		int typeflag);
+
+	static const int event_max_size =
+		sizeof(struct inotify_event) + NAME_MAX + 1;
+
+	static std::string dir;
+};
 
 #endif

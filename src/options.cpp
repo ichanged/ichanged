@@ -25,10 +25,6 @@ bool options::is_import = false;
 /* 导出基准文件*/
 bool options::is_export = false;
 
-bool options::is_daemon = false;
-
-std::string options::pidfile = "/var/run";
-
 void
 options::parse_args(int argc, char *argv[])
 {
@@ -41,11 +37,10 @@ options::parse_args(int argc, char *argv[])
 		{"long path", required_argument, NULL, 'l'},
 		{"import datum file", required_argument, NULL, 'm'},
 		{"export datum file", no_argument, NULL, 'x'},
-		{"watch-hidden", no_argument, NULL, 'w'},
-		{"start", no_argument, NULL, 's'}
+		{"watch-hidden", no_argument, NULL, 'w'}
 	};
 
-	while((opt = getopt_long(argc, argv, "i:d:e:t:l:mxws", opts, NULL)) != -1) {
+	while((opt = getopt_long(argc, argv, "i:d:e:t:l:mxw", opts, NULL)) != -1) {
 		switch(opt) {
 		case 'i':
 			options::interval = atoi(optarg);
@@ -70,9 +65,6 @@ options::parse_args(int argc, char *argv[])
 			break;
 		case 'x':
 			options::is_export = true;
-			break;
-		case 's':
-			options::is_daemon = true;	
 			break;
 		case '?':
 		case ':':

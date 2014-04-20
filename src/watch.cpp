@@ -9,14 +9,7 @@
 #include "watcher.h"
 
 watch::watch()
-:node(),
-_path(""),
-_file_change(false),
-_history_exist(false),
-_linked(false)
-{
-	
-}
+{}
 
 watch::watch(const struct stat *s, bool new_create, std::string path, bool read,
 		bool link, bool linked)
@@ -56,8 +49,8 @@ watch::attrib()
 		this->_attrib = true;
 		this->_change = true;
 		this->set_time();
-//		ich_event_to_file(event::TYPE_DELETE, this->get_base_size(),
-//			this->get_current_size(), this->get_path().c_str());
+		record::event_to_file(event::TYPE_DELETE, this->get_base_size(),
+			this->get_current_size(), this->get_path());
 		return true;
 	}
 	return false;
@@ -70,8 +63,8 @@ watch::modify()
 		this->_modify = true;
 		this->_change = true;
 		this->set_time();
-//		ich_event_to_file(event::TYPE_DELETE, this->get_base_size(),
-//			this->get_current_size(), this->get_path().c_str());
+		record::event_to_file(event::TYPE_DELETE, this->get_base_size(),
+			this->get_current_size(), this->get_path());
 		return true;
 	}
 	return false;
@@ -90,8 +83,8 @@ watch::idelete()
 	this->_ns.st_size = -2;
 	this->_change = true;
 	this->set_time();
-//	ich_event_to_file(event::TYPE_DELETE, this->get_base_size(),
-//		this->get_current_size(), this->get_path().c_str());
+	record::event_to_file(event::TYPE_DELETE, this->get_base_size(),
+		this->get_current_size(), this->get_path());
 	return true;
 }
 
@@ -165,9 +158,8 @@ watch::file_create(std::string filename, bool link, std::string link_path)
 	this->_file_map[filename].set_time();
 	this->_file_change = true;
 	this->_file_set.insert(filename);
-//	ich_event_to_file(event::TYPE_CREATE, f->get_base_size(),
-//			f->get_current_size(), 
-//			this->_get_file_path(filename).c_str());
+	record::event_to_file(event::TYPE_CREATE, f->get_base_size(),
+			f->get_current_size(), this->_get_file_path(filename));
 
 	if (link) {
 		this->_file_map[filename].set_link_path(link_path);
@@ -180,19 +172,18 @@ bool
 watch::file_modify(std::string filename)
 {
 	struct stat s;
+	file *f = NULL;
 
 	if (this->_file_map.find(filename) == this->_file_map.end()) {
 		return false;	
 	}
 	if (this->_get_file_stat(filename, &s)) {
-		file *f = NULL;
-
 		f = &this->_file_map[filename];
 		this->_file_map[filename].modify(&s);
 		this->_file_change = true;
 		this->_file_set.insert(filename);
-//		ich_event_to_file(event::TYPE_MODIFY, f->get_base_size(),
-//				f->get_current_size(), this->_get_file_path(filename).c_str());
+		record::event_to_file(event::TYPE_MODIFY, f->get_base_size(),
+				f->get_current_size(), this->_get_file_path(filename));
 		return true;
 	}
 	return false;
@@ -202,19 +193,18 @@ bool
 watch::file_attrib(std::string filename)
 {
 	struct stat s;
+	file *f = NULL;
 
 	if (this->_file_map.find(filename) == this->_file_map.end()) {
 		return false;	
 	}
 	if (this->_get_file_stat(filename, &s)) {
-		file *f = NULL;
-
 		f = &this->_file_map[filename];
 		this->_file_map[filename].attrib(&s);
 		this->_file_change = true;
 		this->_file_set.insert(filename);
-//		ich_event_to_file(event::TYPE_ATTRIB, f->get_base_size(),
-//				f->get_current_size(), this->_get_file_path(filename).c_str());
+		record::event_to_file(event::TYPE_ATTRIB, f->get_base_size(),
+				f->get_current_size(), this->_get_file_path(filename));
 		return true;
 	}
 	return false;
@@ -238,8 +228,8 @@ watch::file_delete(std::string filename)
 	this->_file_map[filename].idelete(NULL);	
 	this->_file_change = true;
 	this->_file_set.insert(filename);
-//	ich_event_to_file(event::TYPE_DELETE, f->get_base_size(),
-//		f->get_current_size(), this->_get_file_path(filename).c_str());
+	record::event_to_file(event::TYPE_DELETE, f->get_base_size(),
+		f->get_current_size(), this->_get_file_path(filename));
 	return true;
 }
 
@@ -247,21 +237,18 @@ bool
 watch::file_write(std::string filename)
 {
 	struct stat s;
+	file *f = NULL;
 
 //	if (!this->is_file_exist(filename)) {
 //		return false;	
 //	}
 	if (this->_get_file_stat(filename, &s)) {
 		if (this->_file_map[filename].write(&s)) {
-			file *f = NULL;	
-		
 			f = &this->_file_map[filename];
 			this->_file_change = true;
 			this->_file_set.insert(filename);
-//			ich_event_to_file(event::TYPE_MODIFY, 
-//					f->get_base_size(),
-//					f->get_current_size(), 
-//					this->_get_file_path(filename).c_str());
+			record::event_to_file(event::TYPE_MODIFY, f->get_base_size(),
+				f->get_current_size(), this->_get_file_path(filename));
 			return true;
 		}
 	}	

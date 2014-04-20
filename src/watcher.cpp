@@ -74,8 +74,8 @@ watcher::add_watch(const struct stat *sb, std::string path, bool link,
 	w = &watcher::_watch_map[wd];
 	w->set_time();
 	watcher::_watch_set.insert(wd);
-//	ich_event_to_file(event::TYPE_CREATE, w->get_base_size(),
-//		w->get_current_size(), w->get_path().c_str());
+	record::event_to_file(event::TYPE_CREATE, w->get_base_size(),
+		w->get_current_size(), w->get_path());
 
 	return wd;
 }
@@ -343,6 +343,11 @@ void
 watcher::file_delete(int wd, std::string name)
 {
 	watch *w;
+	int wd_link;
+	char *dbuf;
+	char *fbuf;
+	char *dir = NULL;
+	char *filename = NULL;
 	std::string path;
 	std::string link_path;
  
@@ -360,12 +365,6 @@ watcher::file_delete(int wd, std::string name)
 	// 删除链接文件的源文件
 	w = &watcher::_watch_map[wd];
 	if (w->is_link_file(name)){
-		int wd_link;
-		char *dbuf;
-		char *fbuf;
-		char *dir = NULL;
-		char *filename = NULL;
-
 		link_path = w->get_file_link_path(name);
 		dbuf = new char[link_path.length() + 1];
 		fbuf = new char[link_path.length() + 1];

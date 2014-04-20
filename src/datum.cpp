@@ -94,6 +94,7 @@ datum::deal_file(const char *fpath, const struct stat *sb)
 {
 	int wd;
 	struct stat ns;
+	char buf[PATH_MAX] = {0};
 	struct stat sb_link;
 	watch *w_tmp = NULL;
 	file *f_tmp = NULL;
@@ -127,8 +128,6 @@ datum::deal_file(const char *fpath, const struct stat *sb)
 					__LINE__, ERRSTR);			
 		}
 		if (S_ISLNK(sb_link.st_mode)) {
-			char buf[PATH_MAX] = {0};
-
 			if (readlink(fpath, buf, sizeof(buf)) == -1) {
 				logger::fatal("[%s %d]readlink error: %s", 
 						__FILE__, __LINE__, ERRSTR);
@@ -143,13 +142,14 @@ datum::deal_file(const char *fpath, const struct stat *sb)
 		watcher::add_file(sb, fpath);	
 	}
 
-	delete[] dbuf;
-	delete[] fbuf;
+	delete dbuf;
+	delete fbuf;
 }
 
 void
 datum::deal_dir(const char *fpath, const struct stat *sb)
 {
+	int wd;
 	struct stat ns;
 	std::string dir;
 	watch *w_tmp;
@@ -158,8 +158,6 @@ datum::deal_dir(const char *fpath, const struct stat *sb)
 	if (!watcher::is_watch_exist(dir)) {
 		watcher::add_watch(sb, fpath);
 	} else {
-		int wd;
-
 		wd = watcher::_wd_map[dir];
 		w_tmp = watcher::get_watch(wd);
 		ns = w_tmp->get_base();

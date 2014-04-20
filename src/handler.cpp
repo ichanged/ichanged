@@ -72,22 +72,22 @@ handler::handle_file_event(struct inotify_event *e, std::string path)
 //		return;
 //	}	
 	if (e->mask & IN_CREATE) {
-		printf("%s %d was created\n", e->name, e->wd);
+	//	printf("%s %d was created\n", e->name, e->wd);
 		watcher::file_create(e->wd, e->name);		
 	}
 	if (e->mask & IN_ATTRIB) {
-		printf("%s %d was attribed\n", e->name, e->wd);
+	//	printf("%s %d was attribed\n", e->name, e->wd);
 		watcher::file_attrib(e->wd, e->name);
 	}
 	if (e->mask & IN_DELETE || e->mask & IN_MOVED_FROM) {
-		printf("%s %d was deleted\n", e->name, e->wd);
+	//	printf("%s %d was deleted\n", e->name, e->wd);
 		watcher::file_delete(e->wd, e->name);
 	}
 	if (e->mask & IN_MODIFY) {
-		printf("%s %d was modified\n", e->name, e->wd);
+	//	printf("%s %d was modified\n", e->name, e->wd);
 		watcher::file_modify(e->wd, e->name);
 	} else if (e->mask & IN_CLOSE_WRITE) {
-		printf("%s %d was write\n", e->name, e->wd);
+	//	printf("%s %d was write\n", e->name, e->wd);
 		watcher::file_write(e->wd, e->name);
 	}
 }

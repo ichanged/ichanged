@@ -1,0 +1,6 @@
+[INFO] [logger.cpp 24] log module init completely
+[INFO] [monitor.cpp 57] thread: 140673850660608 monitor module init completely
+[INFO] [window.cpp 33] thread: 140673708050176 window module init completely
+[INFO] [monitor.cpp 81] monitor module end completely
+[INFO] [window.cpp 57] window module end completely
+[INFO] [ichanged.cpp 38] ichanged exit normally
